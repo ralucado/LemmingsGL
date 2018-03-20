@@ -27,11 +27,11 @@ public:
 
 private:
 	void initShaders();
-	void eraseMask(int mouseX, int mouseY);
-	void applyMask(int mouseX, int mouseY);
+	void modifyMask(int mouseX, int mouseY, bool apply);
 
 private:
 	Texture colorTexture;
+	Texture tileTexture;
 	VariableTexture maskTexture;
 	MaskedTexturedQuad *map;
 	ShaderProgram simpleTexProgram, maskedTexProgram;

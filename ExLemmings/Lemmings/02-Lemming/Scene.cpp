@@ -16,6 +16,11 @@ Scene::~Scene()
 		delete map;
 }
 
+double pit_distance(int x1, int y1, int x2, int y2){
+	return sqrt(double(pow(x1 - x2, 2) + pow(y1 - y2, 2)));
+}
+
+
 
 void Scene::init()
 {
@@ -28,6 +33,9 @@ void Scene::init()
 	colorTexture.loadFromFile("images/fun1.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	colorTexture.setMinFilter(GL_NEAREST);
 	colorTexture.setMagFilter(GL_NEAREST);
+	tileTexture.loadFromFile("images/sand.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	tileTexture.setMinFilter(GL_NEAREST);
+	tileTexture.setMagFilter(GL_NEAREST);
 	maskTexture.loadFromFile("images/fun1_mask.png", TEXTURE_PIXEL_FORMAT_L);
 	maskTexture.setMinFilter(GL_NEAREST);
 	maskTexture.setMagFilter(GL_NEAREST);
@@ -56,7 +64,7 @@ void Scene::render()
 	maskedTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	modelview = glm::mat4(1.0f);
 	maskedTexProgram.setUniformMatrix4f("modelview", modelview);
-	map->render(maskedTexProgram, colorTexture, maskTexture);
+	map->render(maskedTexProgram, colorTexture, maskTexture, tileTexture);
 	
 	simpleTexProgram.use();
 	simpleTexProgram.setUniformMatrix4f("projection", projection);
@@ -69,37 +77,25 @@ void Scene::render()
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
 {
 	if(bLeftButton)
-		eraseMask(mouseX, mouseY);
+		modifyMask(mouseX, mouseY, false);
 	else if(bRightButton)
-		applyMask(mouseX, mouseY);
+		modifyMask(mouseX, mouseY, true);
 }
 
-void Scene::eraseMask(int mouseX, int mouseY)
+void Scene::modifyMask(int mouseX, int mouseY, bool apply)
 {
-	int posX, posY;
-	
+	int posX, posY, color, radius = 5;
+	if (apply) color = 255;
+	else color = 0;
+
 	// Transform from mouse coordinates to map coordinates
 	//   The map is enlarged 3 times and displaced 120 pixels
-	posX = mouseX/3 + 120;
-	posY = mouseY/3;
-
-	for(int y=max(0, posY-3); y<=min(maskTexture.height()-1, posY+3); y++)
-		for(int x=max(0, posX-3); x<=min(maskTexture.width()-1, posX+3); x++)
-			maskTexture.setPixel(x, y, 0);
-}
-
-void Scene::applyMask(int mouseX, int mouseY)
-{
-	int posX, posY;
-	
-	// Transform from mouse coordinates to map coordinates
-	//   The map is enlarged 3 times and displaced 120 pixels
-	posX = mouseX/3 + 120;
-	posY = mouseY/3;
-
-	for(int y=max(0, posY-3); y<=min(maskTexture.height()-1, posY+3); y++)
-		for(int x=max(0, posX-3); x<=min(maskTexture.width()-1, posX+3); x++)
-			maskTexture.setPixel(x, y, 255);
+	posX = mouseX / 3 + 120;
+	posY = mouseY / 3;
+	for (int y = max(0, posY - radius); y <= min(maskTexture.height() - 1, posY + radius); y++)
+		for (int x = max(0, posX - radius); x <= min(maskTexture.width() - 1, posX + radius); x++){
+		if (pit_distance(posX, posY, x, y) <= radius) maskTexture.setPixel(x, y, color);
+	}
 }
 
 void Scene::initShaders()
