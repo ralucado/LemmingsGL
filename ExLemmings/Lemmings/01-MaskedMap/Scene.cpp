@@ -4,9 +4,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Scene.h"
 
-double pit_distance(int x1, int y1, int x2, int y2){
-	return sqrt(double(pow(x1 - x2, 2) + pow(y1 - y2, 2)));
-}
 
 Scene::Scene()
 {
@@ -31,9 +28,6 @@ void Scene::init()
 	colorTexture.loadFromFile("images/fun1.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	colorTexture.setMinFilter(GL_NEAREST);
 	colorTexture.setMagFilter(GL_NEAREST);
-	sandTexture.loadFromFile("images/texSand.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sandTexture.setMinFilter(GL_NEAREST);
-	sandTexture.setMagFilter(GL_NEAREST);
 	maskTexture.loadFromFile("images/fun1_mask.png", TEXTURE_PIXEL_FORMAT_L);
 	maskTexture.setMinFilter(GL_NEAREST);
 	maskTexture.setMagFilter(GL_NEAREST);
@@ -72,26 +66,23 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 void Scene::eraseMask(int mouseX, int mouseY)
 {
 	int posX, posY;
-	int radius = 5;
-	posX = mouseX / 3 + 120;
-	posY = mouseY / 3;
-	for (int y = max(0, posY - radius); y <= min(maskTexture.height() - 1, posY + radius); y++)
-	for (int x = max(0, posX - radius); x <= min(maskTexture.width() - 1, posX + radius); x++){
-		if (pit_distance(posX, posY, x, y) <= radius) maskTexture.setPixel(x, y, 0);
-	}
+	
+	posX = mouseX/3 + 120;
+	posY = mouseY/3;
+	for(int y=max(0, posY-3); y<=min(maskTexture.height()-1, posY+3); y++)
+		for(int x=max(0, posX-3); x<=min(maskTexture.width()-1, posX+3); x++)
+			maskTexture.setPixel(x, y, 0);
 }
 
 void Scene::applyMask(int mouseX, int mouseY)
 {
 	int posX, posY;
-	int radius = 3;
+	
 	posX = mouseX/3 + 120;
 	posY = mouseY/3;
-	for(int y=max(0, posY-radius); y<=min(maskTexture.height()-1, posY+radius); y++)
-	for (int x = max(0, posX - radius); x <= min(maskTexture.width() - 1, posX + radius); x++){
-		if(pit_distance(mouseX, mouseY, x, y) <= radius) maskTexture.setPixel(x, y, 255);
-	}
-
+	for(int y=max(0, posY-3); y<=min(maskTexture.height()-1, posY+3); y++)
+		for(int x=max(0, posX-3); x<=min(maskTexture.width()-1, posX+3); x++)
+			maskTexture.setPixel(x, y, 255);
 }
 
 void Scene::initShaders()

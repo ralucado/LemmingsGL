@@ -35,7 +35,6 @@ private:
 
 private:
 	Texture colorTexture;
-	Texture sandTexture;
 	VariableTexture maskTexture;
 	MaskedTexturedQuad *map;
 	ShaderProgram texProgram;
