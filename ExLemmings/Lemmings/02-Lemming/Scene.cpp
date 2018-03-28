@@ -3,10 +3,10 @@
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Scene.h"
+#include "Game.h"
 
 
-Scene::Scene()
-{
+Scene::Scene(){
 	map = NULL;
 }
 
@@ -52,6 +52,10 @@ unsigned int x = 0;
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+	bool switch_stopped = Game::instance().getKey('q');
+	lemming.makeStopper(switch_stopped);
+	bool switch_bomb = Game::instance().getKey('w');
+	lemming.makeBomber(switch_bomb);
 	lemming.update(deltaTime);
 }
 
