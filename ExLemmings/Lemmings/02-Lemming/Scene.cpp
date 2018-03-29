@@ -75,6 +75,7 @@ void Scene::render()
 	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	modelview = glm::mat4(1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
+	simpleTexProgram.setUniform1f("time", currentTime);
 	lemming.render();
 }
 
@@ -106,13 +107,13 @@ void Scene::initShaders()
 {
 	Shader vShader, fShader;
 
-	vShader.initFromFile(VERTEX_SHADER, "shaders/texture.vert");
+	vShader.initFromFile(VERTEX_SHADER, "shaders/textureLemming.vert");
 	if(!vShader.isCompiled())
 	{
 		cout << "Vertex Shader Error" << endl;
 		cout << "" << vShader.log() << endl << endl;
 	}
-	fShader.initFromFile(FRAGMENT_SHADER, "shaders/texture.frag");
+	fShader.initFromFile(FRAGMENT_SHADER, "shaders/textureLemming.frag");
 	if(!fShader.isCompiled())
 	{
 		cout << "Fragment Shader Error" << endl;

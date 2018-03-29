@@ -110,6 +110,10 @@ void Lemming::update(int deltaTime)
 
 void Lemming::render()
 {
+	//_shaderProgram.setUniform1i("clicked", b);
+	//_shaderProgram.setUniform1f("time", b);
+
+	//	.setUniformMatrix4f("modelview", modelview);
 	_sprite->render();
 }
 

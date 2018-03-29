@@ -29,6 +29,8 @@ public:
 	void use();
 
 	// Pass uniforms to the associated shaders
+	void setUniform1i(const string &uniformName, int v0);
+	void setUniform1f(const string &uniformName, float v0);
 	void setUniform2f(const string &uniformName, float v0, float v1);
 	void setUniform3f(const string &uniformName, float v0, float v1, float v2);
 	void setUniform4f(const string &uniformName, float v0, float v1, float v2, float v3);
