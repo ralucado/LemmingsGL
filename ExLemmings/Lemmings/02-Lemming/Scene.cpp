@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Game.h"
 
+//hacer esta clase virtual?
 
 Scene::Scene(){
 	map = NULL;
