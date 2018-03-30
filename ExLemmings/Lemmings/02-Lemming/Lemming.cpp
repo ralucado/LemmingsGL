@@ -63,42 +63,37 @@ void Lemming::update(int deltaTime)
 			
 		break;
 	case WALKING_LEFT:
-		_sprite->position() += glm::vec2(-1, -1);
+		_sprite->position() += glm::vec2(-1, -3);
 		if(collision())
 		{
-			_sprite->position() -= glm::vec2(-1, -1);
+			_sprite->position() -= glm::vec2(-1, -3);
 			_sprite->changeAnimation(WALKING_RIGHT_ANIM);
 			_state = WALKING_RIGHT;
 		}
 		else
 		{
-			fall = collisionFloor(3);
-			if(fall > 0)
-				_sprite->position() += glm::vec2(0, 1);
-			if(fall > 1)
-				_sprite->position() += glm::vec2(0, 1);
-			if (fall > 2){
+			fall = collisionFloor(6);
+
+			_sprite->position() += glm::vec2(0, fall);
+			if (fall > 5){
 				_state = FALLING_LEFT;
 				_sprite->changeAnimation(FALLING_LEFT_ANIM);
 			}
 		}
 		break;
 	case WALKING_RIGHT:
-		_sprite->position() += glm::vec2(1, -1);
+		_sprite->position() += glm::vec2(1, -3);
 		if(collision())
 		{
-			_sprite->position() -= glm::vec2(1, -1);
+			_sprite->position() -= glm::vec2(1, -3);
 			_sprite->changeAnimation(WALKING_LEFT_ANIM);
 			_state = WALKING_LEFT;
 		}
 		else
 		{
-			fall = collisionFloor(3);
-			if (fall > 0)
-				_sprite->position() += glm::vec2(0, 1);
-			if (fall > 1)
-				_sprite->position() += glm::vec2(0, 1);
-			if (fall > 2) {
+			fall = collisionFloor(6);
+			_sprite->position() += glm::vec2(0, fall);
+			if (fall > 5) {
 				_state = FALLING_RIGHT;
 				_sprite->changeAnimation(FALLING_RIGHT_ANIM);
 			}
