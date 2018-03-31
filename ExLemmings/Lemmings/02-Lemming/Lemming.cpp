@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include "Lemming.h"
@@ -13,7 +14,7 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 	_sprite->setNumberAnimations(NUM_ANIMS);
 
 	for (int i = 0; i < NUM_ANIMS; i++) {
-		_sprite->setAnimationSpeed(i, 12);
+		_sprite->setAnimationSpeed(i, 6);
 	}
 	float height = 1.0f / float(NUM_ANIMS);
 	for (int frame = 0; frame < NUM_FRAMES; frame++) {
@@ -37,7 +38,7 @@ void Lemming::update(int deltaTime)
 {
 	int fall;
 
-	if(_sprite->update(deltaTime) == 0)
+	if(_dead || _sprite->update(deltaTime) == 0)
 		return;
 	bool canDescend;
 	glm::vec2 ori;
@@ -116,17 +117,47 @@ void Lemming::update(int deltaTime)
 			}
 		}
 		break;
+	case EXPLODING:
+		++_framesFromStart;
+		if (_framesFromStart >= 16) pop();
+		break;
+	case BASH_LEFT:
+		++_framesFromStart;
+		_framesFromStart %= 32;
+		if (_framesFromStart == 31) _sprite->position() += glm::vec2(-1, 0);
+		else if (_framesFromStart == 17) _sprite->position() += glm::vec2(-5, 0);
+		else if (_framesFromStart == 27) _sprite->position() += glm::vec2(-3, 0);
+		else if (_framesFromStart == 3 || _framesFromStart == 19) {
+			int posX = floor(_sprite->position().x + 120) + 3;
+			int posY = floor(_sprite->position().y) + 9;
+			hole(posX, posY, 7);
+		}
+		break;
+	case BASH_RIGHT:
+		++_framesFromStart;
+		_framesFromStart %= 32;
+		if( _framesFromStart == 31) _sprite->position() += glm::vec2(1, 0);
+		else if (_framesFromStart == 17) _sprite->position() += glm::vec2(5, 0);
+		else if (_framesFromStart == 27) _sprite->position() += glm::vec2(3, 0);
+		else if (_framesFromStart == 3 || _framesFromStart == 19) {
+			int posX = floor(_sprite->position().x + 120) + 10;
+			int posY = floor(_sprite->position().y) + 7;
+			hole(posX, posY, 7);
+		}
+		break;
 	}
 }
 
 
 void Lemming::render()
 {
-	//_shaderProgram.setUniform1i("clicked", b);
-	_shaderProgram.setUniform2f("center", _sprite->position().x, _sprite->position().y);
+	if (!_dead) {
+		//_shaderProgram.setUniform1i("clicked", b);
+		_shaderProgram.setUniform2f("center", _sprite->position().x, _sprite->position().y);
 
-	//	.setUniformMatrix4f("modelview", modelview);
-	_sprite->render();
+		//	.setUniformMatrix4f("modelview", modelview);
+		_sprite->render();
+	}
 }
 
 void Lemming::makeStopper(bool b) {
@@ -147,15 +178,34 @@ void Lemming::makeBomber(bool b) {
 	if (b && _state != EXPLODING) {
 		loadSpritesheet("images/bomber.png", 16, 1, _sprite->position());
 		_state = EXPLODING;
+		_framesFromStart = 0;
 		_sprite->changeAnimation(EXPLODING_ANIM);
 	}
 	//TEST
 	else if (!b && _state == EXPLODING) {
+		_dead = false;
 		_state = WALKING_RIGHT;
 		loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
 		_sprite->changeAnimation(WALKING_RIGHT_ANIM);
 	}
 }
+
+void Lemming::makeBasher(bool b)
+{
+	if (b && _state != BASH_RIGHT && _state != BASH_LEFT) {
+		loadSpritesheet("images/basher.png", 32, 2, _sprite->position());
+		_state = BASH_LEFT;
+		_framesFromStart = 0;
+		_sprite->changeAnimation(BASH_LEFT_ANIM);
+	}
+	//TEST
+	else if (!b && (_state == BASH_RIGHT || _state == BASH_LEFT)) {
+		_state = WALKING_RIGHT;
+		loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
+		_sprite->changeAnimation(WALKING_RIGHT_ANIM);
+	}
+}
+
 
 
 void Lemming::setMapMask(VariableTexture *mapMask)
@@ -192,9 +242,21 @@ bool Lemming::collision()
 	return true;
 }
 
+void Lemming::hole(int posX, int posY, int radius) {
+	for (int y = max(0, posY - radius); y <= min(_mask->height() - 1, posY + radius); y++)
+		for (int x = max(0, posX - radius); x <= min(_mask->width() - 1, posX + radius); x++) {
+			if (Utils::instance().pit_distance(posX, posY, x, y) <= radius) _mask->setPixel(x, y, 0);
+		}
+}
 
-
-
+void Lemming::pop() {
+	_dead = true;
+	// Transform from mouse coordinates to map coordinates
+	//   The map is enlarged 3 times and displaced 120 pixels
+	int posX = floor(_sprite->position().x + 120)+7;
+	int posY = floor(_sprite->position().y)+16;
+	hole(posX, posY, 5);
+}
 
 
 

@@ -3,6 +3,7 @@
 
 
 #include "Scene.h"
+#include "Utils.h"
 
 
 // Game is a singleton (a class with a single instance) that represents our whole application

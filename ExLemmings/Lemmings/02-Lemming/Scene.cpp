@@ -1,6 +1,3 @@
-#include <iostream>
-#include <cmath>
-#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Scene.h"
 #include "Game.h"
@@ -15,12 +12,6 @@ Scene::~Scene()
 	if(map != NULL)
 		delete map;
 }
-
-double pit_distance(int x1, int y1, int x2, int y2){
-	return sqrt(double(pow(x1 - x2, 2) + pow(y1 - y2, 2)));
-}
-
-
 
 void Scene::init()
 {
@@ -56,6 +47,9 @@ void Scene::update(int deltaTime)
 	lemming.makeStopper(switch_stopped);
 	bool switch_bomb = Game::instance().getKey('w');
 	lemming.makeBomber(switch_bomb);
+	bool switch_bash = Game::instance().getKey('e');
+	lemming.makeBasher(switch_bash);
+
 	lemming.update(deltaTime);
 }
 
@@ -97,9 +91,11 @@ void Scene::modifyMask(int mouseX, int mouseY, bool apply)
 	//   The map is enlarged 3 times and displaced 120 pixels
 	posX = mouseX / 3 + 120;
 	posY = mouseY / 3;
+	cout << "mask: " << posX << "," << posY << endl;
+
 	for (int y = max(0, posY - radius); y <= min(maskTexture.height() - 1, posY + radius); y++)
 		for (int x = max(0, posX - radius); x <= min(maskTexture.width() - 1, posX + radius); x++){
-		if (pit_distance(posX, posY, x, y) <= radius) maskTexture.setPixel(x, y, color);
+		if (Utils::instance().pit_distance(posX, posY, x, y) <= radius) maskTexture.setPixel(x, y, color);
 	}
 }
 
