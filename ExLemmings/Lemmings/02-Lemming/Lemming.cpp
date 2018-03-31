@@ -39,7 +39,8 @@ void Lemming::update(int deltaTime)
 
 	if(_sprite->update(deltaTime) == 0)
 		return;
-
+	bool canDescend;
+	glm::vec2 ori;
 	switch(_state)
 	{
 	case FALLING_LEFT:
@@ -63,37 +64,53 @@ void Lemming::update(int deltaTime)
 			
 		break;
 	case WALKING_LEFT:
-		_sprite->position() += glm::vec2(-1, -3);
-		if(collision())
+		canDescend = true;
+		ori = _sprite->position(); //save original position
+		_sprite->position() += glm::vec2(-1, -3); //try to put the lemming up top a 3 pixel climb
+		while (collision() && canDescend)
 		{
-			_sprite->position() -= glm::vec2(-1, -3);
+			//while the position is a collision, try a position lower
+			_sprite->position() += glm::vec2(0, 1);
+			//if we can not move more positions in a single movement
+			if (_sprite->position().y - ori.y > 3) canDescend = false;
+		}
+		if (!canDescend) {
+			_sprite->position() = ori;
 			_sprite->changeAnimation(WALKING_RIGHT_ANIM);
 			_state = WALKING_RIGHT;
 		}
 		else
 		{
-			fall = collisionFloor(6);
+			fall = collisionFloor(7);
 
 			_sprite->position() += glm::vec2(0, fall);
-			if (fall > 5){
+			if (fall > 6){
 				_state = FALLING_LEFT;
 				_sprite->changeAnimation(FALLING_LEFT_ANIM);
 			}
 		}
 		break;
 	case WALKING_RIGHT:
-		_sprite->position() += glm::vec2(1, -3);
-		if(collision())
+		canDescend = true;
+		ori = _sprite->position(); //save original position
+		_sprite->position() += glm::vec2(1, -3); //try to put the lemming up top a 3 pixel climb
+		while(collision() && canDescend)
 		{
-			_sprite->position() -= glm::vec2(1, -3);
+			//while the position is a collision, try a position lower
+			_sprite->position() += glm::vec2(0, 1);
+			//if we can not move more positions in a single movement
+			if (_sprite->position().y - ori.y > 3) canDescend = false;
+		}
+		if (!canDescend) {
+			_sprite->position() = ori;
 			_sprite->changeAnimation(WALKING_LEFT_ANIM);
 			_state = WALKING_LEFT;
 		}
 		else
 		{
-			fall = collisionFloor(6);
+			fall = collisionFloor(7);
 			_sprite->position() += glm::vec2(0, fall);
-			if (fall > 5) {
+			if (fall > 6) {
 				_state = FALLING_RIGHT;
 				_sprite->changeAnimation(FALLING_RIGHT_ANIM);
 			}
