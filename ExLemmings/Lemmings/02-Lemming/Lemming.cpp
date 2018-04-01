@@ -14,7 +14,7 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 	_sprite->setNumberAnimations(NUM_ANIMS);
 
 	for (int i = 0; i < NUM_ANIMS; i++) {
-		_sprite->setAnimationSpeed(i, 6);
+		_sprite->setAnimationSpeed(i, 12);
 	}
 	float height = 1.0f / float(NUM_ANIMS);
 	for (int frame = 0; frame < NUM_FRAMES; frame++) {
@@ -122,28 +122,23 @@ void Lemming::update(int deltaTime)
 		if (_framesFromStart >= 16) pop();
 		break;
 	case BASH_LEFT:
+		fall = collisionFloor(1);
+		//if (fall > 0)
 		++_framesFromStart;
 		_framesFromStart %= 32;
-		if (_framesFromStart == 31) _sprite->position() += glm::vec2(-1, 0);
-		else if (_framesFromStart == 17) _sprite->position() += glm::vec2(-5, 0);
-		else if (_framesFromStart == 27) _sprite->position() += glm::vec2(-3, 0);
-		else if (_framesFromStart == 3 || _framesFromStart == 19) {
-			int posX = floor(_sprite->position().x + 120) + 3;
-			int posY = floor(_sprite->position().y) + 9;
-			hole(posX, posY, 7);
-		}
+		if ((_framesFromStart > 10 && _framesFromStart <= 15) ||
+			(_framesFromStart > 26 && _framesFromStart <= 31))
+				_sprite->position() += glm::vec2(-1, 0);
 		break;
 	case BASH_RIGHT:
+		fall = collisionFloor(1);
+		//if (fall > 0)
 		++_framesFromStart;
 		_framesFromStart %= 32;
-		if( _framesFromStart == 31) _sprite->position() += glm::vec2(1, 0);
-		else if (_framesFromStart == 17) _sprite->position() += glm::vec2(5, 0);
-		else if (_framesFromStart == 27) _sprite->position() += glm::vec2(3, 0);
-		else if (_framesFromStart == 3 || _framesFromStart == 19) {
-			int posX = floor(_sprite->position().x + 120) + 10;
-			int posY = floor(_sprite->position().y) + 7;
-			hole(posX, posY, 7);
-		}
+		if ((_framesFromStart > 10 && _framesFromStart <= 15) ||
+			(_framesFromStart > 26 && _framesFromStart <= 31))
+			_sprite->position() += glm::vec2(1, 0);
+
 		break;
 	}
 }
@@ -190,19 +185,27 @@ void Lemming::makeBomber(bool b) {
 	}
 }
 
+void Lemming::startBash(bool r) {
+	loadSpritesheet("images/basher.png", 32, 2, _sprite->position());
+	_state = (r? BASH_RIGHT : BASH_LEFT);
+	_framesFromStart = 0;
+	_sprite->changeAnimation((r ? BASH_RIGHT_ANIM : BASH_LEFT_ANIM));
+}
+
+void Lemming::startWalk(bool r) {
+	_state = (r ? WALKING_RIGHT : WALKING_LEFT);
+	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
+	_sprite->changeAnimation((r ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM));
+}
+
 void Lemming::makeBasher(bool b)
 {
 	if (b && _state != BASH_RIGHT && _state != BASH_LEFT) {
-		loadSpritesheet("images/basher.png", 32, 2, _sprite->position());
-		_state = BASH_LEFT;
-		_framesFromStart = 0;
-		_sprite->changeAnimation(BASH_LEFT_ANIM);
+		startBash(!b);
 	}
 	//TEST
 	else if (!b && (_state == BASH_RIGHT || _state == BASH_LEFT)) {
-		_state = WALKING_RIGHT;
-		loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
-		_sprite->changeAnimation(WALKING_RIGHT_ANIM);
+		startWalk(b);
 	}
 }
 

@@ -30,6 +30,10 @@ public:
 
 	void makeBomber(bool b);
 
+	void startBash(bool r);
+
+	void startWalk(bool r);
+
 	void makeBasher(bool b);
 	
 private:
