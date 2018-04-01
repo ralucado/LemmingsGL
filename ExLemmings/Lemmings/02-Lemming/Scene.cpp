@@ -43,13 +43,6 @@ unsigned int x = 0;
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
-	bool switch_stopped = Game::instance().getKey('q');
-	lemming.makeStopper(switch_stopped);
-	bool switch_bomb = Game::instance().getKey('w');
-	lemming.makeBomber(switch_bomb);
-	bool switch_bash = Game::instance().getKey('e');
-	lemming.makeBasher(switch_bash);
-
 	lemming.update(deltaTime);
 }
 
@@ -79,6 +72,16 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 		modifyMask(mouseX, mouseY, false);
 	else if(bRightButton)
 		modifyMask(mouseX, mouseY, true);
+}
+
+void Scene::keyPressed(int key) {
+	if (key == 'q') lemming.switchStopper();
+	else if (key == 'w') lemming.switchBomber();
+	else if (key == 'e') lemming.switchBasher(false);
+	else if (key == 'r') lemming.switchBasher(true);
+}
+
+void Scene::keyReleased(int key) {
 }
 
 void Scene::modifyMask(int mouseX, int mouseY, bool apply)

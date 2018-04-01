@@ -25,6 +25,10 @@ public:
 	
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
 
+	void keyPressed(int key);
+
+	void keyReleased(int key);
+
 private:
 	void initShaders();
 	void modifyMask(int mouseX, int mouseY, bool apply);

@@ -122,22 +122,34 @@ void Lemming::update(int deltaTime)
 		if (_framesFromStart >= 16) pop();
 		break;
 	case BASH_LEFT:
-		fall = collisionFloor(1);
-		//if (fall > 0)
+		//check that there is material to dig
+		cout << collisionWall(12, false) << endl;
+		if (collisionWall(12, false) > 8) startWalk(false);
+
 		++_framesFromStart;
 		_framesFromStart %= 32;
 		if ((_framesFromStart > 10 && _framesFromStart <= 15) ||
 			(_framesFromStart > 26 && _framesFromStart <= 31))
 				_sprite->position() += glm::vec2(-1, 0);
+		if (_framesFromStart >= 2 && _framesFromStart <= 6)
+			bashRow(_framesFromStart - 2, false);
+		else if (_framesFromStart >= 18 && _framesFromStart <= 22)
+			bashRow(_framesFromStart - 18, false);
 		break;
 	case BASH_RIGHT:
-		fall = collisionFloor(1);
-		//if (fall > 0)
+		//check that there is material to dig
+		if (collisionWall(12, true) > 8) startWalk(true);
+
+
 		++_framesFromStart;
 		_framesFromStart %= 32;
 		if ((_framesFromStart > 10 && _framesFromStart <= 15) ||
 			(_framesFromStart > 26 && _framesFromStart <= 31))
 			_sprite->position() += glm::vec2(1, 0);
+		if (_framesFromStart >= 2 && _framesFromStart <= 6)
+			bashRow(_framesFromStart - 2, true);
+		else if (_framesFromStart >= 18 && _framesFromStart <= 22)
+			bashRow(_framesFromStart - 18, true);
 
 		break;
 	}
@@ -155,29 +167,29 @@ void Lemming::render()
 	}
 }
 
-void Lemming::makeStopper(bool b) {
-	if (b && _state != STOPPED) {
+void Lemming::switchStopper() {
+	if (_state != STOPPED) {
 		_state = STOPPED;
 		loadSpritesheet("images/stopper.png", 16, 1, _sprite->position());
 		_sprite->changeAnimation(STOPPED_ANIM);
 	}
 	//TEST
-	else if (!b && _state == STOPPED) {
+	else if (_state == STOPPED) {
 		_state = WALKING_RIGHT;
 		loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
 		_sprite->changeAnimation(WALKING_RIGHT_ANIM);
 	}
 }
 
-void Lemming::makeBomber(bool b) {
-	if (b && _state != EXPLODING) {
+void Lemming::switchBomber() {
+	if (_state != EXPLODING) {
 		loadSpritesheet("images/bomber.png", 16, 1, _sprite->position());
 		_state = EXPLODING;
 		_framesFromStart = 0;
 		_sprite->changeAnimation(EXPLODING_ANIM);
 	}
 	//TEST
-	else if (!b && _state == EXPLODING) {
+	else if (_state == EXPLODING) {
 		_dead = false;
 		_state = WALKING_RIGHT;
 		loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
@@ -198,14 +210,14 @@ void Lemming::startWalk(bool r) {
 	_sprite->changeAnimation((r ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM));
 }
 
-void Lemming::makeBasher(bool b)
+void Lemming::switchBasher(bool r)
 {
-	if (b && _state != BASH_RIGHT && _state != BASH_LEFT) {
-		startBash(!b);
+	if (_state != BASH_RIGHT && _state != BASH_LEFT) {
+		startBash(r);
 	}
 	//TEST
-	else if (!b && (_state == BASH_RIGHT || _state == BASH_LEFT)) {
-		startWalk(b);
+	else if (_state == BASH_RIGHT || _state == BASH_LEFT) {
+		startWalk(r);
 	}
 }
 
@@ -234,6 +246,25 @@ int Lemming::collisionFloor(int maxFall)
 	return fall;
 }
 
+int Lemming::collisionWall(int maxDeep, bool r)
+{
+	bool bContact = false;
+	int deep = 0;
+	glm::ivec2 posBase = _sprite->position() + glm::vec2(120, 0); // Add the map displacement
+
+	posBase += glm::ivec2(7, 15);
+	while ((abs(deep) < maxDeep) && !bContact)
+	{
+		if (_mask->pixel(posBase.x + deep, posBase.y) == 0)
+			deep = (r? ++deep : --deep);
+		else
+			bContact = true;
+	}
+
+	return abs(deep);
+}
+
+
 bool Lemming::collision()
 {
 	glm::ivec2 posBase = _sprite->position() + glm::vec2(120, 0); // Add the map displacement
@@ -259,6 +290,17 @@ void Lemming::pop() {
 	int posX = floor(_sprite->position().x + 120)+7;
 	int posY = floor(_sprite->position().y)+16;
 	hole(posX, posY, 5);
+}
+
+void Lemming::bashRow(int index, bool r) {
+	int displacement = 120;
+	if (!r) displacement += 19; //the sprite width
+	glm::ivec2 posBase = _sprite->position() + glm::vec2(displacement, 0);
+	for (int i = 8; i <= bashPixels[index].x; ++i) {
+		int aux = (r? i : -i);
+		_mask->setPixel(posBase.x + aux, posBase.y + bashPixels[index].y,     0);
+		_mask->setPixel(posBase.x + aux, posBase.y + bashPixels[index].y + 1, 0);
+	}
 }
 
 

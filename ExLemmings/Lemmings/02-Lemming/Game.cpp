@@ -29,11 +29,13 @@ void Game::keyPressed(int key)
 	if(key == 27) // Escape code
 		bPlay = false;
 	keys[key] = true;
+	scene.keyPressed(key);
 }
 
 void Game::keyReleased(int key)
 {
 	keys[key] = false;
+	scene.keyReleased(key);
 }
 
 void Game::specialKeyPressed(int key)

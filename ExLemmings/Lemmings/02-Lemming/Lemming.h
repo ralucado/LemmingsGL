@@ -26,25 +26,32 @@ public:
 	
 	void setMapMask(VariableTexture *mapMask);
 
-	void makeStopper(bool b);
+	void switchStopper();
 
-	void makeBomber(bool b);
+	void switchBomber();
 
 	void startBash(bool r);
 
 	void startWalk(bool r);
 
-	void makeBasher(bool b);
+	void switchBasher(bool r);
 	
 private:
 	int collisionFloor(int maxFall);
+	int collisionWall(int maxDeep, bool r);
 	bool collision();
 
 	void hole(int posX, int posY, int radius);
 
 	void pop();
+
+	void bashRow(int index, bool r);
+
 	
 private:
+
+	glm::vec2 bashPixels[5] = {glm::vec2(13,6) , glm::vec2(14, 8) , glm::vec2(15, 10) , glm::vec2(14, 12), glm::vec2(14, 14)};
+
 	enum LemmingState
 	{
 		WALKING_RIGHT, WALKING_LEFT,
@@ -80,6 +87,8 @@ private:
 		DRWONING_ANIM,
 		SQUASHED_ANIM*/
 	};
+
+	bool pressedKey = false;
 
 	bool _canClimb = false;
 	bool _canFloat = false;
