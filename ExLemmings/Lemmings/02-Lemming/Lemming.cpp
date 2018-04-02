@@ -12,9 +12,10 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 	_spritesheet.setMagFilter(GL_NEAREST);
 	_sprite = Sprite::createSprite(glm::ivec2(_spritesheet.width() / NUM_FRAMES, _spritesheet.height() / NUM_ANIMS), glm::vec2(1.0f / float(NUM_FRAMES), 1.0f / float(NUM_ANIMS)), &_spritesheet, &_shaderProgram);
 	_sprite->setNumberAnimations(NUM_ANIMS);
-
+	int speed = 12;
+	if (_state == START_FLOAT_RIGHT || _state == START_FLOAT_LEFT) speed = 8;
 	for (int i = 0; i < NUM_ANIMS; i++) {
-		_sprite->setAnimationSpeed(i, 12);
+		_sprite->setAnimationSpeed(i, speed);
 	}
 	float height = 1.0f / float(NUM_ANIMS);
 	for (int frame = 0; frame < NUM_FRAMES; frame++) {
@@ -45,24 +46,36 @@ void Lemming::update(int deltaTime)
 	switch(_state)
 	{
 	case FALLING_LEFT:
-		fall = collisionFloor(2);
-		if(fall > 0)
-			_sprite->position() += glm::vec2(0, fall);
-		else{
-			_state = WALKING_LEFT;
-			_sprite->changeAnimation(WALKING_LEFT_ANIM);
+		if (_fallenDistance > HEIGHT_TO_FLOAT && _canFloat) {
+			startFloat(false);
 		}
-
+	case FLOAT_LEFT:
+		if(!updateFall()){
+			startWalk(false);
+		}
 		break;
 	case FALLING_RIGHT:
-		fall = collisionFloor(2);
-		if(fall > 0)
-			_sprite->position() += glm::vec2(0, fall);
-		else{
-			_state = WALKING_RIGHT;
-			_sprite->changeAnimation(WALKING_RIGHT_ANIM);
+		if (_fallenDistance > HEIGHT_TO_FLOAT && _canFloat) {
+			startFloat(true);
 		}
-			
+	case FLOAT_RIGHT:
+		if (!updateFall()){
+			startWalk(true);
+		}
+		break;
+	case START_FLOAT_LEFT:
+		++_framesFromStart;
+		if (_framesFromStart == 3) {
+			_state = FLOAT_LEFT;
+			_sprite->changeAnimation(FLOAT_LEFT_ANIM);
+		}
+		break;
+	case START_FLOAT_RIGHT:
+		++_framesFromStart;
+		if (_framesFromStart == 3) {
+			_state = FLOAT_RIGHT;
+			_sprite->changeAnimation(FLOAT_RIGHT_ANIM);
+		}
 		break;
 	case WALKING_LEFT:
 		canDescend = true;
@@ -83,7 +96,6 @@ void Lemming::update(int deltaTime)
 		else
 		{
 			fall = collisionFloor(7);
-
 			_sprite->position() += glm::vec2(0, fall);
 			if (fall > 6){
 				_state = FALLING_LEFT;
@@ -123,7 +135,6 @@ void Lemming::update(int deltaTime)
 		break;
 	case BASH_LEFT:
 		//check that there is material to dig
-		cout << collisionWall(12, false) << endl;
 		if (collisionWall(12, false) > 8) startWalk(false);
 
 		++_framesFromStart;
@@ -140,7 +151,6 @@ void Lemming::update(int deltaTime)
 		//check that there is material to dig
 		if (collisionWall(12, true) > 8) startWalk(true);
 
-
 		++_framesFromStart;
 		_framesFromStart %= 32;
 		if ((_framesFromStart > 10 && _framesFromStart <= 15) ||
@@ -155,6 +165,16 @@ void Lemming::update(int deltaTime)
 	}
 }
 
+bool Lemming::updateFall() {
+	int fall = collisionFloor(2);
+	if (fall > 0) {
+		_sprite->position() += glm::vec2(0, fall);
+		_fallenDistance += fall;
+		return true;
+	}
+	return false;
+}
+
 
 void Lemming::render()
 {
@@ -165,6 +185,14 @@ void Lemming::render()
 		//	.setUniformMatrix4f("modelview", modelview);
 		_sprite->render();
 	}
+}
+
+void Lemming::switchFloater() {
+	_canFloat = !_canFloat;
+}
+
+void Lemming::switchClimber() {
+	_canClimb = !_canClimb;
 }
 
 void Lemming::switchStopper() {
@@ -197,6 +225,17 @@ void Lemming::switchBomber() {
 	}
 }
 
+void Lemming::switchBasher(bool r)
+{
+	if (_state != BASH_RIGHT && _state != BASH_LEFT) {
+		startBash(r);
+	}
+	//TEST
+	else if (_state == BASH_RIGHT || _state == BASH_LEFT) {
+		startWalk(r);
+	}
+}
+
 void Lemming::startBash(bool r) {
 	loadSpritesheet("images/basher.png", 32, 2, _sprite->position());
 	_state = (r? BASH_RIGHT : BASH_LEFT);
@@ -210,15 +249,11 @@ void Lemming::startWalk(bool r) {
 	_sprite->changeAnimation((r ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM));
 }
 
-void Lemming::switchBasher(bool r)
-{
-	if (_state != BASH_RIGHT && _state != BASH_LEFT) {
-		startBash(r);
-	}
-	//TEST
-	else if (_state == BASH_RIGHT || _state == BASH_LEFT) {
-		startWalk(r);
-	}
+void Lemming::startFloat(bool r) {
+	_state = (r ? START_FLOAT_RIGHT : START_FLOAT_LEFT);
+	loadSpritesheet("images/floater.png", 4, 4, _sprite->position());
+	_framesFromStart = 0;
+	_sprite->changeAnimation((r ? START_FLOAT_RIGHT_ANIM : START_FLOAT_LEFT_ANIM));
 }
 
 

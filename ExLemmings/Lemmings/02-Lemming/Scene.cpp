@@ -79,6 +79,7 @@ void Scene::keyPressed(int key) {
 	else if (key == 'w') lemming.switchBomber();
 	else if (key == 'e') lemming.switchBasher(false);
 	else if (key == 'r') lemming.switchBasher(true);
+	else if (key == 't') lemming.switchFloater();
 }
 
 void Scene::keyReleased(int key) {
