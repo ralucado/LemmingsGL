@@ -21,7 +21,9 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 	for (int frame = 0; frame < NUM_FRAMES; frame++) {
 		float num_frame = float(frame) / float(NUM_FRAMES);
 		for (int anim = 0; anim < NUM_ANIMS; anim++) {
-			_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height));
+			_sprite->addKeyframe(anim, glm::vec2(num_frame + 0.5f / _spritesheet.width(), float(anim)*height + 0.5f / _spritesheet.height()));
+			//_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height));
+
 		}
 	}
 	_sprite->setPosition(position);
@@ -49,15 +51,37 @@ void Lemming::update(int deltaTime)
 		if (_fallenDistance > HEIGHT_TO_FLOAT && _canFloat) {
 			startFloat(false);
 		}
-	case FLOAT_LEFT:
-		if(!updateFall()){
-			startWalk(false);
+		if (!updateFall()) {
+			if (_fallenDistance > HEIGHT_TO_DIE) {
+				startSquish();
+			}
+			else {
+				_fallenDistance = 0;
+				_sprite->changeAnimation(WALKING_LEFT_ANIM);
+				_state = WALKING_LEFT;
+			}
 		}
 		break;
 	case FALLING_RIGHT:
 		if (_fallenDistance > HEIGHT_TO_FLOAT && _canFloat) {
 			startFloat(true);
 		}
+		if (!updateFall()) {
+			if (_fallenDistance > HEIGHT_TO_DIE) {
+				startSquish();
+			}
+			else {
+				_fallenDistance = 0;
+				_sprite->changeAnimation(WALKING_RIGHT_ANIM);
+				_state = WALKING_RIGHT;
+			}
+		}
+		break;
+	case FLOAT_LEFT:
+		if(!updateFall()){
+			startWalk(false);
+		}
+		break;
 	case FLOAT_RIGHT:
 		if (!updateFall()){
 			startWalk(true);
@@ -129,10 +153,6 @@ void Lemming::update(int deltaTime)
 			}
 		}
 		break;
-	case EXPLODING:
-		++_framesFromStart;
-		if (_framesFromStart >= 16) pop();
-		break;
 	case BASH_LEFT:
 		//check that there is material to dig
 		if (collisionWall(12, false) > 8) startWalk(false);
@@ -162,6 +182,13 @@ void Lemming::update(int deltaTime)
 			bashRow(_framesFromStart - 18, true);
 
 		break;
+	case EXPLODING:
+		++_framesFromStart;
+		if (_framesFromStart == 16) pop();
+		break;
+	case SQUISHED:
+		++_framesFromStart;
+		if (_framesFromStart == 16) _dead = true;
 	}
 }
 
@@ -245,6 +272,7 @@ void Lemming::startBash(bool r) {
 
 void Lemming::startWalk(bool r) {
 	_state = (r ? WALKING_RIGHT : WALKING_LEFT);
+	_fallenDistance = 0;
 	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
 	_sprite->changeAnimation((r ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM));
 }
@@ -254,6 +282,13 @@ void Lemming::startFloat(bool r) {
 	loadSpritesheet("images/floater.png", 4, 4, _sprite->position());
 	_framesFromStart = 0;
 	_sprite->changeAnimation((r ? START_FLOAT_RIGHT_ANIM : START_FLOAT_LEFT_ANIM));
+}
+
+void Lemming::startSquish() {
+	_state = SQUISHED;
+	loadSpritesheet("images/squished.png", 16, 1, _sprite->position());
+	_framesFromStart = 0;
+	_sprite->changeAnimation(SQUISHED_ANIM);
 }
 
 
