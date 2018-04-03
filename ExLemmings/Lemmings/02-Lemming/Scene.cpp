@@ -95,7 +95,6 @@ void Scene::modifyMask(int mouseX, int mouseY, bool apply)
 	//   The map is enlarged 3 times and displaced 120 pixels
 	posX = mouseX / 3 + 120;
 	posY = mouseY / 3;
-	cout << "mask: " << posX << "," << posY << endl;
 
 	for (int y = max(0, posY - radius); y <= min(maskTexture.height() - 1, posY + radius); y++)
 		for (int x = max(0, posX - radius); x <= min(maskTexture.width() - 1, posX + radius); x++){
