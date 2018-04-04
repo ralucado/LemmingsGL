@@ -6,6 +6,7 @@
 #include "ShaderProgram.h"
 #include "MaskedTexturedQuad.h"
 #include "Lemming.h"
+#include "Button.h"
 
 
 // Scene contains all the entities of our game.
@@ -19,7 +20,7 @@ public:
 	Scene();
 	~Scene();
 
-	void init();
+	void init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings);
 	void update(int deltaTime);
 	void render();
 	
@@ -38,6 +39,7 @@ private:
 	float currentTime;
 	glm::mat4 projection;
 	Lemming lemming;
+	Button button;
 
 };
 
