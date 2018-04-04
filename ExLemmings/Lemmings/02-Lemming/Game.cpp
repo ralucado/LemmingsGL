@@ -8,7 +8,7 @@ void Game::init()
 	bPlay = true;
 	bLeftMouse = bRightMouse = false;
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-	scene.init();
+	scene.init(sceneMaps[0], sceneMasks[0], glm::vec2(60, 30), glm::vec2(60, 30), glm::vec2(60, 30));
 }
 
 bool Game::update(int deltaTime)
@@ -24,10 +24,16 @@ void Game::render()
 	scene.render();
 }
 
+
+
 void Game::keyPressed(int key)
 {
 	if(key == 27) // Escape code
 		bPlay = false;
+	if (key == 49) 
+		scene.init(sceneMaps[0], sceneMasks[0], glm::vec2(60, 30), glm::vec2(60, 30), glm::vec2(60, 30));
+	if (key == 50)
+		scene.init(sceneMaps[1], sceneMasks[1], glm::vec2(60, 30), glm::vec2(60, 30), glm::vec2(60, 30));
 	keys[key] = true;
 }
 
