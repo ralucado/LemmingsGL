@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Utils.h"
 
+#define NUM_SCENES 2
 
 // Game is a singleton (a class with a single instance) that represents our whole application
 
@@ -47,6 +48,15 @@ private:
 	int mouseX, mouseY;               // Mouse position
 	bool bLeftMouse, bRightMouse;     // Mouse button states
 
+	string sceneMaps[NUM_SCENES] = {
+		"images/fun1.png",
+		"images/fun1.png"
+	};
+
+	string sceneMasks[NUM_SCENES] = {
+		"images/fun1.png",
+		"images/fun1.png"
+	};
 };
 
 
