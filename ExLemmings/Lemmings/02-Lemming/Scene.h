@@ -7,6 +7,7 @@
 #include "MaskedTexturedQuad.h"
 #include "Lemming.h"
 #include "Button.h"
+#include "Utils.h"
 
 
 // Scene contains all the entities of our game.
@@ -25,6 +26,10 @@ public:
 	void render();
 	
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
+
+	void keyPressed(int key);
+
+	void keyReleased(int key);
 
 private:
 	void initShaders();

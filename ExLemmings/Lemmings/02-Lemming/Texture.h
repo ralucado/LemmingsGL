@@ -1,8 +1,7 @@
 #ifndef _TEXTURE_INCLUDE
 #define _TEXTURE_INCLUDE
 
-
-#include <string>
+#include "Utils.h"
 #include <GL/glew.h>
 #include "common_defs.h"
 

@@ -35,11 +35,13 @@ void Game::keyPressed(int key)
 	if (key == 50)
 		scene.init(sceneMaps[1], sceneMasks[1], glm::vec2(60, 30), glm::vec2(60, 30), glm::vec2(60, 30));
 	keys[key] = true;
+	scene.keyPressed(key);
 }
 
 void Game::keyReleased(int key)
 {
 	keys[key] = false;
+	scene.keyReleased(key);
 }
 
 void Game::specialKeyPressed(int key)

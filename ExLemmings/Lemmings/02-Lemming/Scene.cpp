@@ -1,6 +1,3 @@
-#include <iostream>
-#include <cmath>
-#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Scene.h"
 #include "Game.h"
@@ -56,10 +53,6 @@ unsigned int x = 0;
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
-	bool switch_stopped = Game::instance().getKey('q');
-	lemming.makeStopper(switch_stopped);
-	bool switch_bomb = Game::instance().getKey('w');
-	lemming.makeBomber(switch_bomb);
 	lemming.update(deltaTime);
 }
 
@@ -79,6 +72,7 @@ void Scene::render()
 	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	modelview = glm::mat4(1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
+	simpleTexProgram.setUniform1f("time", currentTime);
 	lemming.render();
 	//button.render();
 }
@@ -92,6 +86,17 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 		modifyMask(mouseX, mouseY, true);
 }
 
+void Scene::keyPressed(int key) {
+	if (key == 'q') lemming.switchStopper();
+	else if (key == 'w') lemming.switchBomber();
+	else if (key == 'e') lemming.switchBasher(false);
+	else if (key == 'r') lemming.switchBasher(true);
+	else if (key == 't') lemming.switchFloater();
+}
+
+void Scene::keyReleased(int key) {
+}
+
 void Scene::modifyMask(int mouseX, int mouseY, bool apply)
 {
 	int posX, posY, color, radius = 5;
@@ -102,9 +107,10 @@ void Scene::modifyMask(int mouseX, int mouseY, bool apply)
 	//   The map is enlarged 3 times and displaced 120 pixels
 	posX = mouseX / 3 + 120;
 	posY = mouseY / 3;
+
 	for (int y = max(0, posY - radius); y <= min(maskTexture.height() - 1, posY + radius); y++)
 		for (int x = max(0, posX - radius); x <= min(maskTexture.width() - 1, posX + radius); x++){
-		if (pit_distance(posX, posY, x, y) <= radius) maskTexture.setPixel(x, y, color);
+		if (Utils::instance().pit_distance(posX, posY, x, y) <= radius) maskTexture.setPixel(x, y, color);
 	}
 }
 
