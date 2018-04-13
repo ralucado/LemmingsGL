@@ -183,14 +183,17 @@ void Lemming::update(int deltaTime)
 		break;
 	case DIGGING:
 		++_framesFromStart;
-		if (collisionFloor(1) > 0) {
-			_sprite->position() += glm::vec2(0, -2);
+		_framesFromStart %= 16;
+		_sprite->position() += glm::vec2(0, -2);
+		fall = collisionFloor(1);
+		_sprite->position() += glm::vec2(0, 2);
+		if (fall > 0) {
 			startWalk(true);
 		}
 		else if (_framesFromStart == 7 || _framesFromStart == 15)
 		{
 			digRow();
-			_sprite->position() += glm::vec2(0, 1);
+			_sprite->position() += glm::vec2(0, 2);
 		}
 		break;
 	case EXPLODING:
@@ -235,31 +238,22 @@ void Lemming::switchClimber() {
 
 void Lemming::switchStopper() {
 	if (_state != STOPPED) {
-		_state = STOPPED;
-		loadSpritesheet("images/stopper.png", 16, 1, _sprite->position());
-		_sprite->changeAnimation(STOPPED_ANIM);
+		startStop();
 	}
 	//TEST
 	else if (_state == STOPPED) {
-		_state = WALKING_RIGHT;
-		loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
-		_sprite->changeAnimation(WALKING_RIGHT_ANIM);
+		startWalk(true);
 	}
 }
 
 void Lemming::switchBomber() {
 	if (_state != EXPLODING) {
-		loadSpritesheet("images/bomber.png", 16, 1, _sprite->position());
-		_state = EXPLODING;
-		_framesFromStart = 0;
-		_sprite->changeAnimation(EXPLODING_ANIM);
+		startPop();
 	}
 	//TEST
 	else if (_state == EXPLODING) {
 		_dead = false;
-		_state = WALKING_RIGHT;
-		loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
-		_sprite->changeAnimation(WALKING_RIGHT_ANIM);
+		startWalk(true);
 	}
 }
 
@@ -283,6 +277,19 @@ void Lemming::switchDigger()
 	else if (_state == DIGGING) {
 		startWalk(true);
 	}
+}
+
+void Lemming::startStop() {
+	_state = STOPPED;
+	loadSpritesheet("images/stopper.png", 16, 1, _sprite->position());
+	_sprite->changeAnimation(STOPPED_ANIM);
+}
+
+void Lemming::startPop() {
+	loadSpritesheet("images/bomber.png", 16, 1, _sprite->position());
+	_state = EXPLODING;
+	_framesFromStart = 0;
+	_sprite->changeAnimation(EXPLODING_ANIM);
 }
 
 void Lemming::startBash(bool r) {
@@ -405,7 +412,12 @@ void Lemming::bashRow(int index, bool r) {
 }
 
 void Lemming::digRow() {
-
+	int posX = floor(_sprite->position().x + 120) + 3;
+	int posY = floor(_sprite->position().y) + 16;
+	for (int i = 0; i < 8; ++i){
+		_mask->setPixel(posX + i, posY - 2, 0);
+		_mask->setPixel(posX + i, posY - 1, 0);
+	}
 }
 
 void Lemming::die() {

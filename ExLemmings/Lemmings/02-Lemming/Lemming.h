@@ -42,6 +42,8 @@ private:
 	bool updateFall();
 
 	void startWalk(bool r);
+	void startStop();
+	void startPop();
 	void startFloat(bool r);
 	void startBash(bool r);
 	void startSquish();
