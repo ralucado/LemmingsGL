@@ -30,9 +30,9 @@ void Game::keyPressed(int key)
 {
 	if(key == 27) // Escape code
 		bPlay = false;
-	if (key == 49) 
+	if (key == 49) //1
 		scene.init(sceneMaps[0], sceneMasks[0], glm::vec2(60, 30), glm::vec2(60, 30), glm::vec2(60, 30));
-	if (key == 50)
+	if (key == 50) //2
 		scene.init(sceneMaps[1], sceneMasks[1], glm::vec2(60, 30), glm::vec2(60, 30), glm::vec2(60, 30));
 	keys[key] = true;
 	scene.keyPressed(key);

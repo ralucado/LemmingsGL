@@ -50,12 +50,12 @@ private:
 
 	string sceneMaps[NUM_SCENES] = {
 		"images/fun1.png",
-		"images/fun1.png"
+		"images/fun2.png"
 	};
 
 	string sceneMasks[NUM_SCENES] = {
-		"images/fun1.png",
-		"images/fun1.png"
+		"images/fun1_mask.png",
+		"images/fun2_mask.png"
 	};
 };
 
