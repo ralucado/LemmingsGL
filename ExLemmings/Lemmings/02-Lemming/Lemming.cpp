@@ -113,9 +113,14 @@ void Lemming::update(int deltaTime)
 			if (_sprite->position().y - ori.y > 3) canDescend = false;
 		}
 		if (!canDescend) {
-			_sprite->position() = ori;
-			_sprite->changeAnimation(WALKING_RIGHT_ANIM);
-			_state = WALKING_RIGHT;
+			if (_canClimb){
+				startClimb(false);
+			}
+			else{
+				_sprite->position() = ori;
+				_sprite->changeAnimation(WALKING_RIGHT_ANIM);
+				_state = WALKING_RIGHT;
+			}
 		}
 		else
 		{
@@ -139,9 +144,14 @@ void Lemming::update(int deltaTime)
 			if (_sprite->position().y - ori.y > 3) canDescend = false;
 		}
 		if (!canDescend) {
-			_sprite->position() = ori;
-			_sprite->changeAnimation(WALKING_LEFT_ANIM);
-			_state = WALKING_LEFT;
+			if (_canClimb) {
+				startClimb(true);
+			}
+			else {
+				_sprite->position() = ori;
+				_sprite->changeAnimation(WALKING_LEFT_ANIM);
+				_state = WALKING_LEFT;
+			}
 		}
 		else
 		{
@@ -268,6 +278,7 @@ void Lemming::switchBasher(bool r)
 	}
 }
 
+
 void Lemming::switchDigger()
 {
 	if (_state != DIGGING) {
@@ -329,6 +340,14 @@ void Lemming::startDig() {
 	_framesFromStart = 0;
 	_sprite->changeAnimation(DIGGING_ANIM);
 }
+
+void Lemming::startClimb(bool r) {
+	_state = (r ? CLIMB_RIGHT : CLIMB_LEFT);
+	loadSpritesheet("images/climber.png", 8, 4, _sprite->position());
+	_framesFromStart = 0;
+	_sprite->changeAnimation((r ? CLIMB_RIGHT_ANIM : CLIMB_LEFT_ANIM));
+}
+
 
 
 void Lemming::setMapMask(VariableTexture *mapMask)

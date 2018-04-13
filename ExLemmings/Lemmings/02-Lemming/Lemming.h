@@ -47,8 +47,10 @@ private:
 	void startFloat(bool r);
 	void startBash(bool r);
 	void startSquish();
-
 	void startDig();
+	void startClimb(bool r);
+
+
 
 
 	void hole(int posX, int posY, int radius);
@@ -74,8 +76,9 @@ private:
 		FLOAT_RIGHT, FLOAT_LEFT,
 		SQUISHED,
 		DIGGING, 
-/*		CLIMBING,
-		END_CLIMBING,
+		CLIMB_RIGHT, CLIMB_LEFT,
+		END_CLIMB_RIGHT, END_CLIMB_LEFT,
+/*		
 		BUILD_RIGHT, BUILD_LEFT, END_BUILD,
 		MINE_RIGHT, MINE_LEFT,
 		DRWONING,
@@ -95,9 +98,9 @@ private:
 		START_FLOAT_LEFT_ANIM=2, FLOAT_LEFT_ANIM=3,
 		SQUISHED_ANIM = 0,
 		DIGGING_ANIM = 0,
+		CLIMB_RIGHT_ANIM = 0, CLIMB_LEFT_ANIM = 1,
+		END_CLIMB_RIGHT_ANIM = 2, END_CLIMB_LEFT_ANIM = 3,
 		/*
-		CLIMBING_ANIM,
-		END_CLIMBING_ANIM,
 		BUILD_RIGHT_ANIM, BUILD_LEFT_ANIM, END_BUILD_ANIM,
 		MINE_RIGHT_ANIM, MINE_LEFT_ANIM,
 		DRWONING_ANIM,

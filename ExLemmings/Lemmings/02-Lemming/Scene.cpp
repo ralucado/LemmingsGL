@@ -94,6 +94,7 @@ void Scene::keyPressed(int key) {
 	else if (key == 'a') lemming.switchFloater();
 	else if (key == 's') lemming.revive();
 	else if (key == 'd') lemming.switchDigger();
+	else if (key == 'c') lemming.switchClimber();
 }
 
 void Scene::keyReleased(int key) {
