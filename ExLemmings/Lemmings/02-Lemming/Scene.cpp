@@ -42,7 +42,7 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	
-	lemming.init(glm::vec2(60, 30), simpleTexProgram);
+	lemming.init(positionLemmings, simpleTexProgram);
 	lemming.setMapMask(&maskTexture);
 
 	//button.init(glm::vec2(60, 30), "images/lemming.png", simpleTexProgram);
@@ -91,7 +91,9 @@ void Scene::keyPressed(int key) {
 	else if (key == 'w') lemming.switchBomber();
 	else if (key == 'e') lemming.switchBasher(false);
 	else if (key == 'r') lemming.switchBasher(true);
-	else if (key == 't') lemming.switchFloater();
+	else if (key == 'a') lemming.switchFloater();
+	else if (key == 's') lemming.revive();
+	else if (key == 'd') lemming.switchDigger();
 }
 
 void Scene::keyReleased(int key) {

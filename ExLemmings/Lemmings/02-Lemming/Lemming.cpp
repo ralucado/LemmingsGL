@@ -180,7 +180,18 @@ void Lemming::update(int deltaTime)
 			bashRow(_framesFromStart - 2, true);
 		else if (_framesFromStart >= 18 && _framesFromStart <= 22)
 			bashRow(_framesFromStart - 18, true);
-
+		break;
+	case DIGGING:
+		++_framesFromStart;
+		if (collisionFloor(1) > 0) {
+			_sprite->position() += glm::vec2(0, -2);
+			startWalk(true);
+		}
+		else if (_framesFromStart == 7 || _framesFromStart == 15)
+		{
+			digRow();
+			_sprite->position() += glm::vec2(0, 1);
+		}
 		break;
 	case EXPLODING:
 		++_framesFromStart;
@@ -188,7 +199,7 @@ void Lemming::update(int deltaTime)
 		break;
 	case SQUISHED:
 		++_framesFromStart;
-		if (_framesFromStart == 16) _dead = true;
+		if (_framesFromStart == 16) die();
 	}
 }
 
@@ -263,6 +274,17 @@ void Lemming::switchBasher(bool r)
 	}
 }
 
+void Lemming::switchDigger()
+{
+	if (_state != DIGGING) {
+		startDig();
+	}
+	//TEST
+	else if (_state == DIGGING) {
+		startWalk(true);
+	}
+}
+
 void Lemming::startBash(bool r) {
 	loadSpritesheet("images/basher.png", 32, 2, _sprite->position());
 	_state = (r? BASH_RIGHT : BASH_LEFT);
@@ -291,6 +313,15 @@ void Lemming::startSquish() {
 	_sprite->changeAnimation(SQUISHED_ANIM);
 }
 
+void Lemming::startDig() {
+	_state = DIGGING;
+	//digging animation is displaced, it shows pixels of the lemming INSIDE of the ground
+	//we move 2 squares down to achieve the effect
+	_sprite->position() += glm::vec2(0, 2);
+	loadSpritesheet("images/digger.png", 16, 1, _sprite->position());
+	_framesFromStart = 0;
+	_sprite->changeAnimation(DIGGING_ANIM);
+}
 
 
 void Lemming::setMapMask(VariableTexture *mapMask)
@@ -354,7 +385,7 @@ void Lemming::hole(int posX, int posY, int radius) {
 }
 
 void Lemming::pop() {
-	_dead = true;
+	die();
 	// Transform from mouse coordinates to map coordinates
 	//   The map is enlarged 3 times and displaced 120 pixels
 	int posX = floor(_sprite->position().x + 120)+7;
@@ -373,5 +404,17 @@ void Lemming::bashRow(int index, bool r) {
 	}
 }
 
+void Lemming::digRow() {
 
+}
 
+void Lemming::die() {
+	_dead = true;
+	_framesFromStart = 0;
+	_fallenDistance = 0;
+}
+
+void Lemming::revive() {
+	_dead = false;
+	startWalk(true);
+}

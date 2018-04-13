@@ -32,6 +32,8 @@ public:
 	void switchClimber();
 	void switchBomber();
 	void switchBasher(bool r);
+	void switchDigger();
+	void revive();
 	
 private:
 	int collisionFloor(int maxFall);
@@ -44,9 +46,16 @@ private:
 	void startBash(bool r);
 	void startSquish();
 
+	void startDig();
+
+
 	void hole(int posX, int posY, int radius);
 	void pop();
 	void bashRow(int index, bool r);
+
+	void digRow();
+
+	void die();
 
 	void loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position);
 
@@ -62,11 +71,11 @@ private:
 		START_FLOAT_RIGHT, START_FLOAT_LEFT,
 		FLOAT_RIGHT, FLOAT_LEFT,
 		SQUISHED,
+		DIGGING, 
 /*		CLIMBING,
 		END_CLIMBING,
 		BUILD_RIGHT, BUILD_LEFT, END_BUILD,
 		MINE_RIGHT, MINE_LEFT,
-		DIGGING, 
 		DRWONING,
 */
 	};
@@ -83,12 +92,12 @@ private:
 		START_FLOAT_RIGHT_ANIM=0, FLOAT_RIGHT_ANIM=1,
 		START_FLOAT_LEFT_ANIM=2, FLOAT_LEFT_ANIM=3,
 		SQUISHED_ANIM = 0,
+		DIGGING_ANIM = 0,
 		/*
 		CLIMBING_ANIM,
 		END_CLIMBING_ANIM,
 		BUILD_RIGHT_ANIM, BUILD_LEFT_ANIM, END_BUILD_ANIM,
 		MINE_RIGHT_ANIM, MINE_LEFT_ANIM,
-		DIGGING_ANIM,
 		DRWONING_ANIM,
 		*/
 	};
