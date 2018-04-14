@@ -13,6 +13,7 @@
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
 
+#define NUM_LEMMINGS 1
 
 class Scene
 {
@@ -43,7 +44,7 @@ private:
 	ShaderProgram simpleTexProgram, maskedTexProgram;
 	float currentTime;
 	glm::mat4 projection;
-	Lemming lemming;
+	Lemming *lemmings[NUM_LEMMINGS];
 	Button button;
 
 };

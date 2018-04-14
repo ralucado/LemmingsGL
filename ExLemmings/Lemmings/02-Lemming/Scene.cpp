@@ -42,10 +42,17 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	
-	lemming.init(glm::vec2(60, 30), simpleTexProgram);
-	lemming.setMapMask(&maskTexture);
+	for (int i = 0; i < NUM_LEMMINGS; i++) {
+		lemmings[i] = new Lemming;
+		lemmings[i]->init(positionLemmings, simpleTexProgram);
+		//lemmings[i]->init(positionLemmings, positionExit, simpleTexProgram);
+		lemmings[i]->setMapMask(&maskTexture);
+	}
+	
 
-	//button.init(glm::vec2(60, 30), "images/lemming.png", simpleTexProgram);
+
+
+	//button.init(positionExit, "images/lemming.png", simpleTexProgram);
 }
 
 unsigned int x = 0;
@@ -53,7 +60,9 @@ unsigned int x = 0;
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
-	lemming.update(deltaTime);
+	for (int i = 0; i < NUM_LEMMINGS; i++) {
+		lemmings[i]->update(deltaTime);
+	}
 }
 
 void Scene::render()
@@ -73,7 +82,9 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
-	lemming.render();
+	for (int i = 0; i < NUM_LEMMINGS; i++) {
+		lemmings[i]->render();
+	}
 	//button.render();
 }
 
@@ -87,11 +98,11 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 }
 
 void Scene::keyPressed(int key) {
-	if (key == 'q') lemming.switchStopper();
-	else if (key == 'w') lemming.switchBomber();
-	else if (key == 'e') lemming.switchBasher(false);
-	else if (key == 'r') lemming.switchBasher(true);
-	else if (key == 't') lemming.switchFloater();
+	if (key == 'q') lemmings[0]->switchStopper();
+	else if (key == 'w') lemmings[0]->switchBomber();
+	else if (key == 'e') lemmings[0]->switchBasher(false);
+	else if (key == 'r') lemmings[0]->switchBasher(true);
+	else if (key == 't') lemmings[0]->switchFloater();
 }
 
 void Scene::keyReleased(int key) {
