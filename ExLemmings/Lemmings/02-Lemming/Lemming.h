@@ -33,6 +33,7 @@ public:
 	void switchBomber();
 	void switchBasher(bool r);
 	void switchDigger();
+	void switchBuilder(bool r);
 	void revive();
 	
 private:
@@ -51,15 +52,16 @@ private:
 	void startDig();
 	void startClimb(bool r);
 	void endClimb(bool r);
-
-
-
+	void startBuild(bool r);
+	void endBuild(bool r);
 
 	void hole(int posX, int posY, int radius);
 	void pop();
 	void bashRow(int index, bool r);
 
 	void digRow();
+
+	void paintStep(bool r);
 
 	void die();
 
@@ -80,8 +82,8 @@ private:
 		DIGGING, 
 		CLIMB_RIGHT, CLIMB_LEFT,
 		END_CLIMB_RIGHT, END_CLIMB_LEFT,
+		BUILD_RIGHT, BUILD_LEFT, END_BUILD_RIGHT, END_BUILD_LEFT,
 /*		
-		BUILD_RIGHT, BUILD_LEFT, END_BUILD,
 		MINE_RIGHT, MINE_LEFT,
 		DRWONING,
 */
@@ -102,8 +104,8 @@ private:
 		DIGGING_ANIM = 0,
 		CLIMB_RIGHT_ANIM = 0, CLIMB_LEFT_ANIM = 1,
 		END_CLIMB_RIGHT_ANIM = 2, END_CLIMB_LEFT_ANIM = 3,
+		BUILD_RIGHT_ANIM = 0, BUILD_LEFT_ANIM = 1, END_BUILD_ANIM = 2,
 		/*
-		BUILD_RIGHT_ANIM, BUILD_LEFT_ANIM, END_BUILD_ANIM,
 		MINE_RIGHT_ANIM, MINE_LEFT_ANIM,
 		DRWONING_ANIM,
 		*/
@@ -114,6 +116,7 @@ private:
 	bool _canClimb = false;
 	bool _canFloat = false;
 	bool _dead = false;
+	int _builtSteps = 0;
 	int _framesFromStart = 0; //frames from the start of some animation, useful when building, exploding, etc.
 	int _fallenDistance = 0;
 	LemmingState _state;

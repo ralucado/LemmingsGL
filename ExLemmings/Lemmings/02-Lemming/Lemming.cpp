@@ -244,6 +244,38 @@ void Lemming::update(int deltaTime)
 			startWalk(false);
 		}
 		break;
+	case BUILD_RIGHT:
+		++_framesFromStart;
+		if (_framesFromStart == 16) {
+			_framesFromStart = 0;
+			++_builtSteps;
+			paintStep(true);
+			_sprite->position() += glm::vec2(2, -1);
+		}
+		if (_builtSteps == 12) endBuild(true);
+
+		break;
+	case BUILD_LEFT:
+		++_framesFromStart;
+		if (_framesFromStart == 16) {
+			_framesFromStart = 0;
+			++_builtSteps;
+		    paintStep(false);
+			_sprite->position() += glm::vec2(-2, -1);
+		}
+		if (_builtSteps == 12) endBuild(false);
+
+		break;
+	case END_BUILD_RIGHT:
+		++_framesFromStart;
+		if (_framesFromStart == 7)
+			startWalk(true);
+		break;
+	case END_BUILD_LEFT:
+		++_framesFromStart;
+		if (_framesFromStart == 7)
+			startWalk(false);
+		break;
 	case DIGGING:
 		++_framesFromStart;
 		_framesFromStart %= 16;
@@ -342,6 +374,18 @@ void Lemming::switchDigger()
 		startWalk(true);
 	}
 }
+void Lemming::switchBuilder(bool r)
+{
+	if (_state != BUILD_RIGHT && _state != BUILD_LEFT) {
+		startBuild(r);
+	}
+	//TEST
+	else if (_state == BUILD_RIGHT || _state == BUILD_LEFT) {
+		startWalk(r);
+	}
+}
+
+
 
 void Lemming::startStop() {
 	_state = STOPPED;
@@ -366,6 +410,7 @@ void Lemming::startBash(bool r) {
 void Lemming::startWalk(bool r) {
 	_state = (r ? WALKING_RIGHT : WALKING_LEFT);
 	_fallenDistance = 0;
+	_framesFromStart = 0;
 	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
 	_sprite->changeAnimation((r ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM));
 }
@@ -414,6 +459,20 @@ void Lemming::endClimb(bool r) {
 	_sprite->changeAnimation((r ? END_CLIMB_RIGHT_ANIM : END_CLIMB_LEFT_ANIM));
 }
 
+void Lemming::startBuild(bool r) {
+	loadSpritesheet("images/builder.png", 16, 3, _sprite->position());
+	_state = (r ? BUILD_RIGHT : BUILD_LEFT);
+	_framesFromStart = 0;
+	_builtSteps = 0;
+	_sprite->changeAnimation((r ? BUILD_RIGHT_ANIM : BUILD_LEFT_ANIM));
+}
+
+void Lemming::endBuild(bool r) {
+	_state = (r ? END_BUILD_RIGHT : END_BUILD_LEFT);
+	_framesFromStart = 0;
+	_builtSteps = 0;
+	_sprite->changeAnimation(END_BUILD_ANIM);
+}
 
 void Lemming::setMapMask(VariableTexture *mapMask)
 {
@@ -499,6 +558,17 @@ void Lemming::digRow() {
 		_mask->setPixel(posX + i, posY - 2, 0);
 		_mask->setPixel(posX + i, posY - 1, 0);
 	}
+}
+
+void Lemming::paintStep(bool r) {
+	int ini = 2;
+	if (r) ini = 9;
+	int X = floor(_sprite->position().x + 120) + ini;
+	int Y = floor(_sprite->position().y) + 15;
+	_mask->setPixel(X, Y, 255);
+	_mask->setPixel(X + 1, Y, 255);
+	_mask->setPixel(X + 2, Y, 255);
+	_mask->setPixel(X + 3, Y, 255);
 }
 
 void Lemming::die() {
