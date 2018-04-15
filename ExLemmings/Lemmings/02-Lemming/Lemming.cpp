@@ -21,7 +21,7 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 	for (int frame = 0; frame < NUM_FRAMES; frame++) {
 		float num_frame = float(frame) / float(NUM_FRAMES);
 		for (int anim = 0; anim < NUM_ANIMS; anim++) {
-			_sprite->addKeyframe(anim, glm::vec2(num_frame + 0.5f / _spritesheet.width(), float(anim)*height + 0.5f / _spritesheet.height()));
+			_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height + 0.5f / _spritesheet.height()));
 			//_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height));
 
 		}
@@ -39,12 +39,13 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 
 void Lemming::update(int deltaTime)
 {
-	int fall;
+	int fall, col;
 
 	if(_dead || _sprite->update(deltaTime) == 0)
 		return;
 	bool canDescend;
 	glm::vec2 ori;
+	glm::ivec2 posBase;
 	switch(_state)
 	{
 	case FALLING_LEFT:
@@ -164,8 +165,10 @@ void Lemming::update(int deltaTime)
 		}
 		break;
 	case BASH_LEFT:
+		posBase = _sprite->position() + glm::vec2(120, 0); // Add the map displacement
+		posBase += glm::ivec2(7, 15);
 		//check that there is material to dig
-		if (collisionWall(12, false) > 8) startWalk(false);
+		if (collisionWall(12, false, posBase) > 7) startWalk(false);
 
 		++_framesFromStart;
 		_framesFromStart %= 32;
@@ -179,7 +182,9 @@ void Lemming::update(int deltaTime)
 		break;
 	case BASH_RIGHT:
 		//check that there is material to dig
-		if (collisionWall(12, true) > 8) startWalk(true);
+		posBase = _sprite->position() + glm::vec2(120, 0); // Add the map displacement
+		posBase += glm::ivec2(7, 15);
+		if (collisionWall(12, true, posBase) > 8) startWalk(true);
 
 		++_framesFromStart;
 		_framesFromStart %= 32;
@@ -190,6 +195,50 @@ void Lemming::update(int deltaTime)
 			bashRow(_framesFromStart - 2, true);
 		else if (_framesFromStart >= 18 && _framesFromStart <= 22)
 			bashRow(_framesFromStart - 18, true);
+		break;
+	case CLIMB_RIGHT:
+		++_framesFromStart;
+		_framesFromStart %= 8;
+		posBase = _sprite->position() + glm::vec2(120, 0); // Add the map displacement
+		posBase += glm::vec2(7, 0);
+		col = collisionWall(7, true, posBase);
+		cout << "col: " << col << endl;
+		if (col > 4) endClimb(true);
+		else if (col != 1) {
+			startWalk(true);
+		}
+		if (_framesFromStart > 3)
+			_sprite->position() += glm::vec2(0, -1);
+		break;
+	case CLIMB_LEFT:
+		++_framesFromStart;
+		_framesFromStart %= 8;
+		posBase = _sprite->position() + glm::vec2(120, 0); // Add the map displacement
+		posBase += glm::vec2(8, 0);
+		col = collisionWall(7, false, posBase);
+		cout << "col: " << col << endl;
+		if (col > 4) endClimb(false);
+		else if (col != 1) {
+			startWalk(false);
+		}
+		if (_framesFromStart > 3)
+			_sprite->position() += glm::vec2(0, -1);
+		break;
+	case END_CLIMB_RIGHT:
+		++_framesFromStart;
+		cout << "end climb: " << _framesFromStart << endl;
+		_sprite->position() += glm::vec2(1, -1);
+		if (_framesFromStart == 8)
+			_sprite->position() += glm::vec2(0, -8);
+			startWalk(true);
+		break;
+	case END_CLIMB_LEFT:
+		++_framesFromStart;
+		cout << "end climb: " << _framesFromStart << endl;
+		_sprite->position() += glm::vec2(-1, -1);
+		if (_framesFromStart == 8)
+			_sprite->position() += glm::vec2(0, -8);
+			startWalk(false);
 		break;
 	case DIGGING:
 		++_framesFromStart;
@@ -348,6 +397,11 @@ void Lemming::startClimb(bool r) {
 	_sprite->changeAnimation((r ? CLIMB_RIGHT_ANIM : CLIMB_LEFT_ANIM));
 }
 
+void Lemming::endClimb(bool r) {
+	_state = (r ? END_CLIMB_RIGHT : END_CLIMB_LEFT);
+	_framesFromStart = 0;
+	_sprite->changeAnimation((r ? END_CLIMB_RIGHT_ANIM : END_CLIMB_LEFT_ANIM));
+}
 
 
 void Lemming::setMapMask(VariableTexture *mapMask)
@@ -373,13 +427,10 @@ int Lemming::collisionFloor(int maxFall)
 	return fall;
 }
 
-int Lemming::collisionWall(int maxDeep, bool r)
+int Lemming::collisionWall(int maxDeep, bool r, glm::ivec2 posBase)
 {
 	bool bContact = false;
 	int deep = 0;
-	glm::ivec2 posBase = _sprite->position() + glm::vec2(120, 0); // Add the map displacement
-
-	posBase += glm::ivec2(7, 15);
 	while ((abs(deep) < maxDeep) && !bContact)
 	{
 		if (_mask->pixel(posBase.x + deep, posBase.y) == 0)

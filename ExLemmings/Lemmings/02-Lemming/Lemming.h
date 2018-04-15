@@ -37,7 +37,7 @@ public:
 	
 private:
 	int collisionFloor(int maxFall);
-	int collisionWall(int maxDeep, bool r);
+	int collisionWall(int maxDeep, bool r, glm::ivec2 posBase);
 	bool collision();
 	bool updateFall();
 
@@ -49,6 +49,7 @@ private:
 	void startSquish();
 	void startDig();
 	void startClimb(bool r);
+	void endClimb(bool r);
 
 
 
