@@ -203,9 +203,10 @@ void Lemming::update(int deltaTime)
 		posBase += glm::vec2(7, 0);
 		col = collisionWall(7, true, posBase);
 		cout << "col: " << col << endl;
-		if (col > 4) endClimb(true);
-		else if (col != 1) {
-			startWalk(true);
+		if (col > 1) endClimb(true);
+		else if (col == 0) {
+			_sprite->position() += glm::vec2(-1, 0);
+			startFall(true);
 		}
 		if (_framesFromStart > 3)
 			_sprite->position() += glm::vec2(0, -1);
@@ -217,9 +218,10 @@ void Lemming::update(int deltaTime)
 		posBase += glm::vec2(8, 0);
 		col = collisionWall(7, false, posBase);
 		cout << "col: " << col << endl;
-		if (col > 4) endClimb(false);
-		else if (col != 1) {
-			startWalk(false);
+		if (col > 1) endClimb(false);
+		else if (col == 0) {
+			_sprite->position() += glm::vec2(1, 0);
+			startFall(false);
 		}
 		if (_framesFromStart > 3)
 			_sprite->position() += glm::vec2(0, -1);
@@ -228,17 +230,19 @@ void Lemming::update(int deltaTime)
 		++_framesFromStart;
 		cout << "end climb: " << _framesFromStart << endl;
 		_sprite->position() += glm::vec2(1, -1);
-		if (_framesFromStart == 8)
+		if (_framesFromStart == 8) {
 			_sprite->position() += glm::vec2(0, -8);
 			startWalk(true);
+		}
 		break;
 	case END_CLIMB_LEFT:
 		++_framesFromStart;
 		cout << "end climb: " << _framesFromStart << endl;
 		_sprite->position() += glm::vec2(-1, -1);
-		if (_framesFromStart == 8)
+		if (_framesFromStart == 8) {
 			_sprite->position() += glm::vec2(0, -8);
 			startWalk(false);
+		}
 		break;
 	case DIGGING:
 		++_framesFromStart;
@@ -247,7 +251,7 @@ void Lemming::update(int deltaTime)
 		fall = collisionFloor(1);
 		_sprite->position() += glm::vec2(0, 2);
 		if (fall > 0) {
-			startWalk(true);
+			startFall(true);
 		}
 		else if (_framesFromStart == 7 || _framesFromStart == 15)
 		{
@@ -364,6 +368,13 @@ void Lemming::startWalk(bool r) {
 	_fallenDistance = 0;
 	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
 	_sprite->changeAnimation((r ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM));
+}
+
+void Lemming::startFall(bool r) {
+	_state = (r ? FALLING_RIGHT : FALLING_LEFT);
+	_fallenDistance = 0;
+	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
+	_sprite->changeAnimation((r ? FALLING_RIGHT_ANIM : FALLING_LEFT_ANIM));
 }
 
 void Lemming::startFloat(bool r) {
