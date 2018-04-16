@@ -229,19 +229,23 @@ void Lemming::update(int deltaTime)
 	case END_CLIMB_RIGHT:
 		++_framesFromStart;
 		cout << "end climb: " << _framesFromStart << endl;
-		_sprite->position() += glm::vec2(1, -1);
-		if (_framesFromStart == 8) {
-			_sprite->position() += glm::vec2(0, -8);
-			startWalk(true);
+		if (_framesFromStart < 4) {
+			_sprite->position() += glm::vec2(0, -2);
+		}
+		else if (_framesFromStart >= 4) {
+			_sprite->position() += glm::vec2(1, -1);
+			if (_framesFromStart == 8) startWalk(true);
 		}
 		break;
 	case END_CLIMB_LEFT:
 		++_framesFromStart;
 		cout << "end climb: " << _framesFromStart << endl;
-		_sprite->position() += glm::vec2(-1, -1);
-		if (_framesFromStart == 8) {
-			_sprite->position() += glm::vec2(0, -8);
-			startWalk(false);
+		if (_framesFromStart < 4) {
+			_sprite->position() += glm::vec2(0, -2);
+		}
+		else if (_framesFromStart >= 4) {
+			_sprite->position() += glm::vec2(-1, -1);
+			if (_framesFromStart == 8) startWalk(false);
 		}
 		break;
 	case BUILD_RIGHT:
