@@ -246,6 +246,11 @@ void Lemming::update(int deltaTime)
 		break;
 	case BUILD_RIGHT:
 		++_framesFromStart;
+		if (_framesFromStart == 1) {
+			posBase = _sprite->position() + glm::vec2(120, 0) + glm::vec2(12, 14);
+			col = collisionWall(3, true, posBase);
+			if (col < 1) startWalk(true);
+		}
 		if (_framesFromStart == 16) {
 			_framesFromStart = 0;
 			++_builtSteps;
@@ -253,18 +258,21 @@ void Lemming::update(int deltaTime)
 			_sprite->position() += glm::vec2(2, -1);
 		}
 		if (_builtSteps == 12) endBuild(true);
-
 		break;
 	case BUILD_LEFT:
 		++_framesFromStart;
+		if (_framesFromStart == 1) {
+			posBase = _sprite->position() + glm::vec2(120, 0) + glm::vec2(3, 14);
+			col = collisionWall(3, false, posBase);
+			if (col < 1) startWalk(false);
+		}
 		if (_framesFromStart == 16) {
 			_framesFromStart = 0;
 			++_builtSteps;
-		    paintStep(false);
+			paintStep(false);
 			_sprite->position() += glm::vec2(-2, -1);
 		}
 		if (_builtSteps == 12) endBuild(false);
-
 		break;
 	case END_BUILD_RIGHT:
 		++_framesFromStart;
