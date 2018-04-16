@@ -172,10 +172,16 @@ void Lemming::updateClimb() {
 	glm::ivec2 posBase = _sprite->position() + glm::vec2(DISPLACEMENT, 0); // Add the map displacement
 	posBase += glm::vec2(7, 0);
 	int col = collisionWall(7, _dir, posBase);
-	if (col > 1) endClimb();
+	if (col > 1 && col < 5) {
+		_sprite->position() += glm::vec2(-dir, -4);
+		_dir = !_dir;
+		startWalk();
+	}
+	if (col > 5) endClimb();
 	else if (col == 0) {
-		_sprite->position() += glm::vec2(dir*-1, 0);
-		startFall();
+		_sprite->position() += glm::vec2(dir*-2, -2);
+		_dir = !_dir;
+		startWalk();
 	}
 	if (_framesFromStart > 3) _sprite->position() += glm::vec2(0, -1);
 }
@@ -186,7 +192,7 @@ void Lemming::updateEndClimb() {
 		_sprite->position() += glm::vec2(0, -2);
 	}
 	else if (_framesFromStart >= 4) {
-		_sprite->position() += glm::vec2(dir*1, -1);
+		_sprite->position() += glm::vec2(dir*1, -2);
 		if (_framesFromStart == 8) startWalk();
 	}
 }
