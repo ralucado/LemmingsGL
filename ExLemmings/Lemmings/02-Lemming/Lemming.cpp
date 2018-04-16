@@ -173,7 +173,6 @@ void Lemming::updateClimb() {
 	glm::ivec2 posBase = _sprite->position() + glm::vec2(DISPLACEMENT, 0); // Add the map displacement
 	posBase += glm::vec2(x, 0);
 	int col = collisionWall(7, _dir, posBase);
-	cout << "col: " << col << endl;
 	//pared discontinua hacia fuera
  	if (col > 1) {
 		int col2 = collisionWall(10, _dir, posBase + glm::ivec2(0, -4));
