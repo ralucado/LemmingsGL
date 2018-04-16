@@ -97,6 +97,8 @@ void Scene::keyPressed(int key) {
 	else if (key == 'c') lemming.switchClimber();
 	else if (key == 'v') lemming.switchBuilder(false);
 	else if (key == 'b') lemming.switchBuilder(true);
+	else if (key == 'n') lemming.switchMiner(false);
+	else if (key == 'm') lemming.switchMiner(true);
 }
 
 void Scene::keyReleased(int key) {

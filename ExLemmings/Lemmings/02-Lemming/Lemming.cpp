@@ -288,6 +288,38 @@ void Lemming::update(int deltaTime)
 		if (_framesFromStart == 7)
 			startWalk(false);
 		break;
+	case MINE_RIGHT:
+		++_framesFromStart;
+		_framesFromStart %= 24;
+		if (_framesFromStart == 0) {
+			_sprite->position() += glm::vec2(0, 1);
+		}
+		else if (_framesFromStart == 3) {
+			_sprite->position() += glm::vec2(0, 1);
+		}
+		else if (_framesFromStart == 4) {
+			_sprite->position() += glm::vec2(1, 0);
+		}
+		else if (_framesFromStart == 15) {
+			_sprite->position() += glm::vec2(2, 0);
+		}
+		break;
+	case MINE_LEFT:
+		++_framesFromStart;
+		_framesFromStart %= 24;
+		if (_framesFromStart == 0) {
+			_sprite->position() += glm::vec2(0, 1);
+		}
+		else if (_framesFromStart == 3) {
+			_sprite->position() += glm::vec2(0, 1);
+		}
+		else if (_framesFromStart == 4) {
+			_sprite->position() += glm::vec2(-1, 0);
+		}
+		else if (_framesFromStart == 15) {
+			_sprite->position() += glm::vec2(-2, 0);
+		}
+		break;
 	case DIGGING:
 		++_framesFromStart;
 		_framesFromStart %= 16;
@@ -397,6 +429,17 @@ void Lemming::switchBuilder(bool r)
 	}
 }
 
+void Lemming::switchMiner(bool r)
+{
+	if (_state != MINE_RIGHT && _state != MINE_LEFT) {
+		startMine(r);
+	}
+	//TEST
+	else if (_state == MINE_RIGHT || _state == MINE_LEFT) {
+		startMine(r);
+	}
+}
+
 
 
 void Lemming::startStop() {
@@ -479,11 +522,19 @@ void Lemming::startBuild(bool r) {
 	_sprite->changeAnimation((r ? BUILD_RIGHT_ANIM : BUILD_LEFT_ANIM));
 }
 
+
 void Lemming::endBuild(bool r) {
 	_state = (r ? END_BUILD_RIGHT : END_BUILD_LEFT);
 	_framesFromStart = 0;
 	_builtSteps = 0;
 	_sprite->changeAnimation(END_BUILD_ANIM);
+}
+
+void Lemming::startMine(bool r) {
+	loadSpritesheet("images/miner.png", 24, 2, _sprite->position());
+	_state = (r ? MINE_RIGHT : MINE_LEFT);
+	_framesFromStart = 0;
+	_sprite->changeAnimation((r ? MINE_RIGHT_ANIM : MINE_LEFT_ANIM));
 }
 
 void Lemming::setMapMask(VariableTexture *mapMask)

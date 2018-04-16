@@ -34,6 +34,7 @@ public:
 	void switchBasher(bool r);
 	void switchDigger();
 	void switchBuilder(bool r);
+	void switchMiner(bool r);
 	void revive();
 	
 private:
@@ -54,6 +55,7 @@ private:
 	void endClimb(bool r);
 	void startBuild(bool r);
 	void endBuild(bool r);
+	void startMine(bool r);
 
 	void hole(int posX, int posY, int radius);
 	void pop();
@@ -83,8 +85,8 @@ private:
 		CLIMB_RIGHT, CLIMB_LEFT,
 		END_CLIMB_RIGHT, END_CLIMB_LEFT,
 		BUILD_RIGHT, BUILD_LEFT, END_BUILD_RIGHT, END_BUILD_LEFT,
-/*		
 		MINE_RIGHT, MINE_LEFT,
+/*		
 		DRWONING,
 */
 	};
@@ -105,8 +107,8 @@ private:
 		CLIMB_RIGHT_ANIM = 0, CLIMB_LEFT_ANIM = 1,
 		END_CLIMB_RIGHT_ANIM = 2, END_CLIMB_LEFT_ANIM = 3,
 		BUILD_RIGHT_ANIM = 0, BUILD_LEFT_ANIM = 1, END_BUILD_ANIM = 2,
+		MINE_RIGHT_ANIM = 0, MINE_LEFT_ANIM = 1,
 		/*
-		MINE_RIGHT_ANIM, MINE_LEFT_ANIM,
 		DRWONING_ANIM,
 		*/
 	};
