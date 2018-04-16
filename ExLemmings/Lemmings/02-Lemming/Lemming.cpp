@@ -551,7 +551,12 @@ void Lemming::mineRow() {
 	int Xfi = Xini + 6;
 	for (int i = Xini; i <= Xfi; ++i) {
 		for (int j = 5; j <= 15; ++j) {
-			_mask->setPixel(posX + i, posY + j, 0);
+			int X = posX + i; int Y = posY + j;
+			if (!((X == posX + Xini + int(_dir) * 5 && Y == posY + 5) || (X == posX + Xini + int(_dir) * 5 + 1 && Y == posY + 5) ||
+				  (X == posX + Xini + int(_dir) * 6 && Y == posY + 6) || (X == posX + Xini + int(_dir) * 6 && Y == posY + 14) ||
+				  (X == posX + Xini + int(_dir) * 5 && Y == posY + 15) || (X == posX + Xini + int(_dir) * 5 + 1 && Y == posY + 15))) {
+				_mask->setPixel(X, Y, 0);
+			}
 		}
 	}
 }
