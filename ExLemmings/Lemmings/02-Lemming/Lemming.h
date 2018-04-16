@@ -22,6 +22,17 @@ class Lemming
 
 public:
 	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram);
+	void updateFalling(bool r);
+	void updateStartFloating(bool r);
+	void updateFloating(bool r);
+	void updateWalking(bool r);
+	void updateBash(bool r);
+	void updateClimb(bool r);
+	void updateEndClimb(bool r);
+	void updateBuild(bool r);
+	void updateEndBuild(bool r);
+	void updateMine(bool r);
+	void updateDig();
 	void update(int deltaTime);
 	void render();
 	
@@ -41,7 +52,7 @@ private:
 	int collisionFloor(int maxFall);
 	int collisionWall(int maxDeep, bool r, glm::ivec2 posBase);
 	bool collision();
-	bool updateFall();
+	bool calculateFall();
 
 	void startWalk(bool r);
 	void startFall(bool r);
@@ -114,6 +125,7 @@ private:
 	};
 
 	bool pressedKey = false;
+	float DISPLACEMENT = 120;
 
 	bool _canClimb = false;
 	bool _canFloat = false;
