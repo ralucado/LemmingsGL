@@ -161,9 +161,9 @@ void Lemming::updateBash() {
 		(_framesFromStart > 26 && _framesFromStart <= 31))
 		_sprite->position() += glm::vec2(dir*1, 0);
 	if (_framesFromStart >= 2 && _framesFromStart <= 6)
-		bashRow(_framesFromStart - 2, _dir);
+		bashRow(_framesFromStart - 2);
 	else if (_framesFromStart >= 18 && _framesFromStart <= 22)
-		bashRow(_framesFromStart - 18, _dir);
+		bashRow(_framesFromStart - 18);
 }
 
 void Lemming::updateClimb() {
@@ -239,6 +239,7 @@ void Lemming::updateMine() {
 		_sprite->position() += glm::vec2(0, 1);
 	}
 	else if (_framesFromStart == 4) {
+		mineRow();
 		_sprite->position() += glm::vec2(dir * 1, 0);
 	}
 	else if (_framesFromStart == 15) {
@@ -519,12 +520,12 @@ void Lemming::pop() {
 	hole(posX, posY, 5);
 }
 
-void Lemming::bashRow(int index, bool r) {
+void Lemming::bashRow(int index) {
 	int displacement = DISPLACEMENT;
-	if (!r) displacement += 19; //the sprite width
+	if (!_dir) displacement += 19; //the sprite width
 	glm::ivec2 posBase = _sprite->position() + glm::vec2(displacement, 0);
 	for (int i = 8; i <= bashPixels[index].x; ++i) {
-		int aux = (r? i : -i);
+		int aux = (_dir ? i : -i);
 		_mask->setPixel(posBase.x + aux, posBase.y + bashPixels[index].y,     0);
 		_mask->setPixel(posBase.x + aux, posBase.y + bashPixels[index].y + 1, 0);
 	}
@@ -536,6 +537,18 @@ void Lemming::digRow() {
 	for (int i = 0; i < 8; ++i){
 		_mask->setPixel(posX + i, posY - 2, 0);
 		_mask->setPixel(posX + i, posY - 1, 0);
+	}
+}
+
+void Lemming::mineRow() {
+	int posX = floor(_sprite->position().x + DISPLACEMENT);
+	int posY = floor(_sprite->position().y);
+	int Xini = (_dir ? 10 : 4);
+	int Xfi = Xini + 6;
+	for (int i = Xini; i <= Xfi; ++i) {
+		for (int j = 5; j <= 15; ++j) {
+			_mask->setPixel(posX + i, posY + j, 0);
+		}
 	}
 }
 

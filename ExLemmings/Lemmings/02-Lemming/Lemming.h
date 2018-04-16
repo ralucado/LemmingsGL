@@ -71,9 +71,11 @@ private:
 
 	void hole(int posX, int posY, int radius);
 	void pop();
-	void bashRow(int index, bool r);
+	void bashRow(int index);
 
 	void digRow();
+
+	void mineRow();
 
 	void paintStep(bool r);
 
