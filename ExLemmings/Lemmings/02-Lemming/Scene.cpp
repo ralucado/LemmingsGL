@@ -22,6 +22,7 @@ double pit_distance(int x1, int y1, int x2, int y2){
 
 void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings)
 {
+	_finished = false;
 	glm::vec2 geom[2] = {glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT))};
 	//glm::vec2 texCoords[2] = {glm::vec2(120.f / 512.0, 0.f), glm::vec2((120.f + 320.f) / 512.0f, 160.f / 256.0f)};
 	glm::vec2 texCoords[2] = {glm::vec2(120.f / 512.0, 0.f), glm::vec2((120.f + 320.f) / 512.0f, 160.f / 256.0f)};
@@ -42,17 +43,15 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	
+	_positionExit = positionExit;
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		lemmings[i] = new Lemming;
 		lemmings[i]->init(positionLemmings, simpleTexProgram);
-		//lemmings[i]->init(positionLemmings, positionExit, simpleTexProgram);
 		lemmings[i]->setMapMask(&maskTexture);
 	}
 	
-
-
-
-	//button.init(positionExit, "images/lemming.png", simpleTexProgram);
+	
+	button.init(positionExit, "images/lemming.png", simpleTexProgram);
 }
 
 unsigned int x = 0;
@@ -60,9 +59,16 @@ unsigned int x = 0;
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+	bool finished = true;
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
-		lemmings[i]->update(deltaTime);
+		if (lemmings[i]->checkAlive()) {
+			finished = false;
+			if (lemmings[i]->getPosition() == _positionExit)
+				lemmings[i]->switchWin();
+			lemmings[i]->update(deltaTime);
+		}
 	}
+	_finished = finished;
 }
 
 void Scene::render()
@@ -85,12 +91,12 @@ void Scene::render()
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		lemmings[i]->render();
 	}
-	//button.render();
+	button.render();
 }
 
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
 {
-	//button.mouseMoved(mouseX, mouseY, bLeftButton);
+	button.mouseMoved(mouseX, mouseY, bLeftButton);
 	if(bLeftButton)
 		modifyMask(mouseX, mouseY, false);
 	else if(bRightButton)
@@ -103,6 +109,7 @@ void Scene::keyPressed(int key) {
 	else if (key == 'e') lemmings[0]->switchBasher(false);
 	else if (key == 'r') lemmings[0]->switchBasher(true);
 	else if (key == 't') lemmings[0]->switchFloater();
+	else if (key == 'y') lemmings[0]->switchWin();
 }
 
 void Scene::keyReleased(int key) {
@@ -180,5 +187,7 @@ void Scene::initShaders()
 	fShader.free();
 }
 
-
+bool Scene::checkFinished() {
+	return _finished;
+}
 

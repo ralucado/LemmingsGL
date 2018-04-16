@@ -25,12 +25,10 @@ public:
 	void init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings);
 	void update(int deltaTime);
 	void render();
-	
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
-
 	void keyPressed(int key);
-
 	void keyReleased(int key);
+	bool checkFinished();
 
 private:
 	void initShaders();
@@ -43,8 +41,10 @@ private:
 	MaskedTexturedQuad *map;
 	ShaderProgram simpleTexProgram, maskedTexProgram;
 	float currentTime;
+	bool _finished;
 	glm::mat4 projection;
 	Lemming *lemmings[NUM_LEMMINGS];
+	glm::vec2 _positionExit;
 	Button button;
 
 };

@@ -3,6 +3,7 @@
 
 
 #include "Scene.h"
+#include "Menu.h"
 #include "Utils.h"
 
 #define NUM_SCENES 2
@@ -43,6 +44,8 @@ public:
 private:
 	bool bPlay;                       // Continue to play game?
 	Scene scene;                      // Scene to render
+	Menu mainMenu;
+	bool menuActive;
 	bool keys[256], specialKeys[256]; // Store key states so that 
 	                                  // we can have access at any time
 	int mouseX, mouseY;               // Mouse position
@@ -54,8 +57,8 @@ private:
 	};
 
 	string sceneMasks[NUM_SCENES] = {
-		"images/fun1.png",
-		"images/fun1.png"
+		"images/fun1_mask.png",
+		"images/fun1_mask.png"
 	};
 };
 

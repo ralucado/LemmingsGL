@@ -6,6 +6,7 @@
 #include "Lemming.h"
 #include "Game.h"
 
+
 void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, const glm::vec2& position) {
 	_spritesheet.loadFromFile(filename, TEXTURE_PIXEL_FORMAT_RGBA);
 	_spritesheet.setMinFilter(GL_NEAREST);
@@ -29,9 +30,11 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 	_sprite->setPosition(position);
 }
 
+//void Lemming::init(const glm::vec2 &initialPosition, const glm::vec2 &positionExit, ShaderProgram &shaderProgram)
 void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram)
 {
 	_state = FALLING_RIGHT;
+	//_positionExit = positionExit;
 	_shaderProgram = shaderProgram;
 	loadSpritesheet("images/lemming.png", 8, 4, initialPosition);
 	_sprite->changeAnimation(FALLING_RIGHT_ANIM);
@@ -41,7 +44,7 @@ void Lemming::update(int deltaTime)
 {
 	int fall;
 
-	if(_dead || _sprite->update(deltaTime) == 0)
+	if(_dead || _sprite->update(deltaTime) == 0 || _win)
 		return;
 	bool canDescend;
 	glm::vec2 ori;
@@ -153,6 +156,7 @@ void Lemming::update(int deltaTime)
 			}
 		}
 		break;
+		
 	case BASH_LEFT:
 		//check that there is material to dig
 		if (collisionWall(12, false) > 8) startWalk(false);
@@ -190,6 +194,9 @@ void Lemming::update(int deltaTime)
 		++_framesFromStart;
 		if (_framesFromStart == 16) _dead = true;
 	}
+
+
+
 }
 
 bool Lemming::updateFall() {
@@ -205,7 +212,7 @@ bool Lemming::updateFall() {
 
 void Lemming::render()
 {
-	if (!_dead) {
+	if (!_dead && !_win) {
 		//_shaderProgram.setUniform1i("clicked", b);
 		_shaderProgram.setUniform2f("center", _sprite->position().x, _sprite->position().y);
 
@@ -249,6 +256,15 @@ void Lemming::switchBomber() {
 		_state = WALKING_RIGHT;
 		loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
 		_sprite->changeAnimation(WALKING_RIGHT_ANIM);
+	}
+}
+
+void Lemming::switchWin() {
+	if (_state != EXPLODING) {
+		loadSpritesheet("images/bomber.png", 16, 1, _sprite->position());
+		_state = EXPLODING;
+		_framesFromStart = 0;
+		_sprite->changeAnimation(EXPLODING_ANIM);
 	}
 }
 
@@ -372,6 +388,16 @@ void Lemming::bashRow(int index, bool r) {
 		_mask->setPixel(posBase.x + aux, posBase.y + bashPixels[index].y + 1, 0);
 	}
 }
+
+glm::vec2 Lemming::getPosition() {
+	return _sprite->position() + glm::vec2(7, 16); 
+}
+
+bool Lemming::checkAlive() {
+	return !(_win || _dead);
+}
+
+
 
 
 

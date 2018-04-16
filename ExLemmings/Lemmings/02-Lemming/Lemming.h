@@ -21,7 +21,9 @@ class Lemming
 {
 
 public:
+
 	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram);
+	//void init(const glm::vec2 &initialPosition, const glm::vec2 &positionExit, ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	void render();
 	
@@ -31,7 +33,10 @@ public:
 	void switchFloater();
 	void switchClimber();
 	void switchBomber();
+	void switchWin();
 	void switchBasher(bool r);
+	glm::vec2 getPosition();
+	bool checkAlive();
 	
 private:
 	int collisionFloor(int maxFall);
@@ -98,6 +103,10 @@ private:
 	bool _canClimb = false;
 	bool _canFloat = false;
 	bool _dead = false;
+
+	bool _win = false;
+	glm::vec2 _positionExit;
+
 	int _framesFromStart = 0; //frames from the start of some animation, useful when building, exploding, etc.
 	int _fallenDistance = 0;
 	LemmingState _state;
