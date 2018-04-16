@@ -169,15 +169,26 @@ void Lemming::updateBash() {
 void Lemming::updateClimb() {
 	_framesFromStart %= 8;
 	int dir = (_dir ? 1 : -1);
+	int x = 7 + int(!_dir);
 	glm::ivec2 posBase = _sprite->position() + glm::vec2(DISPLACEMENT, 0); // Add the map displacement
-	posBase += glm::vec2(7, 0);
+	posBase += glm::vec2(x, 0);
 	int col = collisionWall(7, _dir, posBase);
-	if (col > 1 && col < 5) {
-		_sprite->position() += glm::vec2(-dir, -4);
-		_dir = !_dir;
-		startWalk();
+	cout << "col: " << col << endl;
+	//pared discontinua hacia fuera
+ 	if (col > 1) {
+		int col2 = collisionWall(10, _dir, posBase + glm::ivec2(0, -4));
+		//si hay espacio para subir
+		if (col2 > 9) {
+			endClimb();
+		}
+		//si no hay suficiente espacio
+		else {
+			_sprite->position() += glm::vec2(-dir, -4);
+			_dir = !_dir;
+			startWalk();
+		}
 	}
-	if (col > 5) endClimb();
+	//pared discontinua hacia dentro
 	else if (col == 0) {
 		_sprite->position() += glm::vec2(dir*-2, -2);
 		_dir = !_dir;
