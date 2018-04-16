@@ -89,16 +89,13 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 void Scene::keyPressed(int key) {
 	if (key == 'q') lemming.switchStopper();
 	else if (key == 'w') lemming.switchBomber();
-	else if (key == 'e') lemming.switchBasher(false);
-	else if (key == 'r') lemming.switchBasher(true);
-	else if (key == 'a') lemming.switchFloater();
+	else if (key == 'e') lemming.switchBasher();
+	else if (key == 'f') lemming.switchFloater();
 	else if (key == 's') lemming.revive();
 	else if (key == 'd') lemming.switchDigger();
 	else if (key == 'c') lemming.switchClimber();
-	else if (key == 'v') lemming.switchBuilder(false);
-	else if (key == 'b') lemming.switchBuilder(true);
-	else if (key == 'n') lemming.switchMiner(false);
-	else if (key == 'm') lemming.switchMiner(true);
+	else if (key == 'b') lemming.switchBuilder();
+	else if (key == 'm') lemming.switchMiner();
 }
 
 void Scene::keyReleased(int key) {

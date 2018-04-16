@@ -14,7 +14,7 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 	_sprite = Sprite::createSprite(glm::ivec2(_spritesheet.width() / NUM_FRAMES, _spritesheet.height() / NUM_ANIMS), glm::vec2(1.0f / float(NUM_FRAMES), 1.0f / float(NUM_ANIMS)), &_spritesheet, &_shaderProgram);
 	_sprite->setNumberAnimations(NUM_ANIMS);
 	int speed = 12;
-	if (_state == START_FLOAT_RIGHT || _state == START_FLOAT_LEFT) speed = 8;
+	if (_state == START_FLOAT) speed = 8;
 	for (int i = 0; i < NUM_ANIMS; i++) {
 		_sprite->setAnimationSpeed(i, speed);
 	}
@@ -32,42 +32,91 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 
 void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram)
 {
-	_state = FALLING_RIGHT;
+	_state = FALLING;
+	_dir = true;
 	_shaderProgram = shaderProgram;
+	_framesFromStart = 0;
 	loadSpritesheet("images/lemming.png", 8, 4, initialPosition);
 	_sprite->changeAnimation(FALLING_RIGHT_ANIM);
 }
 
-void Lemming::updateFalling(bool r) {
+void Lemming::update(int deltaTime)
+{
+	if(_dead || _sprite->update(deltaTime) == 0) return;
+	++_framesFromStart;
+	switch(_state)
+	{
+	case FALLING:
+		updateFalling();
+		break;
+	case FLOAT:
+		updateFloating();
+		break;
+	case START_FLOAT:
+		updateStartFloating();
+		break;
+	case WALKING:
+		updateWalking();
+		break;
+	case BASH:
+		updateBash();
+		break;
+	case CLIMB:
+		updateClimb();
+		break;
+	case END_CLIMB:
+		updateEndClimb();
+		break;
+	case BUILD:
+		updateBuild();
+		break;
+	case END_BUILD:
+		updateEndBuild();
+		break;
+	case MINE:
+		updateMine();
+		break;
+	case DIGGING:
+		updateDig();
+		break;
+	case EXPLODING:
+		cout << "frame: " << _framesFromStart << endl;
+ 		if (_framesFromStart == 16) pop();
+		break;
+	case SQUISHED:
+		if (_framesFromStart == 16) die();
+	}
+}
+
+void Lemming::updateFalling() {
 	if (_fallenDistance > HEIGHT_TO_FLOAT && _canFloat) {
-		startFloat(r);
+		startFloat();
 	}
 	if (!calculateFall()) {
 		if (_fallenDistance > HEIGHT_TO_DIE) {
 			startSquish();
 		}
 		else {
-			startWalk(r);
+			startWalk();
 		}
 	}
 }
 
-void Lemming::updateStartFloating(bool r) {
-	++_framesFromStart;
+void Lemming::updateStartFloating() {
 	if (_framesFromStart == 3) {
-		_state = (r? FLOAT_RIGHT : FLOAT_LEFT);
-		_sprite->changeAnimation(r? FLOAT_RIGHT_ANIM : FLOAT_LEFT_ANIM);
+		_state = FLOAT;
+		_sprite->changeAnimation(_dir? FLOAT_RIGHT_ANIM : FLOAT_LEFT_ANIM);
 	}
 }
 
-void Lemming::updateFloating(bool r) {
+void Lemming::updateFloating() {
 	if (!calculateFall()) {
-		startWalk(r);
+		startWalk();
 	}
 }
 
-void Lemming::updateWalking(bool r) {
-	int dir = (r? 1 : -1);
+void Lemming::updateWalking() {
+	int dir = (_dir? 1 : -1);
 	bool canDescend = true;
 	glm::vec2 ori = _sprite->position(); //save original position
 	_sprite->position() += glm::vec2(dir*1, -3); //try to put the lemming up top a 3 pixel climb
@@ -80,12 +129,13 @@ void Lemming::updateWalking(bool r) {
 	}
 	if (!canDescend) {
 		if (_canClimb) {
-			startClimb(r);
+			startClimb();
 		}
 		else {
 			_sprite->position() = ori;
-			_sprite->changeAnimation(r ? WALKING_LEFT_ANIM : WALKING_RIGHT_ANIM);
-			_state = (r ? WALKING_LEFT : WALKING_RIGHT);
+			//change direction
+			_dir = !_dir;
+			_sprite->changeAnimation(_dir ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM);
 		}
 	}
 	else
@@ -93,85 +143,79 @@ void Lemming::updateWalking(bool r) {
 		int fall = collisionFloor(7);
 		_sprite->position() += glm::vec2(0, fall);
 		if (fall > 6) {
-			_state = (r? FALLING_RIGHT : FALLING_LEFT);
-			_sprite->changeAnimation(r ? FALLING_RIGHT_ANIM : FALLING_LEFT_ANIM);
+			_state = FALLING;
+			_sprite->changeAnimation(_dir ? FALLING_RIGHT_ANIM : FALLING_LEFT_ANIM);
 		}
 	}
 }
 
-void Lemming::updateBash(bool r) {
+void Lemming::updateBash() {
 	glm::ivec2 posBase = _sprite->position() + glm::vec2(DISPLACEMENT, 0); // Add the map displacement
 	posBase += glm::ivec2(7, 15);
 	//check that there is material to dig
-	if (collisionWall(12, r, posBase) > 7) startWalk(r);
-	++_framesFromStart;
+	if (collisionWall(12, _dir, posBase) > 7+1*_dir) startWalk();
 	_framesFromStart %= 32;
 
-	int dir = (r ? 1 : -1);
+	int dir = (_dir ? 1 : -1);
 	if ((_framesFromStart > 10 && _framesFromStart <= 15) ||
 		(_framesFromStart > 26 && _framesFromStart <= 31))
 		_sprite->position() += glm::vec2(dir*1, 0);
 	if (_framesFromStart >= 2 && _framesFromStart <= 6)
-		bashRow(_framesFromStart - 2, r);
+		bashRow(_framesFromStart - 2, _dir);
 	else if (_framesFromStart >= 18 && _framesFromStart <= 22)
-		bashRow(_framesFromStart - 18, r);
+		bashRow(_framesFromStart - 18, _dir);
 }
 
-void Lemming::updateClimb(bool r) {
-	++_framesFromStart;
+void Lemming::updateClimb() {
 	_framesFromStart %= 8;
-	int dir = (r ? 1 : -1);
+	int dir = (_dir ? 1 : -1);
 	glm::ivec2 posBase = _sprite->position() + glm::vec2(DISPLACEMENT, 0); // Add the map displacement
 	posBase += glm::vec2(7, 0);
-	int col = collisionWall(7, r, posBase);
-	if (col > 1) endClimb(r);
+	int col = collisionWall(7, _dir, posBase);
+	if (col > 1) endClimb();
 	else if (col == 0) {
 		_sprite->position() += glm::vec2(dir*-1, 0);
-		startFall(r);
+		startFall();
 	}
 	if (_framesFromStart > 3) _sprite->position() += glm::vec2(0, -1);
 }
 
-void Lemming::updateEndClimb(bool r) {
-	int dir = (r ? 1 : -1);
-	++_framesFromStart;
+void Lemming::updateEndClimb() {
+	int dir = (_dir ? 1 : -1);
 	if (_framesFromStart < 4) {
 		_sprite->position() += glm::vec2(0, -2);
 	}
 	else if (_framesFromStart >= 4) {
 		_sprite->position() += glm::vec2(dir*1, -1);
-		if (_framesFromStart == 8) startWalk(r);
+		if (_framesFromStart == 8) startWalk();
 	}
 }
 
-void Lemming::updateBuild(bool r) {
-	++_framesFromStart;
-	int x = (r ? 12 : 3);
-	int dir = (r ? 1 : -1);
+void Lemming::updateBuild() {
+	int x = (_dir ? 12 : 3);
+	int dir = (_dir ? 1 : -1);
 	if (_framesFromStart == 1) {
 		glm::ivec2 posBase = _sprite->position() + glm::vec2(DISPLACEMENT, 0) + glm::vec2(x, 14);
-		int col = collisionWall(3, r, posBase);
-		if (col < 1) startWalk(r);
+		int col = collisionWall(3, _dir, posBase);
+		if (col < 1) startWalk();
 	}
 	if (_framesFromStart == 16) {
 		_framesFromStart = 0;
 		++_builtSteps;
-		paintStep(r);
+		paintStep(_dir);
 		_sprite->position() += glm::vec2(dir * 2, -1);
 	}
-	if (_builtSteps == 12) endBuild(r);
+	if (_builtSteps == 12) endBuild();
 }
 
-void Lemming::updateEndBuild(bool r) {
-	++_framesFromStart;
+void Lemming::updateEndBuild() {
 	if (_framesFromStart == 7)
-		startWalk(r);
+		startWalk();
 }
 
-void Lemming::updateMine(bool r) {
-	++_framesFromStart;
+void Lemming::updateMine() {
 	_framesFromStart %= 24;
-	int dir = (r ? 1 : -1);
+	int dir = (_dir ? 1 : -1);
 	if (_framesFromStart == 0) {
 		_sprite->position() += glm::vec2(0, 1);
 	}
@@ -187,100 +231,17 @@ void Lemming::updateMine(bool r) {
 }
 
 void Lemming::updateDig() {
-	++_framesFromStart;
 	_framesFromStart %= 16;
 	_sprite->position() += glm::vec2(0, -2);
 	int fall = collisionFloor(1);
 	_sprite->position() += glm::vec2(0, 2);
 	if (fall > 0) {
-		startFall(true);
+		startFall();
 	}
 	else if (_framesFromStart == 7 || _framesFromStart == 15)
 	{
 		digRow();
 		_sprite->position() += glm::vec2(0, 2);
-	}
-}
-
-void Lemming::update(int deltaTime)
-{
-	int fall, col;
-	glm::ivec2 posBase;
-	if(_dead || _sprite->update(deltaTime) == 0)
-		return;
-
-	switch(_state)
-	{
-	case FALLING_RIGHT:
-		updateFalling(true);
-		break;
-	case FALLING_LEFT:
-		updateFalling(false);
-		break;
-	case FLOAT_RIGHT:
-		updateFloating(true);
-		break;
-	case FLOAT_LEFT:
-		updateFloating(false);
-		break;
-	case START_FLOAT_RIGHT:
-		updateStartFloating(true);
-		break;
-	case START_FLOAT_LEFT:
-		updateStartFloating(false);
-		break;
-	case WALKING_RIGHT:
-		updateWalking(true);
-		break;
-	case WALKING_LEFT:
-		updateWalking(false);
-		break;
-	case BASH_RIGHT:
-		updateBash(true);
-		break;
-	case BASH_LEFT:
-		updateBash(false);
-		break;
-	case CLIMB_RIGHT:
-		updateClimb(true);
-		break;
-	case CLIMB_LEFT:
-		updateClimb(false);
-		break;
-	case END_CLIMB_RIGHT:
-		updateEndClimb(true);
-		break;
-	case END_CLIMB_LEFT:
-		updateEndClimb(false);
-		break;
-	case BUILD_RIGHT:
-		updateBuild(true);
-		break;
-	case BUILD_LEFT:
-		updateBuild(false);
-		break;
-	case END_BUILD_RIGHT:
-		updateEndBuild(true);
-		break;
-	case END_BUILD_LEFT:
-		updateEndBuild(false);
-		break;
-	case MINE_RIGHT:
-		updateMine(true);
-		break;
-	case MINE_LEFT:
-		updateMine(false);
-		break;
-	case DIGGING:
-		updateDig();
-		break;
-	case EXPLODING:
-		++_framesFromStart;
-		if (_framesFromStart == 16) pop();
-		break;
-	case SQUISHED:
-		++_framesFromStart;
-		if (_framesFromStart == 16) die();
 	}
 }
 
@@ -320,7 +281,7 @@ void Lemming::switchStopper() {
 	}
 	//TEST
 	else if (_state == STOPPED) {
-		startWalk(true);
+		startWalk();
 	}
 }
 
@@ -331,18 +292,18 @@ void Lemming::switchBomber() {
 	//TEST
 	else if (_state == EXPLODING) {
 		_dead = false;
-		startWalk(true);
+		startWalk();
 	}
 }
 
-void Lemming::switchBasher(bool r)
+void Lemming::switchBasher()
 {
-	if (_state != BASH_RIGHT && _state != BASH_LEFT) {
-		startBash(r);
+	if (_state != BASH) {
+		startBash();
 	}
 	//TEST
-	else if (_state == BASH_RIGHT || _state == BASH_LEFT) {
-		startWalk(r);
+	else if (_state == BASH) {
+		startWalk();
 	}
 }
 
@@ -354,28 +315,28 @@ void Lemming::switchDigger()
 	}
 	//TEST
 	else if (_state == DIGGING) {
-		startWalk(true);
+		startWalk();
 	}
 }
-void Lemming::switchBuilder(bool r)
+void Lemming::switchBuilder()
 {
-	if (_state != BUILD_RIGHT && _state != BUILD_LEFT) {
-		startBuild(r);
+	if (_state != BUILD) {
+		startBuild();
 	}
 	//TEST
-	else if (_state == BUILD_RIGHT || _state == BUILD_LEFT) {
-		startWalk(r);
+	else if (_state == BUILD) {
+		startWalk();
 	}
 }
 
-void Lemming::switchMiner(bool r)
+void Lemming::switchMiner()
 {
-	if (_state != MINE_RIGHT && _state != MINE_LEFT) {
-		startMine(r);
+	if (_state != MINE) {
+		startMine();
 	}
 	//TEST
-	else if (_state == MINE_RIGHT || _state == MINE_LEFT) {
-		startMine(r);
+	else if (_state == MINE) {
+		startWalk();
 	}
 }
 
@@ -394,33 +355,33 @@ void Lemming::startPop() {
 	_sprite->changeAnimation(EXPLODING_ANIM);
 }
 
-void Lemming::startBash(bool r) {
+void Lemming::startBash() {
 	loadSpritesheet("images/basher.png", 32, 2, _sprite->position());
-	_state = (r? BASH_RIGHT : BASH_LEFT);
+	_state = BASH;
 	_framesFromStart = 0;
-	_sprite->changeAnimation((r ? BASH_RIGHT_ANIM : BASH_LEFT_ANIM));
+	_sprite->changeAnimation((_dir ? BASH_RIGHT_ANIM : BASH_LEFT_ANIM));
 }
 
-void Lemming::startWalk(bool r) {
-	_state = (r ? WALKING_RIGHT : WALKING_LEFT);
+void Lemming::startWalk() {
+	_state = WALKING;
 	_fallenDistance = 0;
 	_framesFromStart = 0;
 	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
-	_sprite->changeAnimation((r ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM));
+	_sprite->changeAnimation((_dir ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM));
 }
 
-void Lemming::startFall(bool r) {
-	_state = (r ? FALLING_RIGHT : FALLING_LEFT);
+void Lemming::startFall() {
+	_state =FALLING;
 	_fallenDistance = 0;
 	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
-	_sprite->changeAnimation((r ? FALLING_RIGHT_ANIM : FALLING_LEFT_ANIM));
+	_sprite->changeAnimation((_dir ? FALLING_RIGHT_ANIM : FALLING_LEFT_ANIM));
 }
 
-void Lemming::startFloat(bool r) {
-	_state = (r ? START_FLOAT_RIGHT : START_FLOAT_LEFT);
+void Lemming::startFloat() {
+	_state = FLOAT;
 	loadSpritesheet("images/floater.png", 4, 4, _sprite->position());
 	_framesFromStart = 0;
-	_sprite->changeAnimation((r ? START_FLOAT_RIGHT_ANIM : START_FLOAT_LEFT_ANIM));
+	_sprite->changeAnimation((_dir ? START_FLOAT_RIGHT_ANIM : START_FLOAT_LEFT_ANIM));
 }
 
 void Lemming::startSquish() {
@@ -440,40 +401,40 @@ void Lemming::startDig() {
 	_sprite->changeAnimation(DIGGING_ANIM);
 }
 
-void Lemming::startClimb(bool r) {
-	_state = (r ? CLIMB_RIGHT : CLIMB_LEFT);
+void Lemming::startClimb() {
+	_state = CLIMB;
 	loadSpritesheet("images/climber.png", 8, 4, _sprite->position());
 	_framesFromStart = 0;
-	_sprite->changeAnimation((r ? CLIMB_RIGHT_ANIM : CLIMB_LEFT_ANIM));
+	_sprite->changeAnimation((_dir ? CLIMB_RIGHT_ANIM : CLIMB_LEFT_ANIM));
 }
 
-void Lemming::endClimb(bool r) {
-	_state = (r ? END_CLIMB_RIGHT : END_CLIMB_LEFT);
+void Lemming::endClimb() {
+	_state = END_CLIMB;
 	_framesFromStart = 0;
-	_sprite->changeAnimation((r ? END_CLIMB_RIGHT_ANIM : END_CLIMB_LEFT_ANIM));
+	_sprite->changeAnimation((_dir ? END_CLIMB_RIGHT_ANIM : END_CLIMB_LEFT_ANIM));
 }
 
-void Lemming::startBuild(bool r) {
+void Lemming::startBuild() {
 	loadSpritesheet("images/builder.png", 16, 3, _sprite->position());
-	_state = (r ? BUILD_RIGHT : BUILD_LEFT);
+	_state =BUILD;
 	_framesFromStart = 0;
 	_builtSteps = 0;
-	_sprite->changeAnimation((r ? BUILD_RIGHT_ANIM : BUILD_LEFT_ANIM));
+	_sprite->changeAnimation((_dir ? BUILD_RIGHT_ANIM : BUILD_LEFT_ANIM));
 }
 
 
-void Lemming::endBuild(bool r) {
-	_state = (r ? END_BUILD_RIGHT : END_BUILD_LEFT);
+void Lemming::endBuild() {
+	_state = END_BUILD;
 	_framesFromStart = 0;
 	_builtSteps = 0;
 	_sprite->changeAnimation(END_BUILD_ANIM);
 }
 
-void Lemming::startMine(bool r) {
+void Lemming::startMine() {
 	loadSpritesheet("images/miner.png", 24, 2, _sprite->position());
-	_state = (r ? MINE_RIGHT : MINE_LEFT);
+	_state = MINE;
 	_framesFromStart = 0;
-	_sprite->changeAnimation((r ? MINE_RIGHT_ANIM : MINE_LEFT_ANIM));
+	_sprite->changeAnimation((_dir ? MINE_RIGHT_ANIM : MINE_LEFT_ANIM));
 }
 
 void Lemming::setMapMask(VariableTexture *mapMask)
@@ -581,5 +542,5 @@ void Lemming::die() {
 
 void Lemming::revive() {
 	_dead = false;
-	startWalk(true);
+	startWalk();
 }

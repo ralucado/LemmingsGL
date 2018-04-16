@@ -22,17 +22,6 @@ class Lemming
 
 public:
 	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram);
-	void updateFalling(bool r);
-	void updateStartFloating(bool r);
-	void updateFloating(bool r);
-	void updateWalking(bool r);
-	void updateBash(bool r);
-	void updateClimb(bool r);
-	void updateEndClimb(bool r);
-	void updateBuild(bool r);
-	void updateEndBuild(bool r);
-	void updateMine(bool r);
-	void updateDig();
 	void update(int deltaTime);
 	void render();
 	
@@ -42,31 +31,43 @@ public:
 	void switchFloater();
 	void switchClimber();
 	void switchBomber();
-	void switchBasher(bool r);
+	void switchBasher();
 	void switchDigger();
-	void switchBuilder(bool r);
-	void switchMiner(bool r);
+	void switchBuilder();
+	void switchMiner();
 	void revive();
 	
 private:
+	void updateFalling();
+	void updateStartFloating();
+	void updateFloating();
+	void updateWalking();
+	void updateBash();
+	void updateClimb();
+	void updateEndClimb();
+	void updateBuild();
+	void updateEndBuild();
+	void updateMine();
+	void updateDig();
+
 	int collisionFloor(int maxFall);
 	int collisionWall(int maxDeep, bool r, glm::ivec2 posBase);
 	bool collision();
 	bool calculateFall();
 
-	void startWalk(bool r);
-	void startFall(bool r);
+	void startWalk();
+	void startFall();
 	void startStop();
 	void startPop();
-	void startFloat(bool r);
-	void startBash(bool r);
+	void startFloat();
+	void startBash();
 	void startSquish();
 	void startDig();
-	void startClimb(bool r);
-	void endClimb(bool r);
-	void startBuild(bool r);
-	void endBuild(bool r);
-	void startMine(bool r);
+	void startClimb();
+	void endClimb();
+	void startBuild();
+	void endBuild();
+	void startMine();
 
 	void hole(int posX, int posY, int radius);
 	void pop();
@@ -84,19 +85,20 @@ private:
 
 	enum LemmingState
 	{
-		WALKING_RIGHT, WALKING_LEFT,
-		FALLING_RIGHT, FALLING_LEFT,
+		WALKING,
+		FALLING,
 		STOPPED,
 		EXPLODING,
-		BASH_RIGHT, BASH_LEFT,
-		START_FLOAT_RIGHT, START_FLOAT_LEFT,
-		FLOAT_RIGHT, FLOAT_LEFT,
+		BASH,
+		START_FLOAT,
+		FLOAT,
 		SQUISHED,
 		DIGGING, 
-		CLIMB_RIGHT, CLIMB_LEFT,
-		END_CLIMB_RIGHT, END_CLIMB_LEFT,
-		BUILD_RIGHT, BUILD_LEFT, END_BUILD_RIGHT, END_BUILD_LEFT,
-		MINE_RIGHT, MINE_LEFT,
+		CLIMB,
+		END_CLIMB,
+		BUILD,
+		END_BUILD,
+		MINE,
 /*		
 		DRWONING,
 */
@@ -133,6 +135,7 @@ private:
 	int _builtSteps = 0;
 	int _framesFromStart = 0; //frames from the start of some animation, useful when building, exploding, etc.
 	int _fallenDistance = 0;
+	bool _dir = true;
 	LemmingState _state;
 	Texture _spritesheet;
 	Sprite *_sprite;
