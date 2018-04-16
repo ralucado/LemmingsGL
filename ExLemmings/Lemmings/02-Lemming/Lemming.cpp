@@ -245,6 +245,10 @@ void Lemming::updateMine() {
 	else if (_framesFromStart == 15) {
 		_sprite->position() += glm::vec2(dir * 2, 0);
 	}
+	int fall = collisionFloor(1);
+	if (fall > 0) {
+		startFall();
+	}
 }
 
 void Lemming::updateDig() {
