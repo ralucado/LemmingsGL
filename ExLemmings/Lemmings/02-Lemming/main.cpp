@@ -90,6 +90,8 @@ int main(int argc, char **argv)
 	glutInitWindowSize(960, 480);
 
 	glutCreateWindow(argv[0]);
+	//desactivar el cursor
+	//glutSetCursor(GLUT_CURSOR_NONE);
 	glutDisplayFunc(drawCallback);
 	glutIdleFunc(idleCallback);
 	glutKeyboardFunc(keyboardDownCallback);
