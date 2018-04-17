@@ -22,7 +22,7 @@ class Lemming
 
 public:
 	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram);
-	void update(int deltaTime);
+	void update(int deltaTime, glm::vec2 disp);
 	void render();
 	
 	void setMapMask(VariableTexture *mapMask);

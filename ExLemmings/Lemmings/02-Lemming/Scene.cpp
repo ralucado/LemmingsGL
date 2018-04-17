@@ -2,8 +2,6 @@
 #include "Scene.h"
 #include "Game.h"
 
-//hacer esta clase virtual?
-
 Scene::Scene(){
 	map = NULL;
 }
@@ -20,10 +18,12 @@ double pit_distance(int x1, int y1, int x2, int y2){
 
 
 
-void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings)
+void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize)
 {
-	_dispX = 120;
-	_dispY = 0;
+	_disp.x = 0;
+	_disp.y = 0;
+	textureTrueSize = ttSize;
+	_clicked = false;
 	
 	//mapa
 	colorTexture.loadFromFile(filenameMap, TEXTURE_PIXEL_FORMAT_RGBA);
@@ -39,8 +39,8 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 	tileTexture.setMagFilter(GL_NEAREST);
 
 	//coords mapa
-	_texCoords[0] = glm::vec2(_dispX / colorTexture.width(), _dispY / colorTexture.height());
-	_texCoords[1] = glm::vec2((_dispX + float(CAMERA_WIDTH)) / colorTexture.width(), (_dispY + float(CAMERA_HEIGHT)) / colorTexture.height());
+	_texCoords[0] = glm::vec2(_disp.x / colorTexture.width(), _disp.y / colorTexture.height());
+	_texCoords[1] = glm::vec2((_disp.x + float(CAMERA_WIDTH)) / colorTexture.width(), (_disp.y + float(CAMERA_HEIGHT)) / colorTexture.height());
 
 	_geom[0] = glm::vec2(0.f, 0.f);
 	_geom[1] = glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT));
@@ -61,8 +61,11 @@ unsigned int x = 0;
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
-	lemming.update(deltaTime);
-	//map = MaskedTexturedQuad::createTexturedQuad(_geom, _texCoords, maskedTexProgram);
+	lemming.update(deltaTime, _disp);
+	//coords mapa
+	_texCoords[0] = glm::vec2(_disp.x / colorTexture.width(), _disp.y / colorTexture.height());
+	_texCoords[1] = glm::vec2((_disp.x + float(CAMERA_WIDTH)) / colorTexture.width(), (_disp.y + float(CAMERA_HEIGHT)) / colorTexture.height());
+	map = MaskedTexturedQuad::createTexturedQuad(_geom, _texCoords, maskedTexProgram);
 
 }
 
@@ -96,8 +99,29 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 			modifyMask(mouseX, mouseY, true);
 	}
 	else {
+		if (bLeftButton) {
+			if (_clicked) {
+				//disp = clickOrigin - mouse
+				float dx = (_clickOrigin.x - mouseX / 3) + _disp.x;
+				float dy = (_clickOrigin.y - mouseY / 3) + _disp.y;
+				if(dx >= 0 && dx < textureTrueSize.x - CAMERA_WIDTH) _disp.x = dx;
+				if(dy >= 0 && dy < textureTrueSize.y - CAMERA_HEIGHT) _disp.y = dy;
+				_clickOrigin.x = mouseX / 3;
+				_clickOrigin.y = mouseY / 3;
 
+			}
+			else {
+				//first click, set click origin
+				_clicked = true;
+				_clickOrigin.x = mouseX/3;
+				_clickOrigin.y = mouseY/3;
+			}
+		}
+		else if (_clicked){
+			_clicked = false;
+		}
 	}
+
 }
 
 void Scene::keyPressed(int key) {
@@ -122,9 +146,9 @@ void Scene::modifyMask(int mouseX, int mouseY, bool apply)
 	else color = 0;
 
 	// Transform from mouse coordinates to map coordinates
-	//   The map is enlarged 3 times and displaced 120 pixels
-	posX = mouseX / 3 + 120;
-	posY = mouseY / 3;
+	//   The map is enlarged 3 times and displaced
+	posX = mouseX / 3 + _disp.x;
+	posY = mouseY / 3 + _disp.y;
 
 	for (int y = max(0, posY - radius); y <= min(maskTexture.height() - 1, posY + radius); y++)
 		for (int x = max(0, posX - radius); x <= min(maskTexture.width() - 1, posX + radius); x++){
@@ -186,15 +210,4 @@ void Scene::initShaders()
 	vShader.free();
 	fShader.free();
 }
-
-float Scene::getDisplacementX() const
-{
-	return _dispX;
-}
-
-float Scene::getDisplacementY() const
-{
-	return _dispY;
-}
-
 

@@ -6,7 +6,6 @@
 #include "Lemming.h"
 #include "Game.h"
 
-
 void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, const glm::vec2& position) {
 	_spritesheet.loadFromFile(filename, TEXTURE_PIXEL_FORMAT_RGBA);
 	_spritesheet.setMinFilter(GL_NEAREST);
@@ -38,18 +37,18 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 	_framesFromStart = 0;
 	loadSpritesheet("images/lemming.png", 8, 4, initialPosition);
 	_sprite->changeAnimation(FALLING_RIGHT_ANIM);
-	_dispX = _dispY = 0;
+	_dispX = 0;
+	_dispY = 0;
 }
 
-void Lemming::update(int deltaTime)
+void Lemming::update(int deltaTime, glm::vec2 disp)
 {
+	_sprite->position() += glm::vec2(_dispX - disp.x, _dispY - disp.y);
+	_dispX = disp.x;
+	_dispY = disp.y;
 	if(_dead || _sprite->update(deltaTime) == 0) return;
 	++_framesFromStart;
-	_dispX = Scene::instance().getDisplacementX();
-	_dispY = Scene::instance().getDisplacementY();
-	cout << "dispX: " << _dispX << endl;
-	cout << "dispY: " << _dispY << endl;
-	_dispX = 120;
+
 	switch(_state)
 	{
 	case FALLING:
