@@ -8,28 +8,55 @@ void Game::init()
 	bPlay = true;
 	bLeftMouse = bRightMouse = false;
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-	//scene.init(sceneMaps[0], sceneMasks[0], glm::vec2(60, 30), glm::vec2(240, 131), glm::vec2(60, 30));
-	menuActive = true;
-	mainMenu.init("images/MainMenu.png");
+	sceneVisible = false;
+	sceneActive = false;
+	currentMenu = MAINMENU;
+	menu.init(mainMenuBackground, mainMenuButtonSprite, mainMenuButtonsPos);
 }
 
 bool Game::update(int deltaTime)
 {
-	
-	if (!menuActive) 
+	switch (currentMenu)
+	{
+	case MAINMENU:
+		switch (menu.buttonPressed())
+		{
+		case 0:
+			menu.~Menu();
+			currentMenu = MENUESC;
+			menu.init(escMenuBackground, escMenuButtonSprite, escMenuButtonsPos);
+			sceneActive = true;
+			sceneVisible = true;
+			scene.init(sceneMaps[0], sceneMasks[0], glm::vec2(60, 30), glm::vec2(360, 130), glm::vec2(60, 30));
+			break;
+		default:
+			break;
+		}
+		break;
+	case MENUESC:
+		break;
+	default:
+		break;
+	}
+
+	if (sceneActive) {
 		if (scene.checkFinished())
 			scene.init(sceneMaps[0], sceneMasks[0], glm::vec2(60, 30), glm::vec2(240, 131), glm::vec2(60, 30));
-	else 
-		scene.update(deltaTime);
+		else
+			scene.update(deltaTime);
+	}
+
 	return bPlay;
 }
 
 void Game::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//scene.render();
-	if (menuActive)
-		mainMenu.render();
+
+	if (sceneVisible)
+		scene.render();
+	if (!sceneActive)
+		menu.render();
 }
 
 void Game::keyPressed(int key)
@@ -41,13 +68,16 @@ void Game::keyPressed(int key)
 	if (key == 50)
 		scene.init(sceneMaps[1], sceneMasks[1], glm::vec2(60, 30), glm::vec2(360, 130), glm::vec2(60, 30));
 	keys[key] = true;
-	//scene.keyPressed(key);
+	
+	if (sceneActive)
+		scene.keyPressed(key);
 }
 
 void Game::keyReleased(int key)
 {
 	keys[key] = false;
-	//scene.keyReleased(key);
+	if (sceneActive)
+		scene.keyReleased(key);
 }
 
 void Game::specialKeyPressed(int key)
@@ -64,38 +94,36 @@ void Game::mouseMove(int x, int y)
 {
 	mouseX = x;
 	mouseY = y;
-	if (menuActive)
-		mainMenu.mouseMoved(mouseX, mouseY, bLeftMouse);
-	//else
-	//	scene.mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+	if (sceneActive)
+		scene.mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+	else 
+		menu.mouseMoved(mouseX, mouseY, bLeftMouse);
 }
 
 void Game::mousePress(int button)
 {
 	if(button == GLUT_LEFT_BUTTON)
-	{
 		bLeftMouse = true;
-		if (menuActive)
-			mainMenu.mouseMoved(mouseX, mouseY, bLeftMouse);
-		//else
-		//	scene.mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
-	}
 	else if(button == GLUT_RIGHT_BUTTON)
-	{
 		bRightMouse = true;
-		if (menuActive)
-			mainMenu.mouseMoved(mouseX, mouseY, bLeftMouse);
-		//else
-		//	scene.mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
-	}
+	
+	if (sceneActive)
+		scene.mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+	else
+		menu.mouseMoved(mouseX, mouseY, bLeftMouse);
 }
 
 void Game::mouseRelease(int button)
 {
-	if(button == GLUT_LEFT_BUTTON)
+	if (button == GLUT_LEFT_BUTTON) 
 		bLeftMouse = false;
 	else if(button == GLUT_RIGHT_BUTTON)
 		bRightMouse = false;
+	
+	if (sceneActive)
+		scene.mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+	else
+		menu.mouseMoved(mouseX, mouseY, bLeftMouse);
 }
 
 bool Game::getKey(int key) const

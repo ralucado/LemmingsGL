@@ -3,7 +3,7 @@
 
 
 
-void Menu::init(string background)
+void Menu::init(string background, string buttonSprites[], glm::vec2 buttonPositions[])
 {
 	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 	glm::vec2 texCoords[2] = { glm::vec2(0.f, 0.f), glm::vec2(1.f, 1.f) };
@@ -19,7 +19,13 @@ void Menu::init(string background)
 	maskTexture.setMagFilter(GL_NEAREST);
 
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
-	buttons[0].init(glm::vec2(100, 100), "images/buttonPP.png", simpleTexProgram);
+
+	for (int i = 0; i < sizeof(buttonPositions); i++) {
+		Button *b = new Button;
+		b->init(buttonPositions[i], buttonSprites[i], simpleTexProgram);
+		buttons.push_back(b);
+	}
+
 }
 
 
@@ -81,7 +87,6 @@ void Menu::initShaders()
 
 void Menu::render()
 {
-	
 	glm::mat4 modelview;
 
 	maskedTexProgram.use();
@@ -97,15 +102,32 @@ void Menu::render()
 	modelview = glm::mat4(1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
-	for (int i = 0; i < NUM_BUTTONS_MAIN; i++)
-		buttons[i].render();
+	for (int i = 0; i < buttons.size(); i++)
+		buttons[i]->render();
 
 }
 
 void Menu::mouseMoved(int mouseX, int mouseY, bool bLeftButton)
 {
-	for (int i = 0; i < NUM_BUTTONS_MAIN; i++)
-		buttons[i].mouseMoved(mouseX, mouseY, bLeftButton);
+	for (int i = 0; i < buttons.size(); i++)
+		buttons[i]->mouseMoved(mouseX, mouseY, bLeftButton);
 	if (bLeftButton)
 		bLeftButton=true;
 }
+
+int Menu::buttonPressed() 
+{
+	for (int i = 0; i < buttons.size(); i++) {
+		if (buttons[i]->isSelected()) {
+			int i2 = i;
+			return i;
+		}
+	}
+	return -1;
+}
+
+Menu::~Menu() {
+	for (int i = 0; i < buttons.size(); i++)
+		delete buttons[i];
+}
+

@@ -6,17 +6,19 @@
 #include "MaskedTexturedQuad.h"
 #include "Button.h"
 
-#define NUM_BUTTONS_MAIN 1
+
 
 class Menu
 {
 public:
-	void init(string background);
+	~Menu();
+	void init(string background, string button[],  glm::vec2 buttonPositions[]);
 	void render();
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton);
+	int buttonPressed();
 
 private:
-	Button buttons[NUM_BUTTONS_MAIN];
+	vector<Button*> buttons;
 	Texture colorTexture;
 	VariableTexture maskTexture;
 	MaskedTexturedQuad *map;
