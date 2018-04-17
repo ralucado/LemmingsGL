@@ -50,7 +50,7 @@ private:
 	void updateMine();
 	void updateDig();
 
-	int collisionFloor(int maxFall);
+	int collisionFloor(int maxFall, int x, int y);
 	int collisionWall(int maxDeep, bool r, glm::ivec2 posBase);
 	bool collision();
 	bool calculateFall();

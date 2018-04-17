@@ -140,7 +140,7 @@ void Lemming::updateWalking() {
 	}
 	else
 	{
-		int fall = collisionFloor(7);
+		int fall = collisionFloor(7, 7, 16);
 		_sprite->position() += glm::vec2(0, fall);
 		if (fall > 6) {
 			_state = FALLING;
@@ -244,17 +244,17 @@ void Lemming::updateMine() {
 	}
 	else if (_framesFromStart == 15) {
 		_sprite->position() += glm::vec2(dir * 2, 0);
-	}
-	int fall = collisionFloor(1);
-	if (fall > 0) {
-		startFall();
+		int fall = collisionFloor(2, 7, 15);
+		if (fall > 1) {
+			startFall();
+		}
 	}
 }
 
 void Lemming::updateDig() {
 	_framesFromStart %= 16;
 	_sprite->position() += glm::vec2(0, -2);
-	int fall = collisionFloor(1);
+	int fall = collisionFloor(1, 7, 16);
 	_sprite->position() += glm::vec2(0, 2);
 	if (fall > 0) {
 		startFall();
@@ -267,7 +267,7 @@ void Lemming::updateDig() {
 }
 
 bool Lemming::calculateFall() {
-	int fall = collisionFloor(2);
+	int fall = collisionFloor(2, 7, 16);
 	if (fall > 0) {
 		_sprite->position() += glm::vec2(0, fall);
 		_fallenDistance += fall;
@@ -463,13 +463,13 @@ void Lemming::setMapMask(VariableTexture *mapMask)
 	_mask = mapMask;
 }
 
-int Lemming::collisionFloor(int maxFall)
+int Lemming::collisionFloor(int maxFall, int x, int y)
 {
 	bool bContact = false;
 	int fall = 0;
 	glm::ivec2 posBase = _sprite->position() + glm::vec2(DISPLACEMENT, 0); // Add the map displacement
 	
-	posBase += glm::ivec2(7, 16);
+	posBase += glm::ivec2(x, y);
 	while((fall < maxFall) && !bContact)
 	{
 		if((_mask->pixel(posBase.x, posBase.y+fall) == 0) && (_mask->pixel(posBase.x+1, posBase.y+fall) == 0))
