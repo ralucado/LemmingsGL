@@ -21,6 +21,13 @@ public:
 	Scene();
 	~Scene();
 
+	static Scene &instance()
+	{
+		static Scene S;
+
+		return S;
+	}
+
 	void init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings);
 	void update(int deltaTime);
 	void render();
@@ -31,6 +38,8 @@ public:
 
 	void keyReleased(int key);
 
+	float getDisplacementX() const;
+	float getDisplacementY() const;
 private:
 	void initShaders();
 	void modifyMask(int mouseX, int mouseY, bool apply);
@@ -45,6 +54,9 @@ private:
 	glm::mat4 projection;
 	Lemming lemming;
 	Button button;
+	glm::vec2 _geom[2];
+	glm::vec2 _texCoords[2];
+	float _dispX, _dispY;
 
 };
 

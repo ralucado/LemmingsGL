@@ -143,6 +143,8 @@ private:
 	Sprite *_sprite;
 	VariableTexture *_mask;
 	ShaderProgram _shaderProgram;
+	float _dispX;
+	float _dispY;
 };
 
 

@@ -22,30 +22,38 @@ double pit_distance(int x1, int y1, int x2, int y2){
 
 void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings)
 {
-	glm::vec2 geom[2] = {glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT))};
-	//glm::vec2 texCoords[2] = {glm::vec2(120.f / 512.0, 0.f), glm::vec2((120.f + 320.f) / 512.0f, 160.f / 256.0f)};
-	glm::vec2 texCoords[2] = {glm::vec2(120.f / 512.0, 0.f), glm::vec2((120.f + 320.f) / 512.0f, 160.f / 256.0f)};
-
-	initShaders();
-
-	map = MaskedTexturedQuad::createTexturedQuad(geom, texCoords, maskedTexProgram);
+	_dispX = 120;
+	_dispY = 0;
+	
+	//mapa
 	colorTexture.loadFromFile(filenameMap, TEXTURE_PIXEL_FORMAT_RGBA);
 	colorTexture.setMinFilter(GL_NEAREST);
 	colorTexture.setMagFilter(GL_NEAREST);
-	tileTexture.loadFromFile("images/sand.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	tileTexture.setMinFilter(GL_NEAREST);
-	tileTexture.setMagFilter(GL_NEAREST);
+	//mask
 	maskTexture.loadFromFile(filenameMask, TEXTURE_PIXEL_FORMAT_L);
 	maskTexture.setMinFilter(GL_NEAREST);
 	maskTexture.setMagFilter(GL_NEAREST);
+	//tile
+	tileTexture.loadFromFile("images/sand.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	tileTexture.setMinFilter(GL_NEAREST);
+	tileTexture.setMagFilter(GL_NEAREST);
+
+	//coords mapa
+	_texCoords[0] = glm::vec2(_dispX / colorTexture.width(), _dispY / colorTexture.height());
+	_texCoords[1] = glm::vec2((_dispX + float(CAMERA_WIDTH)) / colorTexture.width(), (_dispY + float(CAMERA_HEIGHT)) / colorTexture.height());
+
+	_geom[0] = glm::vec2(0.f, 0.f);
+	_geom[1] = glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT));
+
+	initShaders();
+
+	map = MaskedTexturedQuad::createTexturedQuad(_geom, _texCoords, maskedTexProgram);
 
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	
 	lemming.init(positionLemmings, simpleTexProgram);
 	lemming.setMapMask(&maskTexture);
-
-	//button.init(glm::vec2(60, 30), "images/lemming.png", simpleTexProgram);
 }
 
 unsigned int x = 0;
@@ -54,6 +62,8 @@ void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
 	lemming.update(deltaTime);
+	//map = MaskedTexturedQuad::createTexturedQuad(_geom, _texCoords, maskedTexProgram);
+
 }
 
 void Scene::render()
@@ -79,11 +89,15 @@ void Scene::render()
 
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
 {
-	//button.mouseMoved(mouseX, mouseY, bLeftButton);
-	if(bLeftButton)
-		modifyMask(mouseX, mouseY, false);
-	else if(bRightButton)
-		modifyMask(mouseX, mouseY, true);
+	if (Game::instance().getKey(32)) { //space
+		if(bLeftButton)
+			modifyMask(mouseX, mouseY, false);
+		else if(bRightButton)
+			modifyMask(mouseX, mouseY, true);
+	}
+	else {
+
+	}
 }
 
 void Scene::keyPressed(int key) {
@@ -173,5 +187,14 @@ void Scene::initShaders()
 	fShader.free();
 }
 
+float Scene::getDisplacementX() const
+{
+	return _dispX;
+}
+
+float Scene::getDisplacementY() const
+{
+	return _dispY;
+}
 
 

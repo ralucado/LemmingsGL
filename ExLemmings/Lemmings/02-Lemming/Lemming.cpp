@@ -38,12 +38,18 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 	_framesFromStart = 0;
 	loadSpritesheet("images/lemming.png", 8, 4, initialPosition);
 	_sprite->changeAnimation(FALLING_RIGHT_ANIM);
+	_dispX = _dispY = 0;
 }
 
 void Lemming::update(int deltaTime)
 {
 	if(_dead || _sprite->update(deltaTime) == 0) return;
 	++_framesFromStart;
+	_dispX = Scene::instance().getDisplacementX();
+	_dispY = Scene::instance().getDisplacementY();
+	cout << "dispX: " << _dispX << endl;
+	cout << "dispY: " << _dispY << endl;
+	_dispX = 120;
 	switch(_state)
 	{
 	case FALLING:
@@ -150,7 +156,7 @@ void Lemming::updateWalking() {
 }
 
 void Lemming::updateBash() {
-	glm::ivec2 posBase = _sprite->position() + glm::vec2(DISPLACEMENT, 0); // Add the map displacement
+	glm::ivec2 posBase = _sprite->position() + glm::vec2(_dispX, _dispY); // Add the map displacement
 	posBase += glm::ivec2(7, 15);
 	//check that there is material to dig
 	if (collisionWall(12, _dir, posBase) > 7+1*_dir) startWalk();
@@ -170,7 +176,7 @@ void Lemming::updateClimb() {
 	_framesFromStart %= 8;
 	int dir = (_dir ? 1 : -1);
 	int x = 7 + int(!_dir);
-	glm::ivec2 posBase = _sprite->position() + glm::vec2(DISPLACEMENT, 0); // Add the map displacement
+	glm::ivec2 posBase = _sprite->position() + glm::vec2(_dispX, _dispY); // Add the map displacement
 	posBase += glm::vec2(x, 0);
 	int col = collisionWall(7, _dir, posBase);
 	//pared discontinua hacia fuera
@@ -211,7 +217,7 @@ void Lemming::updateBuild() {
 	int x = (_dir ? 12 : 3);
 	int dir = (_dir ? 1 : -1);
 	if (_framesFromStart == 1) {
-		glm::ivec2 posBase = _sprite->position() + glm::vec2(DISPLACEMENT, 0) + glm::vec2(x, 14);
+		glm::ivec2 posBase = _sprite->position() + glm::vec2(_dispX, _dispY) + glm::vec2(x, 14);
 		int col = collisionWall(3, _dir, posBase);
 		if (col < 1) startWalk();
 	}
@@ -467,7 +473,7 @@ int Lemming::collisionFloor(int maxFall, int x, int y)
 {
 	bool bContact = false;
 	int fall = 0;
-	glm::ivec2 posBase = _sprite->position() + glm::vec2(DISPLACEMENT, 0); // Add the map displacement
+	glm::ivec2 posBase = _sprite->position() + glm::vec2(_dispX, _dispY); // Add the map displacement
 	
 	posBase += glm::ivec2(x, y);
 	while((fall < maxFall) && !bContact)
@@ -499,7 +505,7 @@ int Lemming::collisionWall(int maxDeep, bool r, glm::ivec2 posBase)
 
 bool Lemming::collision()
 {
-	glm::ivec2 posBase = _sprite->position() + glm::vec2(DISPLACEMENT, 0); // Add the map displacement
+	glm::ivec2 posBase = _sprite->position() + glm::vec2(_dispX, _dispY); // Add the map displacement
 	
 	posBase += glm::ivec2(7, 15);
 	if((_mask->pixel(posBase.x, posBase.y) == 0) && (_mask->pixel(posBase.x+1, posBase.y) == 0))
@@ -519,15 +525,15 @@ void Lemming::pop() {
 	die();
 	// Transform from mouse coordinates to map coordinates
 	//   The map is enlarged 3 times and displaced 120 pixels
-	int posX = floor(_sprite->position().x + DISPLACEMENT)+7;
-	int posY = floor(_sprite->position().y)+16;
+	int posX = floor(_sprite->position().x + _dispX)+7;
+	int posY = floor(_sprite->position().y + _dispY)+16;
 	hole(posX, posY, 5);
 }
 
 void Lemming::bashRow(int index) {
-	int displacement = DISPLACEMENT;
+	int displacement = _dispX;
 	if (!_dir) displacement += 19; //the sprite width
-	glm::ivec2 posBase = _sprite->position() + glm::vec2(displacement, 0);
+	glm::ivec2 posBase = _sprite->position() + glm::vec2(displacement, _dispY);
 	for (int i = 8; i <= bashPixels[index].x; ++i) {
 		int aux = (_dir ? i : -i);
 		_mask->setPixel(posBase.x + aux, posBase.y + bashPixels[index].y,     0);
@@ -536,8 +542,8 @@ void Lemming::bashRow(int index) {
 }
 
 void Lemming::digRow() {
-	int posX = floor(_sprite->position().x + DISPLACEMENT) + 3;
-	int posY = floor(_sprite->position().y) + 16;
+	int posX = floor(_sprite->position().x + _dispX) + 3;
+	int posY = floor(_sprite->position().y + _dispY) + 16;
 	for (int i = 0; i < 8; ++i){
 		_mask->setPixel(posX + i, posY - 2, 0);
 		_mask->setPixel(posX + i, posY - 1, 0);
@@ -545,8 +551,8 @@ void Lemming::digRow() {
 }
 
 void Lemming::mineRow() {
-	int posX = floor(_sprite->position().x + DISPLACEMENT);
-	int posY = floor(_sprite->position().y);
+	int posX = floor(_sprite->position().x + _dispX);
+	int posY = floor(_sprite->position().y + _dispY);
 	int Xini = (_dir ? 10 : 4);
 	int Xfi = Xini + 6;
 	for (int i = Xini; i <= Xfi; ++i) {
@@ -564,8 +570,8 @@ void Lemming::mineRow() {
 void Lemming::paintStep(bool r) {
 	int ini = 2;
 	if (r) ini = 9;
-	int X = floor(_sprite->position().x + DISPLACEMENT) + ini;
-	int Y = floor(_sprite->position().y) + 15;
+	int X = floor(_sprite->position().x + _dispX) + ini;
+	int Y = floor(_sprite->position().y + _dispY) + 15;
 	_mask->setPixel(X, Y, 255);
 	_mask->setPixel(X + 1, Y, 255);
 	_mask->setPixel(X + 2, Y, 255);
