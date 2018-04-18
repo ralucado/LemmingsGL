@@ -10,6 +10,8 @@ Scene::~Scene()
 {
 	if(map != NULL)
 		delete map;
+	menuPowers.~Menu();
+	menuControl.~Menu();
 }
 
 void Scene::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position, Sprite*& _sprite, Texture& _texture) {
@@ -84,7 +86,10 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 		lemmings[i]->init(positionLemmings, simpleTexProgram);
 		lemmings[i]->setMapMask(&maskTexture);
 	}
-
+	
+  //menus
+	menuPowers.init(menuPowersBackground, geomMenuPowers, menuPowersButtonSprite, menuPowersButtonPos, NUM_POWERS);
+	menuControl.init(menuControlBackground, geomMenuControl, menuControlButtonSprite, menuControlButtonPos, NUM_BUTTONS);
 
 	//exit
 	exit.init(positionExit, simpleTexProgram);
@@ -111,7 +116,7 @@ void Scene::update(int deltaTime)
 	entry.update(deltaTime, _disp);
 	//cursor
 	cursor.update(deltaTime);
-    //lemmings
+  //lemmings
 	bool finished = true;
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		if (lemmings[i]->checkAlive()) {
@@ -141,60 +146,69 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
-
 	//exit
 	exit.render();
-
 	//entry
 	entry.render();
-
 	//lemmings
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		lemmings[i]->render();
 	}
-
+  //menus
+  menuPowers.render();
+	menuControl.render();
 	//cursor
 	cursor.render();
 }
 
+
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
 {
-	//update cursor position
+  //update cursor position
 	cursor.setPosition(glm::vec2(mouseX/3-8, mouseY/3-8));
-	//modify mask
-	if (Game::instance().getKey(32)) { //space
-		if(bLeftButton)
-			modifyMask(mouseX, mouseY, false);
-		else if(bRightButton)
-			modifyMask(mouseX, mouseY, true);
-	}
-	else {
-		if (bLeftButton) {
-		    //update scrolling
-			if (_clicked) {
-				//disp = clickOrigin - mouse
-				float dx = (_clickOrigin.x - mouseX / 3) + _disp.x;
-				float dy = (_clickOrigin.y - mouseY / 3) + _disp.y;
-				if(dx >= 0 && dx < textureTrueSize.x - CAMERA_WIDTH) _disp.x = dx;
-				if(dy >= 0 && dy < textureTrueSize.y - CAMERA_HEIGHT) _disp.y = dy;
-				_clickOrigin.x = mouseX / 3;
-				_clickOrigin.y = mouseY / 3;
+  if (!(((mouseX / 3) > geomMenuPowers[0].x && (mouseX / 3) < geomMenuControl[1].x) &&
+		((mouseY / 3) > geomMenuPowers[0].y && (mouseY / 3) < geomMenuControl[1].y))){
+    //modify mask
+    if (Game::instance().getKey(32)) { //space
+      if(bLeftButton)
+        modifyMask(mouseX, mouseY, false);
+      else if(bRightButton)
+        modifyMask(mouseX, mouseY, true);
+    }
+    else {
+      if (bLeftButton) {
+          //update scrolling
+        if (_clicked) {
+          //disp = clickOrigin - mouse
+          float dx = (_clickOrigin.x - mouseX / 3) + _disp.x;
+          float dy = (_clickOrigin.y - mouseY / 3) + _disp.y;
+          if(dx >= 0 && dx < textureTrueSize.x - CAMERA_WIDTH) _disp.x = dx;
+          if(dy >= 0 && dy < textureTrueSize.y - CAMERA_HEIGHT) _disp.y = dy;
+          _clickOrigin.x = mouseX / 3;
+          _clickOrigin.y = mouseY / 3;
 
-			}
-			//start scrolling
-			else if(maskTexture.pixel(mouseX / 3, mouseY / 3) == 255) {
-				//first click, set click origin
-				_clicked = true;
-				_clickOrigin.x = mouseX/3;
-				_clickOrigin.y = mouseY/3;
-			}
-		}
-		//stop scrolling
-		else if (_clicked){
-			_clicked = false;
-		}
-	} 
+        }
+        //start scrolling
+        else if(maskTexture.pixel(mouseX / 3, mouseY / 3) == 255) {
+          //first click, set click origin
+          _clicked = true;
+          _clickOrigin.x = mouseX/3;
+          _clickOrigin.y = mouseY/3;
+        }
+      }
+      //stop scrolling
+      else if (_clicked){
+        _clicked = false;
+      }
+    } 
+  }
+	menuPowers.mouseMoved(mouseX, mouseY, bLeftButton);
+	menuControl.mouseMoved(mouseX, mouseY, bLeftButton);
+}
 
+void Scene::mouseReleased(int mouseX, int mouseY) {
+	menuPowers.mouseReleased(mouseX, mouseY);
+	menuControl.mouseReleased(mouseX, mouseY);
 }
 
 void Scene::mouseLeftPressed(int mouseX, int mouseY)
@@ -284,6 +298,10 @@ void Scene::modifyMask(int mouseX, int mouseY, bool apply)
 	}
 }
 
+bool Scene::checkFinished() {
+	return _finished;
+}
+
 void Scene::initShaders()
 {
 	Shader vShader, fShader;
@@ -337,8 +355,4 @@ void Scene::initShaders()
 	maskedTexProgram.bindFragmentOutput("outColor");
 	vShader.free();
 	fShader.free();
-}
-
-bool Scene::checkFinished() {
-	return _finished;
 }

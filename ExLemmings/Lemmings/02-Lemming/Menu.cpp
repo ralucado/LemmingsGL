@@ -2,16 +2,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-
-void Menu::init(string background, string buttonSprites[], glm::vec2 buttonPositions[])
+void Menu::init(string background, glm::vec2 geom[2], string buttonSprites[], glm::vec2 buttonPositions[], int num_buttons)
 {
-	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+
 	glm::vec2 texCoords[2] = { glm::vec2(0.f, 0.f), glm::vec2(1.f, 1.f) };
 
 	initShaders();
 	
 	map = MaskedTexturedQuad::createTexturedQuad(geom, texCoords, maskedTexProgram);
-	colorTexture.loadFromFile(background, TEXTURE_PIXEL_FORMAT_RGB);
+	colorTexture.loadFromFile(background, TEXTURE_PIXEL_FORMAT_RGBA);
 	colorTexture.setMinFilter(GL_NEAREST);
 	colorTexture.setMagFilter(GL_NEAREST);
 	maskTexture.loadFromFile("images/MainMenu.png", TEXTURE_PIXEL_FORMAT_L);
@@ -19,15 +18,13 @@ void Menu::init(string background, string buttonSprites[], glm::vec2 buttonPosit
 	maskTexture.setMagFilter(GL_NEAREST);
 
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
-
-	for (int i = 0; i < sizeof(buttonPositions); i++) {
+	for (int i = 0; i < num_buttons; i++) {
 		Button *b = new Button;
 		b->init(buttonPositions[i], buttonSprites[i], simpleTexProgram);
 		buttons.push_back(b);
 	}
 
 }
-
 
 void Menu::initShaders()
 {
@@ -109,10 +106,21 @@ void Menu::render()
 
 void Menu::mouseMoved(int mouseX, int mouseY, bool bLeftButton)
 {
-	for (int i = 0; i < buttons.size(); i++)
+	for (int i = 0; i < buttons.size(); i++) {
 		buttons[i]->mouseMoved(mouseX, mouseY, bLeftButton);
+	}
 	if (bLeftButton)
 		bLeftButton=true;
+}
+
+void Menu::mouseReleased(int mouseX, int mouseY) {
+	int buttonSelected = buttonPressed();
+	for (int i = 0; i < buttons.size(); i++) {
+		buttons[i]->mouseMoved(mouseX, mouseY, false);
+		if (buttons[i]->isSelected())
+			if (buttonSelected != -1 && buttonSelected != i)
+				buttons[buttonSelected]->deselect();
+	}
 }
 
 int Menu::buttonPressed() 

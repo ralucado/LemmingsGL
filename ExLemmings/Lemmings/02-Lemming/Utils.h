@@ -10,6 +10,9 @@
 #define NUM_POWERS 9
 using namespace std;
 
+#define NUM_POWERS 8
+
+
 class Utils
 {
 public:

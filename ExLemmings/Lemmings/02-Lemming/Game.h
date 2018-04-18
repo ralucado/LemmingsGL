@@ -2,12 +2,14 @@
 #define _GAME_INCLUDE
 
 
+#include <glm/glm.hpp>
 #include "Scene.h"
 #include "Menu.h"
 #include "Utils.h"
 
 #define NUM_SCENES 2
 #define NUM_BUTTONS_MAINMENU 1
+#define NUM_BUTTONS_ESCMENU 1
 
 // Game is a singleton (a class with a single instance) that represents our whole application
 
@@ -67,6 +69,8 @@ private:
 	
 	// Main Menu
 	string mainMenuBackground = "images/MainMenu.png";
+	glm::vec2 geomMainMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+	glm::vec2 geomESCMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string mainMenuButtonSprite[NUM_BUTTONS_MAINMENU]{
 		"images/buttonPP.png"

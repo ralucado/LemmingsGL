@@ -12,7 +12,7 @@ void Game::init()
 	sceneVisible = false;
 	sceneActive = false;
 	currentMenu = MAINMENU;
-	menu.init(mainMenuBackground, mainMenuButtonSprite, mainMenuButtonsPos);
+	menu.init(mainMenuBackground, geomMainMenu, mainMenuButtonSprite, mainMenuButtonsPos, NUM_BUTTONS_MAINMENU);
 }
 
 void Game::initScene(int i)
@@ -42,7 +42,7 @@ bool Game::update(int deltaTime)
 		case 0:
 			menu.~Menu();
 			currentMenu = MENUESC;
-			menu.init(escMenuBackground, escMenuButtonSprite, escMenuButtonsPos);
+			menu.init(escMenuBackground, geomESCMenu,escMenuButtonSprite, escMenuButtonsPos, NUM_BUTTONS_ESCMENU);
 			sceneActive = true;
 			sceneVisible = true;
 			initScene(LEVEL1);
@@ -142,9 +142,9 @@ void Game::mouseRelease(int button)
 		bRightMouse = false;
 	
 	if (sceneActive)
-		scene.mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+		scene.mouseReleased(mouseX, mouseY);
 	else
-		menu.mouseMoved(mouseX, mouseY, bLeftMouse);
+		menu.mouseReleased(mouseX, mouseY);
 }
 
 bool Game::getKey(int key) const

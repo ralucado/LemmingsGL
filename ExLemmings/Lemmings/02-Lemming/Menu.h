@@ -8,13 +8,15 @@
 
 
 
+
 class Menu
 {
 public:
 	~Menu();
-	void init(string background, string button[],  glm::vec2 buttonPositions[]);
+	void init(string background, glm::vec2 geom2[2], string button[],  glm::vec2 buttonPositions[], int num_buttons);
 	void render();
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton);
+	void mouseReleased(int mouseX, int mouseY);
 	int buttonPressed();
 
 private:
