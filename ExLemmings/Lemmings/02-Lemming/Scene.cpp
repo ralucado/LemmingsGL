@@ -10,7 +10,8 @@ Scene::~Scene()
 {
 	if(map != NULL)
 		delete map;
-	menu.~Menu();
+	menuPowers.~Menu();
+	menuControl.~Menu();
 }
 
 double pit_distance(int x1, int y1, int x2, int y2){
@@ -58,7 +59,8 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 		lemmings[i]->setMapMask(&maskTexture);
 	}
 	
-	menu.init(menuBackground, geomMenu, menuButtonSprite, menuButtonPos, NUM_BUTTONS);
+	menuPowers.init(menuPowersBackground, geomMenuPowers, menuPowersButtonSprite, menuPowersButtonPos, NUM_POWERS);
+	menuControl.init(menuControlBackground, geomMenuControl, menuControlButtonSprite, menuControlButtonPos, NUM_BUTTONS);
 
 }
 
@@ -105,15 +107,16 @@ void Scene::render()
 	for (int i = 0; i < NUM_LEMMINGS; i++) 
 		lemmings[i]->render();
 
-	menu.render();
+	menuPowers.render();
+	menuControl.render();
 	
 }
 
 
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
 {
-	if (!(((mouseX / 3) > geomMenu[0].x && (mouseX / 3) < geomMenu[1].x) &&
-		((mouseY / 3) > geomMenu[0].y && (mouseY / 3) < geomMenu[1].y)))
+	if (!(((mouseX / 3) > geomMenuPowers[0].x && (mouseX / 3) < geomMenuControl[1].x) &&
+		((mouseY / 3) > geomMenuPowers[0].y && (mouseY / 3) < geomMenuControl[1].y)))
 	{
 		if (Game::instance().getKey(32)) { //space
 			if (bLeftButton)
@@ -146,12 +149,14 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 		}
 	}
 
-	menu.mouseMoved(mouseX, mouseY, bLeftButton);
+	menuPowers.mouseMoved(mouseX, mouseY, bLeftButton);
+	menuControl.mouseMoved(mouseX, mouseY, bLeftButton);
 
 }
 
 void Scene::mouseReleased(int mouseX, int mouseY) {
-	menu.mouseReleased(mouseX, mouseY);
+	menuPowers.mouseReleased(mouseX, mouseY);
+	menuControl.mouseReleased(mouseX, mouseY);
 }
 
 void Scene::keyPressed(int key) {

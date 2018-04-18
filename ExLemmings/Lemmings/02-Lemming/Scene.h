@@ -14,7 +14,7 @@
 // It is responsible for updating and render them.
 
 #define NUM_LEMMINGS 1
-#define NUM_BUTTONS 10
+#define NUM_BUTTONS 3
 
 class Scene
 {
@@ -49,19 +49,17 @@ private:
 	glm::mat4 projection;
 	Lemming *lemmings[NUM_LEMMINGS];
 	glm::vec2 _positionExit;
-	Menu menu;
+	Menu menuPowers, menuControl;
 	glm::vec2 _geom[2];
 	glm::vec2 _texCoords[2];
 	glm::vec2 _disp;
 	glm::vec2 _clickOrigin;
 
 	// Lemming Menu
-	string menuBackground = "images/MainMenu.png";
-	glm::vec2 geomMenu[2] = { glm::vec2(0.f, 140.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+	string menuPowersBackground = "images/MainMenu.png";
+	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, 140.f), glm::vec2(float(CAMERA_WIDTH)*(8.f/11.f), float(CAMERA_HEIGHT)) };
 
-	string menuButtonSprite[NUM_BUTTONS]{
-		"images/buttonPP.png",
-		"images/buttonPP.png",
+	string menuPowersButtonSprite[NUM_POWERS]{
 		"images/buttonPP.png",
 		"images/buttonPP.png",
 		"images/buttonPP.png",
@@ -72,17 +70,31 @@ private:
 		"images/buttonPP.png"
 	};
 
-	glm::vec2 menuButtonPos[NUM_BUTTONS]{
-		glm::vec2(float(CAMERA_WIDTH)*(0.f / 10.f), geomMenu[0][1]),
-		glm::vec2(float(CAMERA_WIDTH)*(1.f / 10.f), geomMenu[0][1]),
-		glm::vec2(float(CAMERA_WIDTH)*(2.f / 10.f), geomMenu[0][1]),
-		glm::vec2(float(CAMERA_WIDTH)*(3.f / 10.f), geomMenu[0][1]),
-		glm::vec2(float(CAMERA_WIDTH)*(4.f / 10.f), geomMenu[0][1]),
-		glm::vec2(float(CAMERA_WIDTH)*(5.f / 10.f), geomMenu[0][1]),
-		glm::vec2(float(CAMERA_WIDTH)*(6.f / 10.f), geomMenu[0][1]),
-		glm::vec2(float(CAMERA_WIDTH)*(7.f / 10.f), geomMenu[0][1]),
-		glm::vec2(float(CAMERA_WIDTH)*(8.f / 10.f), geomMenu[0][1]),
-		glm::vec2(float(CAMERA_WIDTH)*(9.f / 10.f), geomMenu[0][1])
+	glm::vec2 menuPowersButtonPos[NUM_POWERS]{
+		glm::vec2(geomMenuPowers[1][0] *(0.f / NUM_POWERS), geomMenuPowers[0][1]),
+		glm::vec2(geomMenuPowers[1][0] *(1.f / NUM_POWERS), geomMenuPowers[0][1]),
+		glm::vec2(geomMenuPowers[1][0] *(2.f / NUM_POWERS), geomMenuPowers[0][1]),
+		glm::vec2(geomMenuPowers[1][0] *(3.f / NUM_POWERS), geomMenuPowers[0][1]),
+		glm::vec2(geomMenuPowers[1][0] *(4.f / NUM_POWERS), geomMenuPowers[0][1]),
+		glm::vec2(geomMenuPowers[1][0] *(5.f / NUM_POWERS), geomMenuPowers[0][1]),
+		glm::vec2(geomMenuPowers[1][0] *(6.f / NUM_POWERS), geomMenuPowers[0][1]),
+		glm::vec2(geomMenuPowers[1][0] *(7.f / NUM_POWERS), geomMenuPowers[0][1])
+	};
+
+	// Control Menu
+	string menuControlBackground = "images/MainMenu.png";
+	glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(8.f / 11.f), 140.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+
+	string menuControlButtonSprite[NUM_BUTTONS]{
+		"images/buttonPP.png",
+		"images/buttonPP.png",
+		"images/buttonPP.png"
+	};
+
+	glm::vec2 menuControlButtonPos[NUM_BUTTONS]{
+		glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (0.f / NUM_BUTTONS) + geomMenuControl[0][0], geomMenuControl[0][1]),
+		glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (1.f / NUM_BUTTONS) + geomMenuControl[0][0], geomMenuControl[0][1]),
+		glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (2.f / NUM_BUTTONS) + geomMenuControl[0][0], geomMenuControl[0][1])
 	};
 
 };
