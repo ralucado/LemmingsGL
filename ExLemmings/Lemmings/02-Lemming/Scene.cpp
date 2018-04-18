@@ -14,11 +14,30 @@ Scene::~Scene()
 	menuControl.~Menu();
 }
 
-double pit_distance(int x1, int y1, int x2, int y2){
-	return sqrt(double(pow(x1 - x2, 2) + pow(y1 - y2, 2)));
+void Scene::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position, Sprite*& _sprite, Texture& _texture) {
+	_texture.loadFromFile(filename, TEXTURE_PIXEL_FORMAT_RGBA);
+	_texture.setMinFilter(GL_NEAREST);
+	_texture.setMagFilter(GL_NEAREST);
+	_sprite = Sprite::createSprite(glm::ivec2(_texture.width() / NUM_FRAMES, _texture.height() / NUM_ANIMS), glm::vec2(1.0f / float(NUM_FRAMES), 1.0f / float(NUM_ANIMS)), &_texture, &simpleTexProgram);
+	_sprite->setNumberAnimations(NUM_ANIMS);
+	int speed = 12;
+	for (int i = 0; i < NUM_ANIMS; i++) {
+		_sprite->setAnimationSpeed(i, speed);
+	}
+	float height = 1.0f / float(NUM_ANIMS);
+	for (int frame = 0; frame < NUM_FRAMES; frame++) {
+		float num_frame = float(frame) / float(NUM_FRAMES);
+		for (int anim = 0; anim < NUM_ANIMS; anim++) {
+			//_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height + 0.5f / _texture.height()));
+			_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height));
+
+		}
+	}
+	_sprite->setPosition(position);
 }
 
-void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize)
+
+void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize, int powerCount[])
 {
 	_finished = false;
 	_disp.x = 0;
@@ -51,16 +70,34 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
+
+	//update available powers count
+	_powerCount = vector<int>(NUM_POWERS, 0);
+	for (int i = 0; i < _powerCount.size(); ++i) {
+		_powerCount[i] = powerCount[i];
+	}
+
+	//cursor
+	cursor.init(simpleTexProgram);
 	
-	_positionExit = positionExit;
+	//lemmings
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		lemmings[i] = new Lemming;
 		lemmings[i]->init(positionLemmings, simpleTexProgram);
 		lemmings[i]->setMapMask(&maskTexture);
 	}
 	
+  //menus
 	menuPowers.init(menuPowersBackground, geomMenuPowers, menuPowersButtonSprite, menuPowersButtonPos, NUM_POWERS);
 	menuControl.init(menuControlBackground, geomMenuControl, menuControlButtonSprite, menuControlButtonPos, NUM_BUTTONS);
+
+	//exit
+	exit.init(positionExit, simpleTexProgram);
+	exit.setMapMask(&maskTexture);
+
+	//entry
+	entry.init(positionEntry, simpleTexProgram);
+	entry.setMapMask(&maskTexture);
 
 }
 
@@ -73,12 +110,18 @@ void Scene::update(int deltaTime)
 	_texCoords[0] = glm::vec2(_disp.x / colorTexture.width(), _disp.y / colorTexture.height());
 	_texCoords[1] = glm::vec2((_disp.x + float(CAMERA_WIDTH)) / colorTexture.width(), (_disp.y + float(CAMERA_HEIGHT)) / colorTexture.height());
 	map = MaskedTexturedQuad::createTexturedQuad(_geom, _texCoords, maskedTexProgram);
-    //lemmings
+	//exit
+	exit.update(deltaTime, _disp);
+	//entry
+	entry.update(deltaTime, _disp);
+	//cursor
+	cursor.update(deltaTime);
+  //lemmings
 	bool finished = true;
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		if (lemmings[i]->checkAlive()) {
 			finished = false;
-			if (lemmings[i]->getPosition() == _positionExit)
+			if (lemmings[i]->getPosition() == exit.getBasePosition())
 				lemmings[i]->switchWin();
 			lemmings[i]->update(deltaTime, _disp);
 		}
@@ -88,8 +131,8 @@ void Scene::update(int deltaTime)
 
 void Scene::render()
 {
+	//shaders
 	glm::mat4 modelview;
-
 	maskedTexProgram.use();
 	maskedTexProgram.setUniformMatrix4f("projection", projection);
 	maskedTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
@@ -103,55 +146,64 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
-	
-	for (int i = 0; i < NUM_LEMMINGS; i++) 
+	//exit
+	exit.render();
+	//entry
+	entry.render();
+	//lemmings
+	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		lemmings[i]->render();
-
-	menuPowers.render();
+	}
+  //menus
+  menuPowers.render();
 	menuControl.render();
-	
+	//cursor
+	cursor.render();
 }
 
 
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
 {
-	if (!(((mouseX / 3) > geomMenuPowers[0].x && (mouseX / 3) < geomMenuControl[1].x) &&
-		((mouseY / 3) > geomMenuPowers[0].y && (mouseY / 3) < geomMenuControl[1].y)))
-	{
-		if (Game::instance().getKey(32)) { //space
-			if (bLeftButton)
-				modifyMask(mouseX, mouseY, false);
-			else if (bRightButton)
-				modifyMask(mouseX, mouseY, true);
-		}
-		else {
-			if (bLeftButton) {
-				if (_clicked) {
-					//disp = clickOrigin - mouse
-					float dx = (_clickOrigin.x - mouseX / 3) + _disp.x;
-					float dy = (_clickOrigin.y - mouseY / 3) + _disp.y;
-					if (dx >= 0 && dx < textureTrueSize.x - CAMERA_WIDTH) _disp.x = dx;
-					if (dy >= 0 && dy < textureTrueSize.y - CAMERA_HEIGHT) _disp.y = dy;
-					_clickOrigin.x = mouseX / 3;
-					_clickOrigin.y = mouseY / 3;
+  //update cursor position
+	cursor.setPosition(glm::vec2(mouseX/3-8, mouseY/3-8));
+  if (!(((mouseX / 3) > geomMenuPowers[0].x && (mouseX / 3) < geomMenuControl[1].x) &&
+		((mouseY / 3) > geomMenuPowers[0].y && (mouseY / 3) < geomMenuControl[1].y))){
+    //modify mask
+    if (Game::instance().getKey(32)) { //space
+      if(bLeftButton)
+        modifyMask(mouseX, mouseY, false);
+      else if(bRightButton)
+        modifyMask(mouseX, mouseY, true);
+    }
+    else {
+      if (bLeftButton) {
+          //update scrolling
+        if (_clicked) {
+          //disp = clickOrigin - mouse
+          float dx = (_clickOrigin.x - mouseX / 3) + _disp.x;
+          float dy = (_clickOrigin.y - mouseY / 3) + _disp.y;
+          if(dx >= 0 && dx < textureTrueSize.x - CAMERA_WIDTH) _disp.x = dx;
+          if(dy >= 0 && dy < textureTrueSize.y - CAMERA_HEIGHT) _disp.y = dy;
+          _clickOrigin.x = mouseX / 3;
+          _clickOrigin.y = mouseY / 3;
 
-				}
-				else {
-					//first click, set click origin
-					_clicked = true;
-					_clickOrigin.x = mouseX / 3;
-					_clickOrigin.y = mouseY / 3;
-				}
-			}
-			else if (_clicked) {
-				_clicked = false;
-			}
-		}
-	}
-
+        }
+        //start scrolling
+        else if(maskTexture.pixel(mouseX / 3, mouseY / 3) == 255) {
+          //first click, set click origin
+          _clicked = true;
+          _clickOrigin.x = mouseX/3;
+          _clickOrigin.y = mouseY/3;
+        }
+      }
+      //stop scrolling
+      else if (_clicked){
+        _clicked = false;
+      }
+    } 
+  }
 	menuPowers.mouseMoved(mouseX, mouseY, bLeftButton);
 	menuControl.mouseMoved(mouseX, mouseY, bLeftButton);
-
 }
 
 void Scene::mouseReleased(int mouseX, int mouseY) {
@@ -159,17 +211,71 @@ void Scene::mouseReleased(int mouseX, int mouseY) {
 	menuControl.mouseReleased(mouseX, mouseY);
 }
 
+void Scene::mouseLeftPressed(int mouseX, int mouseY)
+{
+	mouseX = mouseX / 3;
+	mouseY = mouseY / 3;
+	//update clicked lemming
+	for (int i = 0; i < NUM_LEMMINGS; i++) {
+		//calc 0,0 position from base position
+		glm::vec2 lemPos = lemmings[i]->getPosition() - glm::vec2(7, 16);
+		if (mouseX >= lemPos.x && mouseX <= lemPos.x + 16 && mouseY >= lemPos.y && mouseY <= lemPos.y + 16) {
+			cout << "clicked lemming " << i << endl;
+			if (_powerCount[_activePower] > 0) {
+				givePower(i);
+			}
+			break;
+		}
+	}
+}
+
 void Scene::keyPressed(int key) {
-	if (key == 'q') lemmings[0]->switchStopper();
-	else if (key == 'w') lemmings[0]->switchBomber();
-	else if (key == 'e') lemmings[0]->switchBasher();
-	else if (key == 'f') lemmings[0]->switchFloater();
+	if (key == 'q') _activePower = BLOCK;
+	else if (key == 'w') _activePower = BOMB;
+	else if (key == 'e') _activePower = BASH;
+	else if (key == 'f') _activePower = FLOAT;
+	else if (key == 'd') _activePower = DIG;
+	else if (key == 'c') _activePower = CLIMB;
+	else if (key == 'b') _activePower = BUILD;
+	else if (key == 'm') _activePower = MINE;
+	//godmode
 	else if (key == 's') lemmings[0]->revive();
-	else if (key == 'd') lemmings[0]->switchDigger();
-	else if (key == 'c') lemmings[0]->switchClimber();
-	else if (key == 'b') lemmings[0]->switchBuilder();
-	else if (key == 'm') lemmings[0]->switchMiner();
-  else if (key == 'y') lemmings[0]->switchWin();
+    else if (key == 'y') lemmings[0]->switchWin();
+}
+
+void Scene::givePower(int i) {
+	bool success = false;
+	switch (_activePower) {
+	case BLOCK:
+		success = lemmings[i]->switchStopper();
+		break;
+	case BOMB:
+		success = lemmings[i]->switchBomber();
+		break;
+	case BASH:
+		success = lemmings[i]->switchBasher();
+		break;
+	case FLOAT:
+		success = lemmings[i]->switchFloater();
+		break;
+	case DIG:
+		success = lemmings[i]->switchDigger();
+		break;
+	case CLIMB:
+		success = lemmings[i]->switchClimber();
+		break;
+	case BUILD:
+		success = lemmings[i]->switchBuilder();
+		break; 
+	case MINE:
+		success = lemmings[i]->switchMiner();
+		break;
+	default:
+		break;
+	}
+	if (success) {
+		--_powerCount[_activePower];
+	}
 }
 
 void Scene::keyReleased(int key) {

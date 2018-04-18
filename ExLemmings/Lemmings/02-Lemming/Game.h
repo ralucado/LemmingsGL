@@ -46,6 +46,7 @@ public:
 
 private:
 	bool bPlay;                       // Continue to play game?
+	bool bPause;
 	Scene scene;                      // Scene to render
 	Menu menu;
 	bool sceneVisible;
@@ -97,8 +98,14 @@ private:
 		MENUESC
 	};
 
+	enum Scenes
+	{
+		LEVEL1, LEVEL2
+	};
+
 	MenuState currentMenu;
 
+	void initScene(int i);
 
 
 

@@ -3,11 +3,11 @@
 #include <algorithm>
 #include <GL/glew.h>
 #include <GL/glut.h>
-#include "Cursor.h"
+#include "Exit.h"
 #include "Game.h"
 
 
-void Cursor::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position, int speed) {
+void Exit::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position, int speed) {
 	_spritesheet.loadFromFile(filename, TEXTURE_PIXEL_FORMAT_RGBA);
 	_spritesheet.setMinFilter(GL_NEAREST);
 	_spritesheet.setMagFilter(GL_NEAREST);
@@ -29,35 +29,45 @@ void Cursor::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, con
 }
 
 //void Exit::init(const glm::vec2 &initialPosition, const glm::vec2 &positionExit, ShaderProgram &shaderProgram)
-void Cursor::init(ShaderProgram &shaderProgram)
+void Exit::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram)
 {
 	_state = NORMAL;
 	_shaderProgram = shaderProgram;
 	_framesFromStart = 0;
-	loadSpritesheet("images/cursor.png", 1, 2, glm::vec2(0,0), 12);
-	_sprite->changeAnimation(NORMAL_ANIM);
+	loadSpritesheet("images/exit.png", 6, 1, initialPosition, 12);
+	_sprite->changeAnimation(ANIM);
 	_dispX = 0;
 	_dispY = 0;
 }
 
-void Cursor::update(int deltaTime)
+void Exit::update(int deltaTime, glm::vec2 disp)
 {
-	_sprite->update(deltaTime);
+	_sprite->position() += glm::vec2(_dispX - disp.x, _dispY - disp.y);
+	_dispX = disp.x;
+	_dispY = disp.y;
+	if (_sprite->update(deltaTime) == 0) return;
+	++_framesFromStart;
+
+	switch (_state)
+	{
+	case NORMAL:
+		break;
+	}
 }
 
-void Cursor::render()
+void Exit::render()
 {
-	_sprite->render();
+
+		_sprite->render();
 }
 
-void Cursor::setPosition(glm::vec2 position)
+
+void Exit::setMapMask(VariableTexture *mapMask)
 {
-	_sprite->setPosition(position);
+	_mask = mapMask;
 }
 
-void Cursor::setActive() {
-	_sprite->changeAnimation(ACTIVE_ANIM);
-}
-void Cursor::setNormal() {
-	_sprite->changeAnimation(NORMAL_ANIM);
+glm::vec2 Exit::getBasePosition()
+{
+	return glm::vec2(_sprite->position().x + 20, _sprite->position().y + 40);
 }
