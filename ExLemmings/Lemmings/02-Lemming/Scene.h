@@ -13,6 +13,7 @@
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
 
+#define NUM_LEMMINGS 1
 
 class Scene
 {
@@ -24,12 +25,10 @@ public:
 	void init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize);
 	void update(int deltaTime);
 	void render();
-	
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
-
 	void keyPressed(int key);
-
 	void keyReleased(int key);
+	bool checkFinished();
 
 private:
 	void initShaders();
@@ -43,9 +42,11 @@ private:
 	MaskedTexturedQuad *map;
 	ShaderProgram simpleTexProgram, maskedTexProgram;
 	float currentTime;
+	bool _finished;
 	bool _clicked;
 	glm::mat4 projection;
-	Lemming lemming;
+	Lemming *lemmings[NUM_LEMMINGS];
+	glm::vec2 _positionExit;
 	Button button;
 	glm::vec2 _geom[2];
 	glm::vec2 _texCoords[2];

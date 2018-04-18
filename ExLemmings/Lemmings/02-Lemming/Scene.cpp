@@ -20,11 +20,11 @@ double pit_distance(int x1, int y1, int x2, int y2){
 
 void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize)
 {
+	_finished = false;
 	_disp.x = 0;
 	_disp.y = 0;
 	textureTrueSize = ttSize;
 	_clicked = false;
-	
 	//mapa
 	colorTexture.loadFromFile(filenameMap, TEXTURE_PIXEL_FORMAT_RGBA);
 	colorTexture.setMinFilter(GL_NEAREST);
@@ -52,8 +52,16 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	
-	lemming.init(positionLemmings, simpleTexProgram);
-	lemming.setMapMask(&maskTexture);
+	_positionExit = positionExit;
+	for (int i = 0; i < NUM_LEMMINGS; i++) {
+		lemmings[i] = new Lemming;
+		lemmings[i]->init(positionLemmings, simpleTexProgram);
+		lemmings[i]->setMapMask(&maskTexture);
+	}
+	
+	
+	button.init(positionExit, "images/lemming.png", simpleTexProgram);
+
 }
 
 unsigned int x = 0;
@@ -61,12 +69,21 @@ unsigned int x = 0;
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
-	lemming.update(deltaTime, _disp);
 	//coords mapa
 	_texCoords[0] = glm::vec2(_disp.x / colorTexture.width(), _disp.y / colorTexture.height());
 	_texCoords[1] = glm::vec2((_disp.x + float(CAMERA_WIDTH)) / colorTexture.width(), (_disp.y + float(CAMERA_HEIGHT)) / colorTexture.height());
 	map = MaskedTexturedQuad::createTexturedQuad(_geom, _texCoords, maskedTexProgram);
-
+  //lemmings
+	bool finished = true;
+	for (int i = 0; i < NUM_LEMMINGS; i++) {
+		if (lemmings[i]->checkAlive()) {
+			finished = false;
+			if (lemmings[i]->getPosition() == _positionExit)
+				lemmings[i]->switchWin();
+			lemmings[i]->update(deltaTime, _disp);
+		}
+	}
+	_finished = finished;
 }
 
 void Scene::render()
@@ -86,8 +103,10 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
-	lemming.render();
-	//button.render();
+	for (int i = 0; i < NUM_LEMMINGS; i++) {
+		lemmings[i]->render();
+	}
+	button.render();
 }
 
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
@@ -125,15 +144,16 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 }
 
 void Scene::keyPressed(int key) {
-	if (key == 'q') lemming.switchStopper();
-	else if (key == 'w') lemming.switchBomber();
-	else if (key == 'e') lemming.switchBasher();
-	else if (key == 'f') lemming.switchFloater();
-	else if (key == 's') lemming.revive();
-	else if (key == 'd') lemming.switchDigger();
-	else if (key == 'c') lemming.switchClimber();
-	else if (key == 'b') lemming.switchBuilder();
-	else if (key == 'm') lemming.switchMiner();
+	if (key == 'q') lemmings[0]->switchStopper();
+	else if (key == 'w') lemmings[0]->switchBomber();
+	else if (key == 'e') lemmings[0]->switchBasher();
+	else if (key == 'f') lemmings[0]->switchFloater();
+	else if (key == 's') lemmings[0]->revive();
+	else if (key == 'd') lemmings[0]->switchDigger();
+	else if (key == 'c') lemmings[0]->switchClimber();
+	else if (key == 'b') lemmings[0]->switchBuilder();
+	else if (key == 'm') lemmings[0]->switchMiner();
+  else if (key == 'y') lemmings[0]->switchWin();
 }
 
 void Scene::keyReleased(int key) {
@@ -211,3 +231,6 @@ void Scene::initShaders()
 	fShader.free();
 }
 
+bool Scene::checkFinished() {
+	return _finished;
+}

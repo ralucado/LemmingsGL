@@ -6,6 +6,7 @@
 #include "Lemming.h"
 #include "Game.h"
 
+
 void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, const glm::vec2& position) {
 	_spritesheet.loadFromFile(filename, TEXTURE_PIXEL_FORMAT_RGBA);
 	_spritesheet.setMinFilter(GL_NEAREST);
@@ -29,6 +30,7 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 	_sprite->setPosition(position);
 }
 
+//void Lemming::init(const glm::vec2 &initialPosition, const glm::vec2 &positionExit, ShaderProgram &shaderProgram)
 void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram)
 {
 	_state = FALLING;
@@ -46,7 +48,7 @@ void Lemming::update(int deltaTime, glm::vec2 disp)
 	_sprite->position() += glm::vec2(_dispX - disp.x, _dispY - disp.y);
 	_dispX = disp.x;
 	_dispY = disp.y;
-	if(_dead || _sprite->update(deltaTime) == 0) return;
+	if(_dead || _sprite->update(deltaTime) == 0 || _win) return;
 	++_framesFromStart;
 
 	switch(_state)
@@ -269,6 +271,9 @@ void Lemming::updateDig() {
 		digRow();
 		_sprite->position() += glm::vec2(0, 2);
 	}
+
+
+
 }
 
 bool Lemming::calculateFall() {
@@ -284,7 +289,7 @@ bool Lemming::calculateFall() {
 
 void Lemming::render()
 {
-	if (!_dead) {
+	if (!_dead && !_win) {
 		//_shaderProgram.setUniform1i("clicked", b);
 		_shaderProgram.setUniform2f("center", _sprite->position().x, _sprite->position().y);
 
@@ -319,6 +324,16 @@ void Lemming::switchBomber() {
 	else if (_state == EXPLODING) {
 		_dead = false;
 		startWalk();
+	}
+}
+
+
+void Lemming::switchWin() {
+	if (_state != EXPLODING) {
+		loadSpritesheet("images/bomber.png", 16, 1, _sprite->position());
+		_state = EXPLODING;
+		_framesFromStart = 0;
+		_sprite->changeAnimation(EXPLODING_ANIM);
 	}
 }
 
@@ -538,6 +553,15 @@ void Lemming::bashRow(int index) {
 		_mask->setPixel(posBase.x + aux, posBase.y + bashPixels[index].y,     0);
 		_mask->setPixel(posBase.x + aux, posBase.y + bashPixels[index].y + 1, 0);
 	}
+}
+
+
+glm::vec2 Lemming::getPosition() {
+	return _sprite->position() + glm::vec2(7, 16); 
+}
+
+bool Lemming::checkAlive() {
+	return !(_win || _dead);
 }
 
 void Lemming::digRow() {

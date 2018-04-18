@@ -21,8 +21,11 @@ class Lemming
 {
 
 public:
+
 	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram);
+
 	void update(int deltaTime, glm::vec2 disp);
+
 	void render();
 	
 	void setMapMask(VariableTexture *mapMask);
@@ -36,6 +39,12 @@ public:
 	void switchBuilder();
 	void switchMiner();
 	void revive();
+	void switchWin();
+  
+	glm::vec2 getPosition();
+	bool checkAlive();
+
+
 	
 private:
 	void updateFalling();
@@ -134,6 +143,8 @@ private:
 	bool _canClimb = false;
 	bool _canFloat = false;
 	bool _dead = false;
+	bool _win = false;
+	glm::vec2 _positionExit;
 	int _builtSteps = 0;
 	int _framesFromStart = 0; //frames from the start of some animation, useful when building, exploding, etc.
 	int _fallenDistance = 0;
