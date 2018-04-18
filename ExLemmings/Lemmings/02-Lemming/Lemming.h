@@ -77,6 +77,7 @@ private:
 	void startBuild();
 	void endBuild();
 	void startMine();
+	void startWin();
 
 	void hole(int posX, int posY, int radius);
 	void pop();

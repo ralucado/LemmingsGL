@@ -85,11 +85,13 @@ void Lemming::update(int deltaTime, glm::vec2 disp)
 		updateDig();
 		break;
 	case EXPLODING:
-		cout << "frame: " << _framesFromStart << endl;
  		if (_framesFromStart == 16) pop();
 		break;
 	case SQUISHED:
 		if (_framesFromStart == 16) die();
+	case WIN:
+		if (_framesFromStart == 7) _win = true;
+		break;
 	}
 }
 
@@ -324,11 +326,8 @@ void Lemming::switchBomber() {
 
 
 void Lemming::switchWin() {
-	if (_state != EXPLODING) {
-		loadSpritesheet("images/bomber.png", 16, 1, _sprite->position(), 12);
-		_state = EXPLODING;
-		_framesFromStart = 0;
-		_sprite->changeAnimation(EXPLODING_ANIM);
+	if (_state != WIN) {
+		startWin();
 	}
 }
 
@@ -471,6 +470,13 @@ void Lemming::startMine() {
 	_state = MINE;
 	_framesFromStart = 0;
 	_sprite->changeAnimation((_dir ? MINE_RIGHT_ANIM : MINE_LEFT_ANIM));
+}
+
+void Lemming::startWin() {
+	loadSpritesheet("images/win.png", 7, 1, _sprite->position(), 12);
+	_state = WIN;
+	_framesFromStart = 0;
+	_sprite->changeAnimation(WIN_ANIM);
 }
 
 void Lemming::setMapMask(VariableTexture *mapMask)
