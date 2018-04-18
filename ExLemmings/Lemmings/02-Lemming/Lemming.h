@@ -86,6 +86,8 @@ private:
 
 	void paintStep(bool r);
 
+	void blockCells();
+
 	void die();
 
 	bool grounded();

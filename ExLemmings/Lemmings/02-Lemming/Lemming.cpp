@@ -387,6 +387,7 @@ void Lemming::startStop() {
 	_state = STOPPED;
 	loadSpritesheet("images/stopper.png", 16, 1, _sprite->position(), 12);
 	_sprite->changeAnimation(STOPPED_ANIM);
+	blockCells();
 }
 
 void Lemming::startPop() {
@@ -606,6 +607,18 @@ void Lemming::paintStep(bool r) {
 	_mask->setPixel(X + 1, Y, 255);
 	_mask->setPixel(X + 2, Y, 255);
 	_mask->setPixel(X + 3, Y, 255);
+}
+
+void Lemming::blockCells() {
+	int X = floor(_sprite->position().x + _dispX);
+	int Y = floor(_sprite->position().y + _dispY);
+	for (int i = 3; i < 12; ++i) {
+		for (int j = 9; j < 15; ++j) {
+			if ((i != 3 || j != 10) && (i != 12 || j != 10)) {
+				_mask->setPixel(X+i, Y+j, 1);
+			}
+		}
+	}
 }
 
 void Lemming::die() {
