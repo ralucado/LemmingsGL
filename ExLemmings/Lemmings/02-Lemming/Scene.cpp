@@ -10,13 +10,12 @@ Scene::~Scene()
 {
 	if(map != NULL)
 		delete map;
+	menu.~Menu();
 }
 
 double pit_distance(int x1, int y1, int x2, int y2){
 	return sqrt(double(pow(x1 - x2, 2) + pow(y1 - y2, 2)));
 }
-
-
 
 void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize)
 {
@@ -59,8 +58,7 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 		lemmings[i]->setMapMask(&maskTexture);
 	}
 	
-	
-	button.init(positionExit, "images/lemming.png", simpleTexProgram);
+	menu.init(menuBackground, geomMenu, menuButtonSprite, menuButtonPos, NUM_BUTTONS);
 
 }
 
@@ -73,7 +71,7 @@ void Scene::update(int deltaTime)
 	_texCoords[0] = glm::vec2(_disp.x / colorTexture.width(), _disp.y / colorTexture.height());
 	_texCoords[1] = glm::vec2((_disp.x + float(CAMERA_WIDTH)) / colorTexture.width(), (_disp.y + float(CAMERA_HEIGHT)) / colorTexture.height());
 	map = MaskedTexturedQuad::createTexturedQuad(_geom, _texCoords, maskedTexProgram);
-  //lemmings
+    //lemmings
 	bool finished = true;
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		if (lemmings[i]->checkAlive()) {
@@ -103,44 +101,57 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
-	for (int i = 0; i < NUM_LEMMINGS; i++) {
+	
+	for (int i = 0; i < NUM_LEMMINGS; i++) 
 		lemmings[i]->render();
-	}
-	button.render();
+
+	menu.render();
+	
 }
+
 
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
 {
-	if (Game::instance().getKey(32)) { //space
-		if(bLeftButton)
-			modifyMask(mouseX, mouseY, false);
-		else if(bRightButton)
-			modifyMask(mouseX, mouseY, true);
-	}
-	else {
-		if (bLeftButton) {
-			if (_clicked) {
-				//disp = clickOrigin - mouse
-				float dx = (_clickOrigin.x - mouseX / 3) + _disp.x;
-				float dy = (_clickOrigin.y - mouseY / 3) + _disp.y;
-				if(dx >= 0 && dx < textureTrueSize.x - CAMERA_WIDTH) _disp.x = dx;
-				if(dy >= 0 && dy < textureTrueSize.y - CAMERA_HEIGHT) _disp.y = dy;
-				_clickOrigin.x = mouseX / 3;
-				_clickOrigin.y = mouseY / 3;
+	if (!(((mouseX / 3) > geomMenu[0].x && (mouseX / 3) < geomMenu[1].x) &&
+		((mouseY / 3) > geomMenu[0].y && (mouseY / 3) < geomMenu[1].y)))
+	{
+		if (Game::instance().getKey(32)) { //space
+			if (bLeftButton)
+				modifyMask(mouseX, mouseY, false);
+			else if (bRightButton)
+				modifyMask(mouseX, mouseY, true);
+		}
+		else {
+			if (bLeftButton) {
+				if (_clicked) {
+					//disp = clickOrigin - mouse
+					float dx = (_clickOrigin.x - mouseX / 3) + _disp.x;
+					float dy = (_clickOrigin.y - mouseY / 3) + _disp.y;
+					if (dx >= 0 && dx < textureTrueSize.x - CAMERA_WIDTH) _disp.x = dx;
+					if (dy >= 0 && dy < textureTrueSize.y - CAMERA_HEIGHT) _disp.y = dy;
+					_clickOrigin.x = mouseX / 3;
+					_clickOrigin.y = mouseY / 3;
 
+				}
+				else {
+					//first click, set click origin
+					_clicked = true;
+					_clickOrigin.x = mouseX / 3;
+					_clickOrigin.y = mouseY / 3;
+				}
 			}
-			else {
-				//first click, set click origin
-				_clicked = true;
-				_clickOrigin.x = mouseX/3;
-				_clickOrigin.y = mouseY/3;
+			else if (_clicked) {
+				_clicked = false;
 			}
 		}
-		else if (_clicked){
-			_clicked = false;
-		}
 	}
 
+	menu.mouseMoved(mouseX, mouseY, bLeftButton);
+
+}
+
+void Scene::mouseReleased(int mouseX, int mouseY) {
+	menu.mouseReleased(mouseX, mouseY);
 }
 
 void Scene::keyPressed(int key) {
@@ -174,6 +185,10 @@ void Scene::modifyMask(int mouseX, int mouseY, bool apply)
 		for (int x = max(0, posX - radius); x <= min(maskTexture.width() - 1, posX + radius); x++){
 		if (Utils::instance().pit_distance(posX, posY, x, y) <= radius) maskTexture.setPixel(x, y, color);
 	}
+}
+
+bool Scene::checkFinished() {
+	return _finished;
 }
 
 void Scene::initShaders()
@@ -229,8 +244,4 @@ void Scene::initShaders()
 	maskedTexProgram.bindFragmentOutput("outColor");
 	vShader.free();
 	fShader.free();
-}
-
-bool Scene::checkFinished() {
-	return _finished;
 }
