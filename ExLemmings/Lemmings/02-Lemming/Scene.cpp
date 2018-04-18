@@ -126,6 +126,7 @@ void Scene::update(int deltaTime)
 			lemmings[i]->update(deltaTime, _disp);
 		}
 	}
+	_activePower =  Power(menuPowers.buttonPressed());
 	_finished = finished;
 }
 
@@ -155,7 +156,7 @@ void Scene::render()
 		lemmings[i]->render();
 	}
   //menus
-  menuPowers.render();
+    menuPowers.render();
 	menuControl.render();
 	//cursor
 	cursor.render();

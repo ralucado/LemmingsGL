@@ -111,6 +111,7 @@ void Menu::mouseMoved(int mouseX, int mouseY, bool bLeftButton)
 	}
 	if (bLeftButton)
 		bLeftButton=true;
+	//wtf jajaja
 }
 
 void Menu::mouseReleased(int mouseX, int mouseY) {
