@@ -8,6 +8,9 @@
 #include <algorithm>
 using namespace std;
 
+#define NUM_POWERS 8
+
+
 class Utils
 {
 public:
