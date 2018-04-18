@@ -23,8 +23,9 @@ class Lemming
 public:
 
 	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram);
-	//void init(const glm::vec2 &initialPosition, const glm::vec2 &positionExit, ShaderProgram &shaderProgram);
-	void update(int deltaTime);
+
+	void update(int deltaTime, glm::vec2 disp);
+
 	void render();
 	
 	void setMapMask(VariableTexture *mapMask);
@@ -33,25 +34,61 @@ public:
 	void switchFloater();
 	void switchClimber();
 	void switchBomber();
+	void switchBasher();
+	void switchDigger();
+	void switchBuilder();
+	void switchMiner();
+	void revive();
 	void switchWin();
-	void switchBasher(bool r);
+  
 	glm::vec2 getPosition();
 	bool checkAlive();
+
+
 	
 private:
-	int collisionFloor(int maxFall);
-	int collisionWall(int maxDeep, bool r);
-	bool collision();
-	bool updateFall();
+	void updateFalling();
+	void updateStartFloating();
+	void updateFloating();
+	void updateWalking();
+	void updateBash();
+	void updateClimb();
+	void updateEndClimb();
+	void updateBuild();
+	void updateEndBuild();
+	void updateMine();
+	void updateDig();
 
-	void startWalk(bool r);
-	void startFloat(bool r);
-	void startBash(bool r);
+	int collisionFloor(int maxFall, int x, int y);
+	int collisionWall(int maxDeep, bool r, glm::ivec2 posBase);
+	bool collision();
+	bool calculateFall();
+
+	void startWalk();
+	void startFall();
+	void startStop();
+	void startPop();
+	void startFloat();
+	void startBash();
 	void startSquish();
+	void startDig();
+	void startClimb();
+	void endClimb();
+	void startBuild();
+	void endBuild();
+	void startMine();
 
 	void hole(int posX, int posY, int radius);
 	void pop();
-	void bashRow(int index, bool r);
+	void bashRow(int index);
+
+	void digRow();
+
+	void mineRow();
+
+	void paintStep(bool r);
+
+	void die();
 
 	void loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position);
 
@@ -59,19 +96,21 @@ private:
 
 	enum LemmingState
 	{
-		WALKING_RIGHT, WALKING_LEFT,
-		FALLING_RIGHT, FALLING_LEFT,
+		WALKING,
+		FALLING,
 		STOPPED,
 		EXPLODING,
-		BASH_RIGHT, BASH_LEFT,
-		START_FLOAT_RIGHT, START_FLOAT_LEFT,
-		FLOAT_RIGHT, FLOAT_LEFT,
+		BASH,
+		START_FLOAT,
+		FLOAT,
 		SQUISHED,
-/*		CLIMBING,
-		END_CLIMBING,
-		BUILD_RIGHT, BUILD_LEFT, END_BUILD,
-		MINE_RIGHT, MINE_LEFT,
 		DIGGING, 
+		CLIMB,
+		END_CLIMB,
+		BUILD,
+		END_BUILD,
+		MINE,
+/*		
 		DRWONING,
 */
 	};
@@ -88,32 +127,35 @@ private:
 		START_FLOAT_RIGHT_ANIM=0, FLOAT_RIGHT_ANIM=1,
 		START_FLOAT_LEFT_ANIM=2, FLOAT_LEFT_ANIM=3,
 		SQUISHED_ANIM = 0,
+		DIGGING_ANIM = 0,
+		CLIMB_RIGHT_ANIM = 0, CLIMB_LEFT_ANIM = 1,
+		END_CLIMB_RIGHT_ANIM = 2, END_CLIMB_LEFT_ANIM = 3,
+		BUILD_RIGHT_ANIM = 0, BUILD_LEFT_ANIM = 1, END_BUILD_ANIM = 2,
+		MINE_RIGHT_ANIM = 0, MINE_LEFT_ANIM = 1,
 		/*
-		CLIMBING_ANIM,
-		END_CLIMBING_ANIM,
-		BUILD_RIGHT_ANIM, BUILD_LEFT_ANIM, END_BUILD_ANIM,
-		MINE_RIGHT_ANIM, MINE_LEFT_ANIM,
-		DIGGING_ANIM,
 		DRWONING_ANIM,
 		*/
 	};
 
 	bool pressedKey = false;
+	float DISPLACEMENT = 120;
 
 	bool _canClimb = false;
 	bool _canFloat = false;
 	bool _dead = false;
-
 	bool _win = false;
 	glm::vec2 _positionExit;
-
+	int _builtSteps = 0;
 	int _framesFromStart = 0; //frames from the start of some animation, useful when building, exploding, etc.
 	int _fallenDistance = 0;
+	bool _dir = true;
 	LemmingState _state;
 	Texture _spritesheet;
 	Sprite *_sprite;
 	VariableTexture *_mask;
 	ShaderProgram _shaderProgram;
+	float _dispX;
+	float _dispY;
 };
 
 

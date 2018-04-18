@@ -14,7 +14,7 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 	_sprite = Sprite::createSprite(glm::ivec2(_spritesheet.width() / NUM_FRAMES, _spritesheet.height() / NUM_ANIMS), glm::vec2(1.0f / float(NUM_FRAMES), 1.0f / float(NUM_ANIMS)), &_spritesheet, &_shaderProgram);
 	_sprite->setNumberAnimations(NUM_ANIMS);
 	int speed = 12;
-	if (_state == START_FLOAT_RIGHT || _state == START_FLOAT_LEFT) speed = 8;
+	if (_state == START_FLOAT) speed = 8;
 	for (int i = 0; i < NUM_ANIMS; i++) {
 		_sprite->setAnimationSpeed(i, speed);
 	}
@@ -22,7 +22,7 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 	for (int frame = 0; frame < NUM_FRAMES; frame++) {
 		float num_frame = float(frame) / float(NUM_FRAMES);
 		for (int anim = 0; anim < NUM_ANIMS; anim++) {
-			_sprite->addKeyframe(anim, glm::vec2(num_frame + 0.5f / _spritesheet.width(), float(anim)*height + 0.5f / _spritesheet.height()));
+			_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height + 0.5f / _spritesheet.height()));
 			//_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height));
 
 		}
@@ -33,174 +33,251 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 //void Lemming::init(const glm::vec2 &initialPosition, const glm::vec2 &positionExit, ShaderProgram &shaderProgram)
 void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram)
 {
-	_state = FALLING_RIGHT;
-	//_positionExit = positionExit;
+	_state = FALLING;
+	_dir = true;
 	_shaderProgram = shaderProgram;
+	_framesFromStart = 0;
 	loadSpritesheet("images/lemming.png", 8, 4, initialPosition);
 	_sprite->changeAnimation(FALLING_RIGHT_ANIM);
+	_dispX = 0;
+	_dispY = 0;
 }
 
-void Lemming::update(int deltaTime)
+void Lemming::update(int deltaTime, glm::vec2 disp)
 {
-	int fall;
+	_sprite->position() += glm::vec2(_dispX - disp.x, _dispY - disp.y);
+	_dispX = disp.x;
+	_dispY = disp.y;
+	if(_dead || _sprite->update(deltaTime) == 0 || _win) return;
+	++_framesFromStart;
 
-	if(_dead || _sprite->update(deltaTime) == 0 || _win)
-		return;
-	bool canDescend;
-	glm::vec2 ori;
 	switch(_state)
 	{
-	case FALLING_LEFT:
-		if (_fallenDistance > HEIGHT_TO_FLOAT && _canFloat) {
-			startFloat(false);
-		}
-		if (!updateFall()) {
-			if (_fallenDistance > HEIGHT_TO_DIE) {
-				startSquish();
-			}
-			else {
-				_fallenDistance = 0;
-				_sprite->changeAnimation(WALKING_LEFT_ANIM);
-				_state = WALKING_LEFT;
-			}
-		}
+	case FALLING:
+		updateFalling();
 		break;
-	case FALLING_RIGHT:
-		if (_fallenDistance > HEIGHT_TO_FLOAT && _canFloat) {
-			startFloat(true);
-		}
-		if (!updateFall()) {
-			if (_fallenDistance > HEIGHT_TO_DIE) {
-				startSquish();
-			}
-			else {
-				_fallenDistance = 0;
-				_sprite->changeAnimation(WALKING_RIGHT_ANIM);
-				_state = WALKING_RIGHT;
-			}
-		}
+	case FLOAT:
+		updateFloating();
 		break;
-	case FLOAT_LEFT:
-		if(!updateFall()){
-			startWalk(false);
-		}
+	case START_FLOAT:
+		updateStartFloating();
 		break;
-	case FLOAT_RIGHT:
-		if (!updateFall()){
-			startWalk(true);
-		}
+	case WALKING:
+		updateWalking();
 		break;
-	case START_FLOAT_LEFT:
-		++_framesFromStart;
-		if (_framesFromStart == 3) {
-			_state = FLOAT_LEFT;
-			_sprite->changeAnimation(FLOAT_LEFT_ANIM);
-		}
+	case BASH:
+		updateBash();
 		break;
-	case START_FLOAT_RIGHT:
-		++_framesFromStart;
-		if (_framesFromStart == 3) {
-			_state = FLOAT_RIGHT;
-			_sprite->changeAnimation(FLOAT_RIGHT_ANIM);
-		}
+	case CLIMB:
+		updateClimb();
 		break;
-	case WALKING_LEFT:
-		canDescend = true;
-		ori = _sprite->position(); //save original position
-		_sprite->position() += glm::vec2(-1, -3); //try to put the lemming up top a 3 pixel climb
-		while (collision() && canDescend)
-		{
-			//while the position is a collision, try a position lower
-			_sprite->position() += glm::vec2(0, 1);
-			//if we can not move more positions in a single movement
-			if (_sprite->position().y - ori.y > 3) canDescend = false;
-		}
-		if (!canDescend) {
-			_sprite->position() = ori;
-			_sprite->changeAnimation(WALKING_RIGHT_ANIM);
-			_state = WALKING_RIGHT;
-		}
-		else
-		{
-			fall = collisionFloor(7);
-			_sprite->position() += glm::vec2(0, fall);
-			if (fall > 6){
-				_state = FALLING_LEFT;
-				_sprite->changeAnimation(FALLING_LEFT_ANIM);
-			}
-		}
+	case END_CLIMB:
+		updateEndClimb();
 		break;
-	case WALKING_RIGHT:
-		canDescend = true;
-		ori = _sprite->position(); //save original position
-		_sprite->position() += glm::vec2(1, -3); //try to put the lemming up top a 3 pixel climb
-		while(collision() && canDescend)
-		{
-			//while the position is a collision, try a position lower
-			_sprite->position() += glm::vec2(0, 1);
-			//if we can not move more positions in a single movement
-			if (_sprite->position().y - ori.y > 3) canDescend = false;
-		}
-		if (!canDescend) {
-			_sprite->position() = ori;
-			_sprite->changeAnimation(WALKING_LEFT_ANIM);
-			_state = WALKING_LEFT;
-		}
-		else
-		{
-			fall = collisionFloor(7);
-			_sprite->position() += glm::vec2(0, fall);
-			if (fall > 6) {
-				_state = FALLING_RIGHT;
-				_sprite->changeAnimation(FALLING_RIGHT_ANIM);
-			}
-		}
+	case BUILD:
+		updateBuild();
 		break;
-		
-	case BASH_LEFT:
-		//check that there is material to dig
-		if (collisionWall(12, false) > 8) startWalk(false);
-
-		++_framesFromStart;
-		_framesFromStart %= 32;
-		if ((_framesFromStart > 10 && _framesFromStart <= 15) ||
-			(_framesFromStart > 26 && _framesFromStart <= 31))
-				_sprite->position() += glm::vec2(-1, 0);
-		if (_framesFromStart >= 2 && _framesFromStart <= 6)
-			bashRow(_framesFromStart - 2, false);
-		else if (_framesFromStart >= 18 && _framesFromStart <= 22)
-			bashRow(_framesFromStart - 18, false);
+	case END_BUILD:
+		updateEndBuild();
 		break;
-	case BASH_RIGHT:
-		//check that there is material to dig
-		if (collisionWall(12, true) > 8) startWalk(true);
-
-		++_framesFromStart;
-		_framesFromStart %= 32;
-		if ((_framesFromStart > 10 && _framesFromStart <= 15) ||
-			(_framesFromStart > 26 && _framesFromStart <= 31))
-			_sprite->position() += glm::vec2(1, 0);
-		if (_framesFromStart >= 2 && _framesFromStart <= 6)
-			bashRow(_framesFromStart - 2, true);
-		else if (_framesFromStart >= 18 && _framesFromStart <= 22)
-			bashRow(_framesFromStart - 18, true);
-
+	case MINE:
+		updateMine();
+		break;
+	case DIGGING:
+		updateDig();
 		break;
 	case EXPLODING:
-		++_framesFromStart;
-		if (_framesFromStart == 16) pop();
+		cout << "frame: " << _framesFromStart << endl;
+ 		if (_framesFromStart == 16) pop();
 		break;
 	case SQUISHED:
-		++_framesFromStart;
-		if (_framesFromStart == 16) _dead = true;
+		if (_framesFromStart == 16) die();
+	}
+}
+
+void Lemming::updateFalling() {
+	if (_fallenDistance > HEIGHT_TO_FLOAT && _canFloat) {
+		startFloat();
+	}
+	if (!calculateFall()) {
+		if (_fallenDistance > HEIGHT_TO_DIE) {
+			startSquish();
+		}
+		else {
+			startWalk();
+		}
+	}
+}
+
+void Lemming::updateStartFloating() {
+	if (_framesFromStart == 3) {
+		_state = FLOAT;
+		_sprite->changeAnimation(_dir? FLOAT_RIGHT_ANIM : FLOAT_LEFT_ANIM);
+	}
+}
+
+void Lemming::updateFloating() {
+	if (!calculateFall()) {
+		startWalk();
+	}
+}
+
+void Lemming::updateWalking() {
+	int dir = (_dir? 1 : -1);
+	bool canDescend = true;
+	glm::vec2 ori = _sprite->position(); //save original position
+	_sprite->position() += glm::vec2(dir*1, -3); //try to put the lemming up top a 3 pixel climb
+	while (collision() && canDescend)
+	{
+		//while the position is a collision, try a position lower
+		_sprite->position() += glm::vec2(0, 1);
+		//if we can not move more positions in a single movement
+		if (_sprite->position().y - ori.y > 3) canDescend = false;
+	}
+	if (!canDescend) {
+		if (_canClimb) {
+			startClimb();
+		}
+		else {
+			_sprite->position() = ori;
+			//change direction
+			_dir = !_dir;
+			_sprite->changeAnimation(_dir ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM);
+		}
+	}
+	else
+	{
+		int fall = collisionFloor(7, 7, 16);
+		_sprite->position() += glm::vec2(0, fall);
+		if (fall > 6) {
+			_state = FALLING;
+			_sprite->changeAnimation(_dir ? FALLING_RIGHT_ANIM : FALLING_LEFT_ANIM);
+		}
+	}
+}
+
+void Lemming::updateBash() {
+	glm::ivec2 posBase = _sprite->position() + glm::vec2(_dispX, _dispY); // Add the map displacement
+	posBase += glm::ivec2(7, 15);
+	//check that there is material to dig
+	if (collisionWall(12, _dir, posBase) > 7+1*_dir) startWalk();
+	_framesFromStart %= 32;
+
+	int dir = (_dir ? 1 : -1);
+	if ((_framesFromStart > 10 && _framesFromStart <= 15) ||
+		(_framesFromStart > 26 && _framesFromStart <= 31))
+		_sprite->position() += glm::vec2(dir*1, 0);
+	if (_framesFromStart >= 2 && _framesFromStart <= 6)
+		bashRow(_framesFromStart - 2);
+	else if (_framesFromStart >= 18 && _framesFromStart <= 22)
+		bashRow(_framesFromStart - 18);
+}
+
+void Lemming::updateClimb() {
+	_framesFromStart %= 8;
+	int dir = (_dir ? 1 : -1);
+	int x = 7 + int(!_dir);
+	glm::ivec2 posBase = _sprite->position() + glm::vec2(_dispX, _dispY); // Add the map displacement
+	posBase += glm::vec2(x, 0);
+	int col = collisionWall(7, _dir, posBase);
+	//pared discontinua hacia fuera
+ 	if (col > 1) {
+		int col2 = collisionWall(10, _dir, posBase + glm::ivec2(0, -4));
+		//si hay espacio para subir
+		if (col2 > 9) {
+			endClimb();
+		}
+		//si no hay suficiente espacio
+		else {
+			_sprite->position() += glm::vec2(-dir, -4);
+			_dir = !_dir;
+			startWalk();
+		}
+	}
+	//pared discontinua hacia dentro
+	else if (col == 0) {
+		_sprite->position() += glm::vec2(dir*-2, -2);
+		_dir = !_dir;
+		startWalk();
+	}
+	if (_framesFromStart > 3) _sprite->position() += glm::vec2(0, -1);
+}
+
+void Lemming::updateEndClimb() {
+	int dir = (_dir ? 1 : -1);
+	if (_framesFromStart < 4) {
+		_sprite->position() += glm::vec2(0, -2);
+	}
+	else if (_framesFromStart >= 4) {
+		_sprite->position() += glm::vec2(dir*1, -2);
+		if (_framesFromStart == 8) startWalk();
+	}
+}
+
+void Lemming::updateBuild() {
+	int x = (_dir ? 12 : 3);
+	int dir = (_dir ? 1 : -1);
+	if (_framesFromStart == 1) {
+		glm::ivec2 posBase = _sprite->position() + glm::vec2(_dispX, _dispY) + glm::vec2(x, 14);
+		int col = collisionWall(3, _dir, posBase);
+		if (col < 1) startWalk();
+	}
+	if (_framesFromStart == 16) {
+		_framesFromStart = 0;
+		++_builtSteps;
+		paintStep(_dir);
+		_sprite->position() += glm::vec2(dir * 2, -1);
+	}
+	if (_builtSteps == 12) endBuild();
+}
+
+void Lemming::updateEndBuild() {
+	if (_framesFromStart == 7)
+		startWalk();
+}
+
+void Lemming::updateMine() {
+	_framesFromStart %= 24;
+	int dir = (_dir ? 1 : -1);
+	if (_framesFromStart == 0) {
+		_sprite->position() += glm::vec2(0, 1);
+	}
+	else if (_framesFromStart == 3) {
+		_sprite->position() += glm::vec2(0, 1);
+	}
+	else if (_framesFromStart == 4) {
+		mineRow();
+		_sprite->position() += glm::vec2(dir * 1, 0);
+	}
+	else if (_framesFromStart == 15) {
+		_sprite->position() += glm::vec2(dir * 2, 0);
+		int fall = collisionFloor(2, 7, 15);
+		if (fall > 1) {
+			startFall();
+		}
+	}
+}
+
+void Lemming::updateDig() {
+	_framesFromStart %= 16;
+	_sprite->position() += glm::vec2(0, -2);
+	int fall = collisionFloor(1, 7, 16);
+	_sprite->position() += glm::vec2(0, 2);
+	if (fall > 0) {
+		startFall();
+	}
+	else if (_framesFromStart == 7 || _framesFromStart == 15)
+	{
+		digRow();
+		_sprite->position() += glm::vec2(0, 2);
 	}
 
 
 
 }
 
-bool Lemming::updateFall() {
-	int fall = collisionFloor(2);
+bool Lemming::calculateFall() {
+	int fall = collisionFloor(2, 7, 16);
 	if (fall > 0) {
 		_sprite->position() += glm::vec2(0, fall);
 		_fallenDistance += fall;
@@ -231,33 +308,25 @@ void Lemming::switchClimber() {
 
 void Lemming::switchStopper() {
 	if (_state != STOPPED) {
-		_state = STOPPED;
-		loadSpritesheet("images/stopper.png", 16, 1, _sprite->position());
-		_sprite->changeAnimation(STOPPED_ANIM);
+		startStop();
 	}
 	//TEST
 	else if (_state == STOPPED) {
-		_state = WALKING_RIGHT;
-		loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
-		_sprite->changeAnimation(WALKING_RIGHT_ANIM);
+		startWalk();
 	}
 }
 
 void Lemming::switchBomber() {
 	if (_state != EXPLODING) {
-		loadSpritesheet("images/bomber.png", 16, 1, _sprite->position());
-		_state = EXPLODING;
-		_framesFromStart = 0;
-		_sprite->changeAnimation(EXPLODING_ANIM);
+		startPop();
 	}
 	//TEST
 	else if (_state == EXPLODING) {
 		_dead = false;
-		_state = WALKING_RIGHT;
-		loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
-		_sprite->changeAnimation(WALKING_RIGHT_ANIM);
+		startWalk();
 	}
 }
+
 
 void Lemming::switchWin() {
 	if (_state != EXPLODING) {
@@ -268,36 +337,92 @@ void Lemming::switchWin() {
 	}
 }
 
-void Lemming::switchBasher(bool r)
+void Lemming::switchBasher()
 {
-	if (_state != BASH_RIGHT && _state != BASH_LEFT) {
-		startBash(r);
+	if (_state != BASH) {
+		startBash();
 	}
 	//TEST
-	else if (_state == BASH_RIGHT || _state == BASH_LEFT) {
-		startWalk(r);
+	else if (_state == BASH) {
+		startWalk();
 	}
 }
 
-void Lemming::startBash(bool r) {
-	loadSpritesheet("images/basher.png", 32, 2, _sprite->position());
-	_state = (r? BASH_RIGHT : BASH_LEFT);
-	_framesFromStart = 0;
-	_sprite->changeAnimation((r ? BASH_RIGHT_ANIM : BASH_LEFT_ANIM));
+
+void Lemming::switchDigger()
+{
+	if (_state != DIGGING) {
+		startDig();
+	}
+	//TEST
+	else if (_state == DIGGING) {
+		startWalk();
+	}
+}
+void Lemming::switchBuilder()
+{
+	if (_state != BUILD) {
+		startBuild();
+	}
+	//TEST
+	else if (_state == BUILD) {
+		startWalk();
+	}
 }
 
-void Lemming::startWalk(bool r) {
-	_state = (r ? WALKING_RIGHT : WALKING_LEFT);
+void Lemming::switchMiner()
+{
+	if (_state != MINE) {
+		startMine();
+	}
+	//TEST
+	else if (_state == MINE) {
+		startWalk();
+	}
+}
+
+
+
+void Lemming::startStop() {
+	_state = STOPPED;
+	loadSpritesheet("images/stopper.png", 16, 1, _sprite->position());
+	_sprite->changeAnimation(STOPPED_ANIM);
+}
+
+void Lemming::startPop() {
+	loadSpritesheet("images/bomber.png", 16, 1, _sprite->position());
+	_state = EXPLODING;
+	_framesFromStart = 0;
+	_sprite->changeAnimation(EXPLODING_ANIM);
+}
+
+void Lemming::startBash() {
+	loadSpritesheet("images/basher.png", 32, 2, _sprite->position());
+	_state = BASH;
+	_framesFromStart = 0;
+	_sprite->changeAnimation((_dir ? BASH_RIGHT_ANIM : BASH_LEFT_ANIM));
+}
+
+void Lemming::startWalk() {
+	_state = WALKING;
+	_fallenDistance = 0;
+	_framesFromStart = 0;
+	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
+	_sprite->changeAnimation((_dir ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM));
+}
+
+void Lemming::startFall() {
+	_state =FALLING;
 	_fallenDistance = 0;
 	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
-	_sprite->changeAnimation((r ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM));
+	_sprite->changeAnimation((_dir ? FALLING_RIGHT_ANIM : FALLING_LEFT_ANIM));
 }
 
-void Lemming::startFloat(bool r) {
-	_state = (r ? START_FLOAT_RIGHT : START_FLOAT_LEFT);
+void Lemming::startFloat() {
+	_state = FLOAT;
 	loadSpritesheet("images/floater.png", 4, 4, _sprite->position());
 	_framesFromStart = 0;
-	_sprite->changeAnimation((r ? START_FLOAT_RIGHT_ANIM : START_FLOAT_LEFT_ANIM));
+	_sprite->changeAnimation((_dir ? START_FLOAT_RIGHT_ANIM : START_FLOAT_LEFT_ANIM));
 }
 
 void Lemming::startSquish() {
@@ -307,20 +432,64 @@ void Lemming::startSquish() {
 	_sprite->changeAnimation(SQUISHED_ANIM);
 }
 
+void Lemming::startDig() {
+	_state = DIGGING;
+	//digging animation is displaced, it shows pixels of the lemming INSIDE of the ground
+	//we move 2 squares down to achieve the effect
+	_sprite->position() += glm::vec2(0, 2);
+	loadSpritesheet("images/digger.png", 16, 1, _sprite->position());
+	_framesFromStart = 0;
+	_sprite->changeAnimation(DIGGING_ANIM);
+}
 
+void Lemming::startClimb() {
+	_state = CLIMB;
+	loadSpritesheet("images/climber.png", 8, 4, _sprite->position());
+	_framesFromStart = 0;
+	_sprite->changeAnimation((_dir ? CLIMB_RIGHT_ANIM : CLIMB_LEFT_ANIM));
+}
+
+void Lemming::endClimb() {
+	_state = END_CLIMB;
+	_framesFromStart = 0;
+	_sprite->changeAnimation((_dir ? END_CLIMB_RIGHT_ANIM : END_CLIMB_LEFT_ANIM));
+}
+
+void Lemming::startBuild() {
+	loadSpritesheet("images/builder.png", 16, 3, _sprite->position());
+	_state =BUILD;
+	_framesFromStart = 0;
+	_builtSteps = 0;
+	_sprite->changeAnimation((_dir ? BUILD_RIGHT_ANIM : BUILD_LEFT_ANIM));
+}
+
+
+void Lemming::endBuild() {
+	_state = END_BUILD;
+	_framesFromStart = 0;
+	_builtSteps = 0;
+	_sprite->changeAnimation(END_BUILD_ANIM);
+}
+
+void Lemming::startMine() {
+	loadSpritesheet("images/miner.png", 24, 2, _sprite->position());
+	_state = MINE;
+	_framesFromStart = 0;
+	_sprite->changeAnimation((_dir ? MINE_RIGHT_ANIM : MINE_LEFT_ANIM));
+}
 
 void Lemming::setMapMask(VariableTexture *mapMask)
 {
 	_mask = mapMask;
 }
 
-int Lemming::collisionFloor(int maxFall)
+int Lemming::collisionFloor(int maxFall, int x, int y)
 {
 	bool bContact = false;
 	int fall = 0;
-	glm::ivec2 posBase = _sprite->position() + glm::vec2(120, 0); // Add the map displacement
+	glm::ivec2 posBase = _sprite->position() + glm::vec2(_dispX, _dispY); // Add the map displacement
 	
-	posBase += glm::ivec2(7, 16);
+	posBase += glm::ivec2(x, y);
 	while((fall < maxFall) && !bContact)
 	{
 		if((_mask->pixel(posBase.x, posBase.y+fall) == 0) && (_mask->pixel(posBase.x+1, posBase.y+fall) == 0))
@@ -332,13 +501,10 @@ int Lemming::collisionFloor(int maxFall)
 	return fall;
 }
 
-int Lemming::collisionWall(int maxDeep, bool r)
+int Lemming::collisionWall(int maxDeep, bool r, glm::ivec2 posBase)
 {
 	bool bContact = false;
 	int deep = 0;
-	glm::ivec2 posBase = _sprite->position() + glm::vec2(120, 0); // Add the map displacement
-
-	posBase += glm::ivec2(7, 15);
 	while ((abs(deep) < maxDeep) && !bContact)
 	{
 		if (_mask->pixel(posBase.x + deep, posBase.y) == 0)
@@ -353,7 +519,7 @@ int Lemming::collisionWall(int maxDeep, bool r)
 
 bool Lemming::collision()
 {
-	glm::ivec2 posBase = _sprite->position() + glm::vec2(120, 0); // Add the map displacement
+	glm::ivec2 posBase = _sprite->position() + glm::vec2(_dispX, _dispY); // Add the map displacement
 	
 	posBase += glm::ivec2(7, 15);
 	if((_mask->pixel(posBase.x, posBase.y) == 0) && (_mask->pixel(posBase.x+1, posBase.y) == 0))
@@ -370,24 +536,25 @@ void Lemming::hole(int posX, int posY, int radius) {
 }
 
 void Lemming::pop() {
-	_dead = true;
+	die();
 	// Transform from mouse coordinates to map coordinates
 	//   The map is enlarged 3 times and displaced 120 pixels
-	int posX = floor(_sprite->position().x + 120)+7;
-	int posY = floor(_sprite->position().y)+16;
+	int posX = floor(_sprite->position().x + _dispX)+7;
+	int posY = floor(_sprite->position().y + _dispY)+16;
 	hole(posX, posY, 5);
 }
 
-void Lemming::bashRow(int index, bool r) {
-	int displacement = 120;
-	if (!r) displacement += 19; //the sprite width
-	glm::ivec2 posBase = _sprite->position() + glm::vec2(displacement, 0);
+void Lemming::bashRow(int index) {
+	int displacement = _dispX;
+	if (!_dir) displacement += 19; //the sprite width
+	glm::ivec2 posBase = _sprite->position() + glm::vec2(displacement, _dispY);
 	for (int i = 8; i <= bashPixels[index].x; ++i) {
-		int aux = (r? i : -i);
+		int aux = (_dir ? i : -i);
 		_mask->setPixel(posBase.x + aux, posBase.y + bashPixels[index].y,     0);
 		_mask->setPixel(posBase.x + aux, posBase.y + bashPixels[index].y + 1, 0);
 	}
 }
+
 
 glm::vec2 Lemming::getPosition() {
 	return _sprite->position() + glm::vec2(7, 16); 
@@ -397,7 +564,50 @@ bool Lemming::checkAlive() {
 	return !(_win || _dead);
 }
 
+void Lemming::digRow() {
+	int posX = floor(_sprite->position().x + _dispX) + 3;
+	int posY = floor(_sprite->position().y + _dispY) + 16;
+	for (int i = 0; i < 8; ++i){
+		_mask->setPixel(posX + i, posY - 2, 0);
+		_mask->setPixel(posX + i, posY - 1, 0);
+	}
+}
 
+void Lemming::mineRow() {
+	int posX = floor(_sprite->position().x + _dispX);
+	int posY = floor(_sprite->position().y + _dispY);
+	int Xini = (_dir ? 10 : 4);
+	int Xfi = Xini + 6;
+	for (int i = Xini; i <= Xfi; ++i) {
+		for (int j = 5; j <= 15; ++j) {
+			int X = posX + i; int Y = posY + j;
+			if (!((X == posX + Xini + int(_dir) * 5 && Y == posY + 5) || (X == posX + Xini + int(_dir) * 5 + 1 && Y == posY + 5) ||
+				  (X == posX + Xini + int(_dir) * 6 && Y == posY + 6) || (X == posX + Xini + int(_dir) * 6 && Y == posY + 14) ||
+				  (X == posX + Xini + int(_dir) * 5 && Y == posY + 15) || (X == posX + Xini + int(_dir) * 5 + 1 && Y == posY + 15))) {
+				_mask->setPixel(X, Y, 0);
+			}
+		}
+	}
+}
 
+void Lemming::paintStep(bool r) {
+	int ini = 2;
+	if (r) ini = 9;
+	int X = floor(_sprite->position().x + _dispX) + ini;
+	int Y = floor(_sprite->position().y + _dispY) + 15;
+	_mask->setPixel(X, Y, 255);
+	_mask->setPixel(X + 1, Y, 255);
+	_mask->setPixel(X + 2, Y, 255);
+	_mask->setPixel(X + 3, Y, 255);
+}
 
+void Lemming::die() {
+	_dead = true;
+	_framesFromStart = 0;
+	_fallenDistance = 0;
+}
 
+void Lemming::revive() {
+	_dead = false;
+	startWalk();
+}

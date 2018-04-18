@@ -22,7 +22,7 @@ public:
 	Scene();
 	~Scene();
 
-	void init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings);
+	void init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize);
 	void update(int deltaTime);
 	void render();
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
@@ -36,16 +36,22 @@ private:
 
 private:
 	Texture colorTexture;
+	glm::vec2 textureTrueSize;
 	Texture tileTexture;
 	VariableTexture maskTexture;
 	MaskedTexturedQuad *map;
 	ShaderProgram simpleTexProgram, maskedTexProgram;
 	float currentTime;
 	bool _finished;
+	bool _clicked;
 	glm::mat4 projection;
 	Lemming *lemmings[NUM_LEMMINGS];
 	glm::vec2 _positionExit;
 	Button button;
+	glm::vec2 _geom[2];
+	glm::vec2 _texCoords[2];
+	glm::vec2 _disp;
+	glm::vec2 _clickOrigin;
 
 };
 
