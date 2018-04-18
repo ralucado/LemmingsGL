@@ -94,8 +94,14 @@ private:
 		MENUESC
 	};
 
+	enum Scenes
+	{
+		LEVEL1, LEVEL2
+	};
+
 	MenuState currentMenu;
 
+	void initScene(int i);
 
 
 

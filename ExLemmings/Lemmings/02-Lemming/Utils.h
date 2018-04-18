@@ -6,6 +6,8 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+
+#define NUM_POWERS 9
 using namespace std;
 
 class Utils

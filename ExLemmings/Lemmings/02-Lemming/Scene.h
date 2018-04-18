@@ -17,6 +17,7 @@
 
 #define NUM_LEMMINGS 2
 
+
 class Scene
 {
 
@@ -25,7 +26,7 @@ public:
 	~Scene();
 
 
-	void init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize);
+	void init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize, int powerCount[]);
 	void update(int deltaTime);
 	void render();
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
@@ -37,8 +38,13 @@ public:
 private:
 	void initShaders();
 	void modifyMask(int mouseX, int mouseY, bool apply);
-
+	void givePower(int i);
 private:
+	enum Power {
+		BLOCK, BOMB, BASH, FLOAT, DIG, CLIMB, BUILD, MINE, NONE
+	};
+	vector<int> _powerCount;
+	Power _activePower;
 	void loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2 & position, Sprite*& _sprite, Texture& texture);
 	Texture colorTexture;
 	Cursor cursor;

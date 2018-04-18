@@ -30,14 +30,14 @@ public:
 	
 	void setMapMask(VariableTexture *mapMask);
 
-	void switchStopper();
-	void switchFloater();
-	void switchClimber();
-	void switchBomber();
-	void switchBasher();
-	void switchDigger();
-	void switchBuilder();
-	void switchMiner();
+	bool switchStopper();
+	bool switchFloater();
+	bool switchClimber();
+	bool switchBomber();
+	bool switchBasher();
+	bool switchDigger();
+	bool switchBuilder();
+	bool switchMiner();
 	void revive();
 	void switchWin();
   

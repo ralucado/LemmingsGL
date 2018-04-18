@@ -35,7 +35,7 @@ void Scene::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, cons
 }
 
 
-void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize)
+void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize, int powerCount[])
 {
 	_finished = false;
 	_disp.x = 0;
@@ -68,6 +68,12 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
+
+	//update available powers count
+	_powerCount = vector<int>(NUM_POWERS, 0);
+	for (int i = 0; i < _powerCount.size(); ++i) {
+		_powerCount[i] = powerCount[i];
+	}
 
 	//cursor
 	cursor.init(simpleTexProgram);
@@ -201,22 +207,61 @@ void Scene::mouseLeftPressed(int mouseX, int mouseY)
 		glm::vec2 lemPos = lemmings[i]->getPosition() - glm::vec2(7, 16);
 		if (mouseX >= lemPos.x && mouseX <= lemPos.x + 16 && mouseY >= lemPos.y && mouseY <= lemPos.y + 16) {
 			cout << "clicked lemming " << i << endl;
+			if (_powerCount[_activePower] > 0) {
+				givePower(i);
+			}
 			break;
 		}
 	}
 }
 
 void Scene::keyPressed(int key) {
-	if (key == 'q') lemmings[0]->switchStopper();
-	else if (key == 'w') lemmings[0]->switchBomber();
-	else if (key == 'e') lemmings[0]->switchBasher();
-	else if (key == 'f') lemmings[0]->switchFloater();
+	if (key == 'q') _activePower = BLOCK;
+	else if (key == 'w') _activePower = BOMB;
+	else if (key == 'e') _activePower = BASH;
+	else if (key == 'f') _activePower = FLOAT;
+	else if (key == 'd') _activePower = DIG;
+	else if (key == 'c') _activePower = CLIMB;
+	else if (key == 'b') _activePower = BUILD;
+	else if (key == 'm') _activePower = MINE;
+	//godmode
 	else if (key == 's') lemmings[0]->revive();
-	else if (key == 'd') lemmings[0]->switchDigger();
-	else if (key == 'c') lemmings[0]->switchClimber();
-	else if (key == 'b') lemmings[0]->switchBuilder();
-	else if (key == 'm') lemmings[0]->switchMiner();
     else if (key == 'y') lemmings[0]->switchWin();
+}
+
+void Scene::givePower(int i) {
+	bool success = false;
+	switch (_activePower) {
+	case BLOCK:
+		success = lemmings[i]->switchStopper();
+		break;
+	case BOMB:
+		success = lemmings[i]->switchBomber();
+		break;
+	case BASH:
+		success = lemmings[i]->switchBasher();
+		break;
+	case FLOAT:
+		success = lemmings[i]->switchFloater();
+		break;
+	case DIG:
+		success = lemmings[i]->switchDigger();
+		break;
+	case CLIMB:
+		success = lemmings[i]->switchClimber();
+		break;
+	case BUILD:
+		success = lemmings[i]->switchBuilder();
+		break; 
+	case MINE:
+		success = lemmings[i]->switchMiner();
+		break;
+	default:
+		break;
+	}
+	if (success) {
+		--_powerCount[_activePower];
+	}
 }
 
 void Scene::keyReleased(int key) {

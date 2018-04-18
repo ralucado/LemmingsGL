@@ -286,7 +286,6 @@ void Lemming::updateDig() {
 
 }
 
-
 bool Lemming::calculateFall() {
 	int fall = collisionFloor(2, 7, 16);
 	if (fall > 0) {
@@ -297,15 +296,18 @@ bool Lemming::calculateFall() {
 	return false;
 }
 
-void Lemming::switchFloater() {
+bool Lemming::switchFloater() {
 	_canFloat = !_canFloat;
+	return true;
 }
 
-void Lemming::switchClimber() {
+bool Lemming::switchClimber() {
 	_canClimb = !_canClimb;
+	return true;
+
 }
 
-void Lemming::switchStopper() {
+bool Lemming::switchStopper() {
 	if (_state != STOPPED) {
 		startStop();
 	}
@@ -313,9 +315,11 @@ void Lemming::switchStopper() {
 	else if (_state == STOPPED) {
 		startWalk();
 	}
+	return true;
+
 }
 
-void Lemming::switchBomber() {
+bool Lemming::switchBomber() {
 	if (_state != EXPLODING) {
 		startPop();
 	}
@@ -324,16 +328,12 @@ void Lemming::switchBomber() {
 		_dead = false;
 		startWalk();
 	}
+	return true;
+
 }
 
 
-void Lemming::switchWin() {
-	if (_state != WIN) {
-		startWin();
-	}
-}
-
-void Lemming::switchBasher()
+bool Lemming::switchBasher()
 {
 	if (_state != BASH) {
 		startBash();
@@ -342,10 +342,12 @@ void Lemming::switchBasher()
 	else if (_state == BASH) {
 		startWalk();
 	}
+	return true;
+
 }
 
 
-void Lemming::switchDigger()
+bool Lemming::switchDigger()
 {
 	if (_state != DIGGING) {
 		startDig();
@@ -354,8 +356,10 @@ void Lemming::switchDigger()
 	else if (_state == DIGGING) {
 		startWalk();
 	}
+	return true;
+
 }
-void Lemming::switchBuilder()
+bool Lemming::switchBuilder()
 {
 	if (_state != BUILD) {
 		startBuild();
@@ -364,9 +368,11 @@ void Lemming::switchBuilder()
 	else if (_state == BUILD) {
 		startWalk();
 	}
+	return true;
+
 }
 
-void Lemming::switchMiner()
+bool Lemming::switchMiner()
 {
 	if (_state != MINE) {
 		startMine();
@@ -374,6 +380,14 @@ void Lemming::switchMiner()
 	//TEST
 	else if (_state == MINE) {
 		startWalk();
+	}
+	return true;
+
+}
+
+void Lemming::switchWin() {
+	if (_state != WIN) {
+		startWin();
 	}
 }
 
