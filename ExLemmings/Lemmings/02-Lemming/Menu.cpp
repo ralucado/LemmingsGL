@@ -118,7 +118,7 @@ void Menu::mouseReleased(int mouseX, int mouseY) {
 	for (int i = 0; i < buttons.size(); i++) {
 		buttons[i]->mouseMoved(mouseX, mouseY, false);
 		if (buttons[i]->isSelected())
-			if (buttonSelected != -1 && buttonSelected != i)
+			if (buttonSelected != -1) 
 				buttons[buttonSelected]->deselect();
 	}
 }
