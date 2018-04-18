@@ -7,6 +7,19 @@
 #include "Game.h"
 
 
+bool Lemming::grounded()
+{
+	return( _state != FLOAT && _state != START_FLOAT && _state != FALLING && _state != SQUISHED && _state != WIN && _state != EXPLODING);
+}
+
+bool Lemming::acceptsPower() {
+	if (grounded() && _state != STOPPED) {
+		cout << "accepts power" << endl;
+		return true;
+	}
+	return false;
+}
+
 void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, const glm::vec2& position, int speed) {
 	_spritesheet.loadFromFile(filename, TEXTURE_PIXEL_FORMAT_RGBA);
 	_spritesheet.setMinFilter(GL_NEAREST);
@@ -118,7 +131,6 @@ void Lemming::updateFalling() {
 }
 
 void Lemming::updateStartFloating() {
-	cout << _framesFromStart << endl;
 	if (_framesFromStart == 3) {
 		_state = FLOAT;
 		_sprite->changeAnimation(_dir? FLOAT_RIGHT_ANIM : FLOAT_LEFT_ANIM);
@@ -126,7 +138,6 @@ void Lemming::updateStartFloating() {
 }
 
 void Lemming::updateFloating() {
-	cout << "floating " << endl;
 	if (!calculateFall()) {
 		startWalk();
 	}
@@ -297,92 +308,71 @@ bool Lemming::calculateFall() {
 }
 
 bool Lemming::switchFloater() {
-	_canFloat = !_canFloat;
+	if(_canFloat) return false;
+	_canFloat = true;
 	return true;
 }
 
 bool Lemming::switchClimber() {
-	_canClimb = !_canClimb;
+	if (_canClimb || !acceptsPower()) return false;
+	_canClimb = true;
 	return true;
 
 }
 
 bool Lemming::switchStopper() {
-	if (_state != STOPPED) {
+	if (_state != STOPPED && acceptsPower()) {
 		startStop();
+		return true;
 	}
-	//TEST
-	else if (_state == STOPPED) {
-		startWalk();
-	}
-	return true;
-
+	return false;
 }
 
 bool Lemming::switchBomber() {
-	if (_state != EXPLODING) {
+	if (grounded()) {
 		startPop();
+		return true;
 	}
-	//TEST
-	else if (_state == EXPLODING) {
-		_dead = false;
-		startWalk();
-	}
-	return true;
+	return false;
 
 }
 
 
 bool Lemming::switchBasher()
 {
-	if (_state != BASH) {
+	if (_state != BASH && acceptsPower()) {
 		startBash();
+		return true;
 	}
-	//TEST
-	else if (_state == BASH) {
-		startWalk();
-	}
-	return true;
-
+	return false;
 }
 
 
 bool Lemming::switchDigger()
 {
-	if (_state != DIGGING) {
+	if (_state != DIGGING && acceptsPower()) {
 		startDig();
+		return true;
 	}
-	//TEST
-	else if (_state == DIGGING) {
-		startWalk();
-	}
-	return true;
-
+	return false;
 }
+
 bool Lemming::switchBuilder()
 {
-	if (_state != BUILD) {
+	if (_state != BUILD && acceptsPower()) {
 		startBuild();
+		return true;
 	}
-	//TEST
-	else if (_state == BUILD) {
-		startWalk();
-	}
-	return true;
-
+	return false;
 }
 
 bool Lemming::switchMiner()
 {
-	if (_state != MINE) {
+	if (_state != MINE && acceptsPower()) {
 		startMine();
+		return true;
 	}
-	//TEST
-	else if (_state == MINE) {
-		startWalk();
-	}
-	return true;
-
+	return false;
 }
 
 void Lemming::switchWin() {

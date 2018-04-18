@@ -91,6 +91,8 @@ private:
 
 	void die();
 
+	bool grounded();
+	bool acceptsPower();
 	void loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position, int speed);
 
 	glm::vec2 bashPixels[5] = {glm::vec2(13,6) , glm::vec2(14, 8) , glm::vec2(15, 10) , glm::vec2(14, 12), glm::vec2(14, 14)};
