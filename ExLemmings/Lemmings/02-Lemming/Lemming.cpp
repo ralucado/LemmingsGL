@@ -20,8 +20,8 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 	for (int frame = 0; frame < NUM_FRAMES; frame++) {
 		float num_frame = float(frame) / float(NUM_FRAMES);
 		for (int anim = 0; anim < NUM_ANIMS; anim++) {
-			_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height + 0.5f / _spritesheet.height()));
-			//_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height));
+			//_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height + 0.5f / _spritesheet.height()));
+			_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height));
 
 		}
 	}
@@ -118,6 +118,7 @@ void Lemming::updateFalling() {
 }
 
 void Lemming::updateStartFloating() {
+	cout << _framesFromStart << endl;
 	if (_framesFromStart == 3) {
 		_state = FLOAT;
 		_sprite->changeAnimation(_dir? FLOAT_RIGHT_ANIM : FLOAT_LEFT_ANIM);
@@ -125,6 +126,7 @@ void Lemming::updateStartFloating() {
 }
 
 void Lemming::updateFloating() {
+	cout << "floating " << endl;
 	if (!calculateFall()) {
 		startWalk();
 	}
@@ -413,7 +415,7 @@ void Lemming::startFall() {
 }
 
 void Lemming::startFloat() {
-	_state = FLOAT;
+	_state = START_FLOAT;
 	loadSpritesheet("images/floater.png", 4, 4, _sprite->position(), 8);
 	_framesFromStart = 0;
 	_sprite->changeAnimation((_dir ? START_FLOAT_RIGHT_ANIM : START_FLOAT_LEFT_ANIM));

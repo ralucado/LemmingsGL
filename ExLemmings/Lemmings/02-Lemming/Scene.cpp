@@ -68,6 +68,9 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
+
+	//cursor
+	cursor.init(simpleTexProgram);
 	
 	//lemmings
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
@@ -100,6 +103,8 @@ void Scene::update(int deltaTime)
 	exit.update(deltaTime, _disp);
 	//entry
 	entry.update(deltaTime, _disp);
+	//cursor
+	cursor.update(deltaTime);
     //lemmings
 	bool finished = true;
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
@@ -141,10 +146,16 @@ void Scene::render()
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		lemmings[i]->render();
 	}
+
+	//cursor
+	cursor.render();
 }
 
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
 {
+	//update cursor position
+	cursor.setPosition(glm::vec2(mouseX/3-8, mouseY/3-8));
+	//modify mask
 	if (Game::instance().getKey(32)) { //space
 		if(bLeftButton)
 			modifyMask(mouseX, mouseY, false);
@@ -153,6 +164,7 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 	}
 	else {
 		if (bLeftButton) {
+		    //update scrolling
 			if (_clicked) {
 				//disp = clickOrigin - mouse
 				float dx = (_clickOrigin.x - mouseX / 3) + _disp.x;
@@ -163,18 +175,35 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 				_clickOrigin.y = mouseY / 3;
 
 			}
-			else {
+			//start scrolling
+			else if(maskTexture.pixel(mouseX / 3, mouseY / 3) == 255) {
 				//first click, set click origin
 				_clicked = true;
 				_clickOrigin.x = mouseX/3;
 				_clickOrigin.y = mouseY/3;
 			}
 		}
+		//stop scrolling
 		else if (_clicked){
 			_clicked = false;
 		}
-	}
+	} 
 
+}
+
+void Scene::mouseLeftPressed(int mouseX, int mouseY)
+{
+	mouseX = mouseX / 3;
+	mouseY = mouseY / 3;
+	//update clicked lemming
+	for (int i = 0; i < NUM_LEMMINGS; i++) {
+		//calc 0,0 position from base position
+		glm::vec2 lemPos = lemmings[i]->getPosition() - glm::vec2(7, 16);
+		if (mouseX >= lemPos.x && mouseX <= lemPos.x + 16 && mouseY >= lemPos.y && mouseY <= lemPos.y + 16) {
+			cout << "clicked lemming " << i << endl;
+			break;
+		}
+	}
 }
 
 void Scene::keyPressed(int key) {

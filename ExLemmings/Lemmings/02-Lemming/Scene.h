@@ -10,11 +10,12 @@
 #include "Utils.h"
 #include "Exit.h"
 #include "Entry.h"
+#include "Cursor.h"
 
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
 
-#define NUM_LEMMINGS 1
+#define NUM_LEMMINGS 2
 
 class Scene
 {
@@ -28,6 +29,7 @@ public:
 	void update(int deltaTime);
 	void render();
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
+	void mouseLeftPressed(int mouseX, int mouseY);
 	void keyPressed(int key);
 	void keyReleased(int key);
 	bool checkFinished();
@@ -39,7 +41,9 @@ private:
 private:
 	void loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2 & position, Sprite*& _sprite, Texture& texture);
 	Texture colorTexture;
+	Cursor cursor;
 	glm::vec2 textureTrueSize;
+	int _selectedLemming;
 	Texture tileTexture;
 	VariableTexture maskTexture;
 	MaskedTexturedQuad *map;

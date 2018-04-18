@@ -20,8 +20,8 @@ void Exit::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const
 	for (int frame = 0; frame < NUM_FRAMES; frame++) {
 		float num_frame = float(frame) / float(NUM_FRAMES);
 		for (int anim = 0; anim < NUM_ANIMS; anim++) {
-			_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height + 0.5f / _spritesheet.height()));
-			//_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height));
+			//_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height + 0.5f / _spritesheet.height()));
+			_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height));
 
 		}
 	}

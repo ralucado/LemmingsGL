@@ -71,7 +71,7 @@ void Game::keyPressed(int key)
 		scene.init(sceneMaps[0], sceneMasks[0], glm::vec2(160, 10), glm::vec2(340, 91), glm::vec2(180, 30), glm::vec2(512, 159));
 		//                                      entry              exit               lemmings           drawing size
 	if (key == 50) //2
-		scene.init(sceneMaps[1], sceneMasks[1], glm::vec2(110, 10), glm::vec2(340, 91), glm::vec2(110, 10), glm::vec2(443, 160));
+		scene.init(sceneMaps[1], sceneMasks[1], glm::vec2(110, 10), glm::vec2(330, 109), glm::vec2(110, 10), glm::vec2(443, 160));
 	keys[key] = true;
 	if (key == 57) //9
 		bPause = !bPause;
@@ -113,8 +113,10 @@ void Game::mousePress(int button)
 	else if(button == GLUT_RIGHT_BUTTON)
 		bRightMouse = true;
 	
-	if (sceneActive)
+	if (sceneActive) {
 		scene.mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+		scene.mouseLeftPressed(mouseX, mouseY);
+	}
 	else
 		menu.mouseMoved(mouseX, mouseY, bLeftMouse);
 }
