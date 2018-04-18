@@ -76,10 +76,14 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 		lemmings[i]->setMapMask(&maskTexture);
 	}
 
-	_positionExit = positionExit;
 
-	exit.init(_positionExit, simpleTexProgram);
+	//exit
+	exit.init(positionExit, simpleTexProgram);
 	exit.setMapMask(&maskTexture);
+
+	//entry
+	entry.init(positionEntry, simpleTexProgram);
+	entry.setMapMask(&maskTexture);
 
 }
 
@@ -94,13 +98,13 @@ void Scene::update(int deltaTime)
 	map = MaskedTexturedQuad::createTexturedQuad(_geom, _texCoords, maskedTexProgram);
 	//exit
 	exit.update(deltaTime, _disp);
+	//entry
+	entry.update(deltaTime, _disp);
     //lemmings
 	bool finished = true;
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		if (lemmings[i]->checkAlive()) {
 			finished = false;
-			cout << "lemming " << lemmings[i]->getPosition().x << "," << lemmings[i]->getPosition().y << endl;
-			cout << "exit " << exit.getBasePosition().x << "," << exit.getBasePosition().y << endl;
 			if (lemmings[i]->getPosition() == exit.getBasePosition())
 				lemmings[i]->switchWin();
 			lemmings[i]->update(deltaTime, _disp);
@@ -129,6 +133,9 @@ void Scene::render()
 
 	//exit
 	exit.render();
+
+	//entry
+	entry.render();
 
 	//lemmings
 	for (int i = 0; i < NUM_LEMMINGS; i++) {

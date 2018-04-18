@@ -9,7 +9,7 @@
 #include "Button.h"
 #include "Utils.h"
 #include "Exit.h"
-
+#include "Entry.h"
 
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
@@ -50,11 +50,11 @@ private:
 	glm::mat4 projection;
 	Lemming *lemmings[NUM_LEMMINGS];
 	Exit exit;
+	Entry entry;
 	glm::vec2 _geom[2];
 	glm::vec2 _texCoords[2];
 	glm::vec2 _disp;
 	glm::vec2 _clickOrigin;
-	glm::vec2 _positionExit;
 };
 
 

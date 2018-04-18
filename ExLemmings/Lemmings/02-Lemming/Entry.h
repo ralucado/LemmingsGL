@@ -1,11 +1,11 @@
-#ifndef _EXIT_INCLUDE
-#define _EXIT_INCLUDE
+#ifndef _ENTRY_INCLUDE
+#define _ENTRY_INCLUDE
 
 #include "Sprite.h"
 #include "VariableTexture.h"
 #include "Utils.h"
 
-class Exit
+class Entry
 {
 
 public:
@@ -25,21 +25,20 @@ private:
 
 	void loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position, int speed);
 
-	enum ExitState
+	enum EntryState
 	{
+		OPENING,
 		NORMAL
 	};
 
-	//We need to use different textures for some animations
-	//therefore their indices will be the same
-	enum ExitAnim
+	enum EntryAnim
 	{
-		ANIM = 0
+		OPENING_ANIM, NORMAL_ANIM
 	};
 
 	int _framesFromStart = 0; //frames from the start of some animation, useful when building, exploding, etc.
 
-	ExitState _state;
+	EntryState _state;
 	Texture _spritesheet;
 	Sprite *_sprite;
 	VariableTexture *_mask;
@@ -49,6 +48,6 @@ private:
 };
 
 
-#endif // _EXIT_INCLUDE
+#endif // _ENTRY_INCLUDE
 
 
