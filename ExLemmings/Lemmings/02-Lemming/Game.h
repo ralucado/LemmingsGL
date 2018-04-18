@@ -44,6 +44,7 @@ public:
 
 private:
 	bool bPlay;                       // Continue to play game?
+	bool bPause;
 	Scene scene;                      // Scene to render
 	Menu menu;
 	bool sceneVisible;

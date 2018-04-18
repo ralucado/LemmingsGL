@@ -12,10 +12,27 @@ Scene::~Scene()
 		delete map;
 }
 
-double pit_distance(int x1, int y1, int x2, int y2){
-	return sqrt(double(pow(x1 - x2, 2) + pow(y1 - y2, 2)));
-}
+void Scene::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position, Sprite*& _sprite, Texture& _texture) {
+	_texture.loadFromFile(filename, TEXTURE_PIXEL_FORMAT_RGBA);
+	_texture.setMinFilter(GL_NEAREST);
+	_texture.setMagFilter(GL_NEAREST);
+	_sprite = Sprite::createSprite(glm::ivec2(_texture.width() / NUM_FRAMES, _texture.height() / NUM_ANIMS), glm::vec2(1.0f / float(NUM_FRAMES), 1.0f / float(NUM_ANIMS)), &_texture, &simpleTexProgram);
+	_sprite->setNumberAnimations(NUM_ANIMS);
+	int speed = 12;
+	for (int i = 0; i < NUM_ANIMS; i++) {
+		_sprite->setAnimationSpeed(i, speed);
+	}
+	float height = 1.0f / float(NUM_ANIMS);
+	for (int frame = 0; frame < NUM_FRAMES; frame++) {
+		float num_frame = float(frame) / float(NUM_FRAMES);
+		for (int anim = 0; anim < NUM_ANIMS; anim++) {
+			//_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height + 0.5f / _texture.height()));
+			_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height));
 
+		}
+	}
+	_sprite->setPosition(position);
+}
 
 
 void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize)
@@ -52,15 +69,17 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	
-	_positionExit = positionExit;
+	//lemmings
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		lemmings[i] = new Lemming;
 		lemmings[i]->init(positionLemmings, simpleTexProgram);
 		lemmings[i]->setMapMask(&maskTexture);
 	}
-	
-	
-	button.init(positionExit, "images/lemming.png", simpleTexProgram);
+
+	_positionExit = positionExit;
+
+	exit.init(_positionExit, simpleTexProgram);
+	exit.setMapMask(&maskTexture);
 
 }
 
@@ -73,12 +92,16 @@ void Scene::update(int deltaTime)
 	_texCoords[0] = glm::vec2(_disp.x / colorTexture.width(), _disp.y / colorTexture.height());
 	_texCoords[1] = glm::vec2((_disp.x + float(CAMERA_WIDTH)) / colorTexture.width(), (_disp.y + float(CAMERA_HEIGHT)) / colorTexture.height());
 	map = MaskedTexturedQuad::createTexturedQuad(_geom, _texCoords, maskedTexProgram);
-  //lemmings
+	//exit
+	exit.update(deltaTime, _disp);
+    //lemmings
 	bool finished = true;
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		if (lemmings[i]->checkAlive()) {
 			finished = false;
-			if (lemmings[i]->getPosition() == _positionExit)
+			cout << "lemming " << lemmings[i]->getPosition().x << "," << lemmings[i]->getPosition().y << endl;
+			cout << "exit " << exit.getBasePosition().x << "," << exit.getBasePosition().y << endl;
+			if (lemmings[i]->getPosition() == exit.getBasePosition())
 				lemmings[i]->switchWin();
 			lemmings[i]->update(deltaTime, _disp);
 		}
@@ -88,8 +111,8 @@ void Scene::update(int deltaTime)
 
 void Scene::render()
 {
+	//shaders
 	glm::mat4 modelview;
-
 	maskedTexProgram.use();
 	maskedTexProgram.setUniformMatrix4f("projection", projection);
 	maskedTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
@@ -103,10 +126,14 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
+
+	//exit
+	exit.render();
+
+	//lemmings
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		lemmings[i]->render();
 	}
-	button.render();
 }
 
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
@@ -153,7 +180,7 @@ void Scene::keyPressed(int key) {
 	else if (key == 'c') lemmings[0]->switchClimber();
 	else if (key == 'b') lemmings[0]->switchBuilder();
 	else if (key == 'm') lemmings[0]->switchMiner();
-  else if (key == 'y') lemmings[0]->switchWin();
+    else if (key == 'y') lemmings[0]->switchWin();
 }
 
 void Scene::keyReleased(int key) {

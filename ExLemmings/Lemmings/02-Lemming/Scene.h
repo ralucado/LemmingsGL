@@ -8,6 +8,7 @@
 #include "Lemming.h"
 #include "Button.h"
 #include "Utils.h"
+#include "Exit.h"
 
 
 // Scene contains all the entities of our game.
@@ -22,6 +23,7 @@ public:
 	Scene();
 	~Scene();
 
+
 	void init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize);
 	void update(int deltaTime);
 	void render();
@@ -35,6 +37,7 @@ private:
 	void modifyMask(int mouseX, int mouseY, bool apply);
 
 private:
+	void loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2 & position, Sprite*& _sprite, Texture& texture);
 	Texture colorTexture;
 	glm::vec2 textureTrueSize;
 	Texture tileTexture;
@@ -46,13 +49,12 @@ private:
 	bool _clicked;
 	glm::mat4 projection;
 	Lemming *lemmings[NUM_LEMMINGS];
-	glm::vec2 _positionExit;
-	Button button;
+	Exit exit;
 	glm::vec2 _geom[2];
 	glm::vec2 _texCoords[2];
 	glm::vec2 _disp;
 	glm::vec2 _clickOrigin;
-
+	glm::vec2 _positionExit;
 };
 
 

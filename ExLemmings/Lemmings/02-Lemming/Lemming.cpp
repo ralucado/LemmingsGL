@@ -7,14 +7,12 @@
 #include "Game.h"
 
 
-void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, const glm::vec2& position) {
+void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, const glm::vec2& position, int speed) {
 	_spritesheet.loadFromFile(filename, TEXTURE_PIXEL_FORMAT_RGBA);
 	_spritesheet.setMinFilter(GL_NEAREST);
 	_spritesheet.setMagFilter(GL_NEAREST);
 	_sprite = Sprite::createSprite(glm::ivec2(_spritesheet.width() / NUM_FRAMES, _spritesheet.height() / NUM_ANIMS), glm::vec2(1.0f / float(NUM_FRAMES), 1.0f / float(NUM_ANIMS)), &_spritesheet, &_shaderProgram);
 	_sprite->setNumberAnimations(NUM_ANIMS);
-	int speed = 12;
-	if (_state == START_FLOAT) speed = 8;
 	for (int i = 0; i < NUM_ANIMS; i++) {
 		_sprite->setAnimationSpeed(i, speed);
 	}
@@ -37,7 +35,7 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 	_dir = true;
 	_shaderProgram = shaderProgram;
 	_framesFromStart = 0;
-	loadSpritesheet("images/lemming.png", 8, 4, initialPosition);
+	loadSpritesheet("images/lemming.png", 8, 4, initialPosition, 12);
 	_sprite->changeAnimation(FALLING_RIGHT_ANIM);
 	_dispX = 0;
 	_dispY = 0;
@@ -92,6 +90,14 @@ void Lemming::update(int deltaTime, glm::vec2 disp)
 		break;
 	case SQUISHED:
 		if (_framesFromStart == 16) die();
+	}
+}
+
+void Lemming::render()
+{
+	if (!_dead && !_win) {
+		//_shaderProgram.setUniform2f("center", _sprite->position().x, _sprite->position().y);
+		_sprite->render();
 	}
 }
 
@@ -276,6 +282,7 @@ void Lemming::updateDig() {
 
 }
 
+
 bool Lemming::calculateFall() {
 	int fall = collisionFloor(2, 7, 16);
 	if (fall > 0) {
@@ -284,18 +291,6 @@ bool Lemming::calculateFall() {
 		return true;
 	}
 	return false;
-}
-
-
-void Lemming::render()
-{
-	if (!_dead && !_win) {
-		//_shaderProgram.setUniform1i("clicked", b);
-		_shaderProgram.setUniform2f("center", _sprite->position().x, _sprite->position().y);
-
-		//	.setUniformMatrix4f("modelview", modelview);
-		_sprite->render();
-	}
 }
 
 void Lemming::switchFloater() {
@@ -330,7 +325,7 @@ void Lemming::switchBomber() {
 
 void Lemming::switchWin() {
 	if (_state != EXPLODING) {
-		loadSpritesheet("images/bomber.png", 16, 1, _sprite->position());
+		loadSpritesheet("images/bomber.png", 16, 1, _sprite->position(), 12);
 		_state = EXPLODING;
 		_framesFromStart = 0;
 		_sprite->changeAnimation(EXPLODING_ANIM);
@@ -385,19 +380,19 @@ void Lemming::switchMiner()
 
 void Lemming::startStop() {
 	_state = STOPPED;
-	loadSpritesheet("images/stopper.png", 16, 1, _sprite->position());
+	loadSpritesheet("images/stopper.png", 16, 1, _sprite->position(), 12);
 	_sprite->changeAnimation(STOPPED_ANIM);
 }
 
 void Lemming::startPop() {
-	loadSpritesheet("images/bomber.png", 16, 1, _sprite->position());
+	loadSpritesheet("images/bomber.png", 16, 1, _sprite->position(), 12);
 	_state = EXPLODING;
 	_framesFromStart = 0;
 	_sprite->changeAnimation(EXPLODING_ANIM);
 }
 
 void Lemming::startBash() {
-	loadSpritesheet("images/basher.png", 32, 2, _sprite->position());
+	loadSpritesheet("images/basher.png", 32, 2, _sprite->position(), 12);
 	_state = BASH;
 	_framesFromStart = 0;
 	_sprite->changeAnimation((_dir ? BASH_RIGHT_ANIM : BASH_LEFT_ANIM));
@@ -407,27 +402,27 @@ void Lemming::startWalk() {
 	_state = WALKING;
 	_fallenDistance = 0;
 	_framesFromStart = 0;
-	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
+	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position(), 12);
 	_sprite->changeAnimation((_dir ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM));
 }
 
 void Lemming::startFall() {
 	_state =FALLING;
 	_fallenDistance = 0;
-	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position());
+	loadSpritesheet("images/lemming.png", 8, 4, _sprite->position(), 12);
 	_sprite->changeAnimation((_dir ? FALLING_RIGHT_ANIM : FALLING_LEFT_ANIM));
 }
 
 void Lemming::startFloat() {
 	_state = FLOAT;
-	loadSpritesheet("images/floater.png", 4, 4, _sprite->position());
+	loadSpritesheet("images/floater.png", 4, 4, _sprite->position(), 8);
 	_framesFromStart = 0;
 	_sprite->changeAnimation((_dir ? START_FLOAT_RIGHT_ANIM : START_FLOAT_LEFT_ANIM));
 }
 
 void Lemming::startSquish() {
 	_state = SQUISHED;
-	loadSpritesheet("images/squished.png", 16, 1, _sprite->position());
+	loadSpritesheet("images/squished.png", 16, 1, _sprite->position(), 12);
 	_framesFromStart = 0;
 	_sprite->changeAnimation(SQUISHED_ANIM);
 }
@@ -437,14 +432,14 @@ void Lemming::startDig() {
 	//digging animation is displaced, it shows pixels of the lemming INSIDE of the ground
 	//we move 2 squares down to achieve the effect
 	_sprite->position() += glm::vec2(0, 2);
-	loadSpritesheet("images/digger.png", 16, 1, _sprite->position());
+	loadSpritesheet("images/digger.png", 16, 1, _sprite->position(), 12);
 	_framesFromStart = 0;
 	_sprite->changeAnimation(DIGGING_ANIM);
 }
 
 void Lemming::startClimb() {
 	_state = CLIMB;
-	loadSpritesheet("images/climber.png", 8, 4, _sprite->position());
+	loadSpritesheet("images/climber.png", 8, 4, _sprite->position(), 12);
 	_framesFromStart = 0;
 	_sprite->changeAnimation((_dir ? CLIMB_RIGHT_ANIM : CLIMB_LEFT_ANIM));
 }
@@ -456,7 +451,7 @@ void Lemming::endClimb() {
 }
 
 void Lemming::startBuild() {
-	loadSpritesheet("images/builder.png", 16, 3, _sprite->position());
+	loadSpritesheet("images/builder.png", 16, 3, _sprite->position(), 12);
 	_state =BUILD;
 	_framesFromStart = 0;
 	_builtSteps = 0;
@@ -472,7 +467,7 @@ void Lemming::endBuild() {
 }
 
 void Lemming::startMine() {
-	loadSpritesheet("images/miner.png", 24, 2, _sprite->position());
+	loadSpritesheet("images/miner.png", 24, 2, _sprite->position(), 12);
 	_state = MINE;
 	_framesFromStart = 0;
 	_sprite->changeAnimation((_dir ? MINE_RIGHT_ANIM : MINE_LEFT_ANIM));

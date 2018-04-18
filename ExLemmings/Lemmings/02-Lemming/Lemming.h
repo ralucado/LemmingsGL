@@ -90,7 +90,7 @@ private:
 
 	void die();
 
-	void loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position);
+	void loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position, int speed);
 
 	glm::vec2 bashPixels[5] = {glm::vec2(13,6) , glm::vec2(14, 8) , glm::vec2(15, 10) , glm::vec2(14, 12), glm::vec2(14, 14)};
 
@@ -110,6 +110,7 @@ private:
 		BUILD,
 		END_BUILD,
 		MINE,
+		WIN,
 /*		
 		DRWONING,
 */
@@ -132,6 +133,7 @@ private:
 		END_CLIMB_RIGHT_ANIM = 2, END_CLIMB_LEFT_ANIM = 3,
 		BUILD_RIGHT_ANIM = 0, BUILD_LEFT_ANIM = 1, END_BUILD_ANIM = 2,
 		MINE_RIGHT_ANIM = 0, MINE_LEFT_ANIM = 1,
+		WIN_ANIM = 0,
 		/*
 		DRWONING_ANIM,
 		*/
