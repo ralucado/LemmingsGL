@@ -70,17 +70,18 @@ private:
 
 	// Lemming Menu
 	string menuPowersBackground = "images/MainMenu.png";
-	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, 140.f), glm::vec2(float(CAMERA_WIDTH)*(8.f/11.f), float(CAMERA_HEIGHT)) };
+	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, float(CAMERA_HEIGHT)-31.f), glm::vec2(float(CAMERA_WIDTH)*(9.f/12.f), float(CAMERA_HEIGHT)) };
 
 	string menuPowersButtonSprite[NUM_POWERS]{
-		"images/buttonPP.png",
-		"images/buttonPP.png",
-		"images/buttonPP.png",
-		"images/buttonPP.png",
-		"images/buttonPP.png",
-		"images/buttonPP.png",
-		"images/buttonPP.png",
-		"images/buttonPP.png"
+		"images/buttonBlock.png",
+		"images/buttonBomb.png",
+		"images/buttonBash.png",
+		"images/buttonFloat.png",
+		"images/buttonDig.png",
+		"images/buttonClimb.png",
+		"images/buttonBuild.png",
+		"images/buttonMine.png"
+		//"images/buttonNothing.png"
 	};
 
 	glm::vec2 menuPowersButtonPos[NUM_POWERS]{
@@ -91,23 +92,26 @@ private:
 		glm::vec2(geomMenuPowers[1][0] *(4.f / NUM_POWERS), geomMenuPowers[0][1]),
 		glm::vec2(geomMenuPowers[1][0] *(5.f / NUM_POWERS), geomMenuPowers[0][1]),
 		glm::vec2(geomMenuPowers[1][0] *(6.f / NUM_POWERS), geomMenuPowers[0][1]),
-		glm::vec2(geomMenuPowers[1][0] *(7.f / NUM_POWERS), geomMenuPowers[0][1])
+		glm::vec2(geomMenuPowers[1][0] *(7.f / NUM_POWERS), geomMenuPowers[0][1]),
+		//glm::vec2(geomMenuPowers[1][0] *(8.f / NUM_POWERS), geomMenuPowers[0][1])
 	};
 
 	// Control Menu
 	string menuControlBackground = "images/MainMenu.png";
-	glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(8.f / 11.f), 140.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+	glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(9.f / 12.f), float(CAMERA_HEIGHT) - 31.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string menuControlButtonSprite[NUM_BUTTONS]{
-		"images/buttonPP.png",
-		"images/buttonPP.png",
-		"images/buttonPP.png"
+		"images/buttonPause.png",
+		"images/buttonSpeed.png",
+		"images/buttonNuke.png",
+		//"images/buttonPlay.png"
 	};
 
 	glm::vec2 menuControlButtonPos[NUM_BUTTONS]{
 		glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (0.f / NUM_BUTTONS) + geomMenuControl[0][0], geomMenuControl[0][1]),
 		glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (1.f / NUM_BUTTONS) + geomMenuControl[0][0], geomMenuControl[0][1]),
-		glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (2.f / NUM_BUTTONS) + geomMenuControl[0][0], geomMenuControl[0][1])
+		glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (2.f / NUM_BUTTONS) + geomMenuControl[0][0], geomMenuControl[0][1]),
+		//glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (3.f / NUM_BUTTONS) + geomMenuControl[0][0], geomMenuControl[0][1]),
 	};
 
 };
