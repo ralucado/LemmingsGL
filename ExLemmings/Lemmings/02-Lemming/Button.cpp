@@ -41,7 +41,7 @@ void Button::mouseMoved(int mouseXInput, int mouseYInput, bool bLeftButton)
 	switch (_state)
 	{
 	case NORMAL:
-		if (over && bLeftButton) 
+		if (over && bLeftButton)
 		{
 			_sprite->changeAnimation(MOUSEPRESSED);
 			_state = MOUSEPRESSED;
@@ -79,6 +79,20 @@ void Button::mouseMoved(int mouseXInput, int mouseYInput, bool bLeftButton)
 		}
 		break;
 	}
+}
+
+
+bool Button::mouseReleased(int mouseXInput, int mouseYInput) {
+	int mouseX = mouseXInput / 3;
+	int mouseY = mouseYInput / 3;
+	bool over = false;
+	if (mouseX >= posX && mouseX <= posX + buttonWidth && mouseY >= posY && mouseY <= posY + buttonHeight)
+		over = true;
+	if (_state == SELECTED && over) {
+		this->deselect();
+		return true;
+	}
+	return false;
 }
 
 bool Button::isSelected() 

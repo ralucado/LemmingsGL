@@ -109,28 +109,26 @@ void Menu::mouseMoved(int mouseX, int mouseY, bool bLeftButton)
 	for (int i = 0; i < buttons.size(); i++) {
 		buttons[i]->mouseMoved(mouseX, mouseY, bLeftButton);
 	}
-	if (bLeftButton)
-		bLeftButton=true;
-	//wtf jajaja
 }
 
 void Menu::mouseReleased(int mouseX, int mouseY) {
 	int buttonSelected = buttonPressed();
 	for (int i = 0; i < buttons.size(); i++) {
-		buttons[i]->mouseMoved(mouseX, mouseY, false);
-		if (buttons[i]->isSelected())
-			if (buttonSelected != -1) 
-				buttons[buttonSelected]->deselect();
+		if (!(buttons[i]->mouseReleased(mouseX, mouseY))) {
+			buttons[i]->mouseMoved(mouseX, mouseY, false);
+			if (buttons[i]->isSelected())
+				if (buttonSelected != -1 && buttonSelected != i)
+					buttons[buttonSelected]->deselect();
+		}
 	}
 }
 
 int Menu::buttonPressed() 
 {
 	for (int i = 0; i < buttons.size(); i++) {
-		if (buttons[i]->isSelected()) {
-			int i2 = i;
+		if (buttons[i]->isSelected()) 
 			return i;
-		}
+		
 	}
 	return -1;
 }

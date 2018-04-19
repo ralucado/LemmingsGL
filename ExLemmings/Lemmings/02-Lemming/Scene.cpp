@@ -12,6 +12,8 @@ Scene::~Scene()
 		delete map;
 	menuPowers.~Menu();
 	menuControl.~Menu();
+	for (int i = 0; i < NUM_LEMMINGS; i++) 
+		delete lemmings[i];
 }
 
 void Scene::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position, Sprite*& _sprite, Texture& _texture) {
@@ -87,10 +89,9 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 		lemmings[i]->setMapMask(&maskTexture);
 	}
 	
-  //menus
-	menuPowers.init(menuPowersBackground, geomMenuPowers, menuPowersButtonSprite, menuPowersButtonPos, NUM_POWERS);
-	menuControl.init(menuControlBackground, geomMenuControl, menuControlButtonSprite, menuControlButtonPos, NUM_BUTTONS);
-
+	//menus
+	initMenus();
+	
 	//exit
 	exit.init(positionExit, simpleTexProgram);
 	exit.setMapMask(&maskTexture);
@@ -101,33 +102,53 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 
 }
 
+void Scene::initMenus() {
+	for (int i = 0; i < NUM_POWERS; i++) 
+		menuPowersButtonPos[i] = glm::vec2(geomMenuPowers[1][0] * (i / float(NUM_POWERS)), geomMenuPowers[0][1]);
+
+	for (int i = 0; i < NUM_BUTTONS; i++)
+		menuControlButtonPos[i] = glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (i / float(NUM_BUTTONS)) + geomMenuControl[0][0], geomMenuControl[0][1]);
+
+	menuPowers.init(menuPowersBackground, geomMenuPowers, menuPowersButtonSprite, menuPowersButtonPos, NUM_POWERS);
+	menuControl.init(menuControlBackground, geomMenuControl, menuControlButtonSprite, menuControlButtonPos, NUM_BUTTONS);
+}
+
 unsigned int x = 0;
 
 void Scene::update(int deltaTime)
 {
-	currentTime += deltaTime;
-	//coords mapa
-	_texCoords[0] = glm::vec2(_disp.x / colorTexture.width(), _disp.y / colorTexture.height());
-	_texCoords[1] = glm::vec2((_disp.x + float(CAMERA_WIDTH)) / colorTexture.width(), (_disp.y + float(CAMERA_HEIGHT)) / colorTexture.height());
-	map = MaskedTexturedQuad::createTexturedQuad(_geom, _texCoords, maskedTexProgram);
-	//exit
-	exit.update(deltaTime, _disp);
-	//entry
-	entry.update(deltaTime, _disp);
-	//cursor
-	cursor.update(deltaTime);
-  //lemmings
-	bool finished = true;
-	for (int i = 0; i < NUM_LEMMINGS; i++) {
-		if (lemmings[i]->checkAlive()) {
-			finished = false;
-			if (lemmings[i]->getPosition() == exit.getBasePosition())
-				lemmings[i]->switchWin();
-			lemmings[i]->update(deltaTime, _disp);
+
+	if (menuControl.buttonPressed() != 0) {
+		currentTime += deltaTime;
+		//coords mapa
+		_texCoords[0] = glm::vec2(_disp.x / colorTexture.width(), _disp.y / colorTexture.height());
+		_texCoords[1] = glm::vec2((_disp.x + float(CAMERA_WIDTH)) / colorTexture.width(), (_disp.y + float(CAMERA_HEIGHT)) / colorTexture.height());
+		map = MaskedTexturedQuad::createTexturedQuad(_geom, _texCoords, maskedTexProgram);
+		//exit
+		exit.update(deltaTime, _disp);
+		//entry
+		entry.update(deltaTime, _disp);
+		//cursor
+		cursor.update(deltaTime);
+		//lemmings
+		bool finished = true;
+		for (int i = 0; i < NUM_LEMMINGS; i++) {
+			if (lemmings[i]->checkAlive()) {
+				finished = false;
+				if (lemmings[i]->getPosition() == exit.getBasePosition()) {
+					lemmings[i]->switchWin();
+					lemmingsSaved++;
+				}
+				lemmings[i]->update(deltaTime, _disp);
+			}
 		}
+		_activePower = Power(menuPowers.buttonPressed());
+		if (menuControl.buttonPressed() == 2) {
+			for (int i = 0; i < NUM_LEMMINGS; i++)
+				lemmings[i]->switchBomber();
+		}
+		_finished = finished;
 	}
-	_activePower =  Power(menuPowers.buttonPressed());
-	_finished = finished;
 }
 
 void Scene::render()
@@ -155,7 +176,7 @@ void Scene::render()
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		lemmings[i]->render();
 	}
-  //menus
+	//menus
     menuPowers.render();
 	menuControl.render();
 	//cursor
@@ -301,6 +322,10 @@ void Scene::modifyMask(int mouseX, int mouseY, bool apply)
 
 bool Scene::checkFinished() {
 	return _finished;
+}
+
+bool Scene::checkWin() {
+	return lemmingsSaved >= NUM_LEMMINGS_MIN;
 }
 
 void Scene::initShaders()

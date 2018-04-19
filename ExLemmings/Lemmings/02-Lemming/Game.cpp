@@ -11,24 +11,57 @@ void Game::init()
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	sceneVisible = false;
 	sceneActive = false;
-	currentMenu = MAINMENU;
-	menu.init(mainMenuBackground, geomMainMenu, mainMenuButtonSprite, mainMenuButtonsPos, NUM_BUTTONS_MAINMENU);
+	initMenu(MAINMENU);
 }
 
 void Game::initScene(int i)
 {
+	initMenu(MENUESC);
+	sceneActive = true;
+	sceneVisible = true;
 	int powers[NUM_POWERS] = {1, 1, 1, 1, 1, 1, 1, 1, 0};
 	switch (i){
 	case LEVEL1:
 	    //                                      entry               exit                lemmings            drawing size         powercount
+		currentScene = LEVEL1;
 		scene.init(sceneMaps[0], sceneMasks[0], glm::vec2(180, 30), glm::vec2(340, 91), glm::vec2(180, 30), glm::vec2(512, 159), powers);
 		break;
 	case LEVEL2:
+		currentScene = LEVEL2;
 		scene.init(sceneMaps[1], sceneMasks[1], glm::vec2(110, 10), glm::vec2(330, 109), glm::vec2(110, 10), glm::vec2(443, 160), powers);
 		break;
+	case END:
+		sceneVisible = false;
+		sceneActive = false;
+		initMenu(CREDITS);
 	}
+}
 
+void Game::initMenu(int i)
+{
 
+	switch (i) {
+	case MAINMENU:
+		currentMenu = MAINMENU;
+		menu.init(mainMenuBackground, geomMainMenu, mainMenuButtonSprite, mainMenuButtonsPos, NUM_BUTTONS_MAINMENU);
+		break;
+	case MENUESC:
+		currentMenu = MENUESC;
+		menu.init(escMenuBackground, geomESCMenu, escMenuButtonSprite, escMenuButtonsPos, NUM_BUTTONS_ESCMENU);
+		break;
+	case MENUWIN:
+		currentMenu = MENUWIN;
+		menu.init(winMenuBackground, geomWinMenu, winMenuButtonSprite, winMenuButtonsPos, NUM_BUTTONS_WINMENU);
+		break;
+	case MENULOSE:
+		currentMenu = MENULOSE;
+		menu.init(loseMenuBackground, geomLoseMenu, loseMenuButtonSprite, loseMenuButtonsPos, NUM_BUTTONS_LOSEMENU);
+		break;
+	case CREDITS:
+		currentMenu = CREDITS;
+		menu.init(creditsBackground, geomCredits, creditsButtonSprite, creditsButtonsPos, NUM_BUTTONS_CREDITS);
+		break;
+	}
 }
 
 bool Game::update(int deltaTime)
@@ -41,25 +74,80 @@ bool Game::update(int deltaTime)
 		{
 		case 0:
 			menu.~Menu();
-			currentMenu = MENUESC;
-			menu.init(escMenuBackground, geomESCMenu,escMenuButtonSprite, escMenuButtonsPos, NUM_BUTTONS_ESCMENU);
-			sceneActive = true;
-			sceneVisible = true;
 			initScene(LEVEL1);
+			break;
+		case 1:
+			menu.~Menu();
+			initMenu(CREDITS);
 			break;
 		default:
 			break;
 		}
 		break;
 	case MENUESC:
+		switch (menu.buttonPressed())
+		{
+		case 0:
+			menu.~Menu();
+			initMenu(MENUESC);
+			sceneActive = true;
+			sceneVisible = true;
+			break;
+		default:
+			break;
+		}
+		break;
+	case MENUWIN:
+		switch (menu.buttonPressed())
+		{
+		case 0:
+			menu.~Menu();
+			initScene(currentScene+1);
+			break;
+		case 1:
+			menu.~Menu();
+			initScene(currentScene+1);
+			break;
+		default:
+			break;
+		}
+		break;
+	case MENULOSE:
+		switch (menu.buttonPressed())
+		{
+		case 0:
+			menu.~Menu();
+			initScene(currentScene);
+			break;
+		default:
+			break;
+		}
+		break;
+	case CREDITS:
+		switch (menu.buttonPressed())
+		{
+		case 0:
+			menu.~Menu();
+			initMenu(MAINMENU);
+			break;
+		default:
+			break;
+		}
 		break;
 	default:
 		break;
 	}
 
 	if (sceneActive) {
-		if (scene.checkFinished())
-			initScene(LEVEL1);
+		if (scene.checkFinished()) {
+			//scene.~Scene();
+			sceneActive = false;
+			sceneVisible = false;
+			if (scene.checkWin())
+				initMenu(MENUWIN);
+			else
+				initMenu(MENULOSE);
+		}
 		else
 			scene.update(deltaTime);
 	}
@@ -80,8 +168,20 @@ void Game::render()
 void Game::keyPressed(int key)
 {
 	keys[key] = true;
-	if(key == 27) // Escape code
-		bPlay = false;
+	if (key == 27) { // Escape code
+		//bPlay = false;
+		if (sceneActive) {
+			sceneActive = false;
+			initMenu(MENUESC);
+		}
+		else {
+			if (sceneVisible) {
+				menu.~Menu();
+				sceneActive = true;
+			}
+		}
+
+	}
 	if (key == 49) //1
 		initScene(LEVEL1);
 	if (key == 50) //2
