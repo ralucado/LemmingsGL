@@ -1,11 +1,12 @@
 #ifndef _UTILS_INCLUDE
 #define _UTILS_INCLUDE
 
-#include <iostream>
-#include <cmath>
-#include <vector>
-#include <string>
 #include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <set>
+#include <string>
+#include <vector>
 
 #define NUM_POWERS 8
 using namespace std;

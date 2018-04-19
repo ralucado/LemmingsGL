@@ -60,7 +60,7 @@ private:
 	ShaderProgram simpleTexProgram, maskedTexProgram;
 	float currentTime;
 	bool _finished;
-	int lemmingsSaved;
+	int lemmingsSaved = 0;
 	bool _clicked;
 	glm::mat4 projection;
 	Lemming *lemmings[NUM_LEMMINGS];
@@ -71,10 +71,10 @@ private:
 	glm::vec2 _texCoords[2];
 	glm::vec2 _disp;
 	glm::vec2 _clickOrigin;
-
+	set<pair<int, int>> _blockers;
 	// Lemming Menu
 	string menuPowersBackground = "images/MainMenu.png";
-	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, float(CAMERA_HEIGHT)-31.f), glm::vec2(float(CAMERA_WIDTH)*(8.f/11.f), float(CAMERA_HEIGHT)) };
+	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, float(CAMERA_HEIGHT)-31.f), glm::vec2(float(CAMERA_WIDTH)*(9.f/12.f), float(CAMERA_HEIGHT)) };
 
 	string menuPowersButtonSprite[NUM_POWERS]{
 		"images/buttonBlock.png",
@@ -84,14 +84,14 @@ private:
 		"images/buttonDig.png",
 		"images/buttonClimb.png",
 		"images/buttonBuild.png",
-		"images/buttonMine.png"
+		"images/buttonMine.png",
 	};
 
 	glm::vec2 menuPowersButtonPos[NUM_POWERS];
 
 	// Control Menu
 	string menuControlBackground = "images/MainMenu.png";
-	glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(8.f / 11.f), float(CAMERA_HEIGHT) - 31.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+	glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(9.f / 12.f), float(CAMERA_HEIGHT) - 31.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string menuControlButtonSprite[NUM_BUTTONS]{
 		"images/buttonPause.png",

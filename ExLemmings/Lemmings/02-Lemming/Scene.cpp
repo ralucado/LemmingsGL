@@ -87,7 +87,7 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 	//lemmings
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		lemmings[i] = new Lemming;
-		lemmings[i]->init(positionLemmings, simpleTexProgram);
+		lemmings[i]->init(positionLemmings, simpleTexProgram, &_blockers);
 		lemmings[i]->setMapMask(&maskTexture);
 	}
 	
@@ -122,8 +122,8 @@ unsigned int x = 0;
 void Scene::update(int deltaTime)
 {
 
-	if (menuControl.buttonPressed() != 0) {
-		if (menuControl.buttonPressed() == 1) deltaTime *= 2;
+	if (menuControl.buttonPressed() != 0) { //pause
+		if (menuControl.buttonPressed() == 1) deltaTime *= 2; //fast
 		currentTime += deltaTime;
 		//coords mapa
 		_texCoords[0] = glm::vec2(_disp.x / colorTexture.width(), _disp.y / colorTexture.height());

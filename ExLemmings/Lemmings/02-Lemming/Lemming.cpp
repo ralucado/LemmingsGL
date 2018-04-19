@@ -42,11 +42,12 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 }
 
 //void Lemming::init(const glm::vec2 &initialPosition, const glm::vec2 &positionExit, ShaderProgram &shaderProgram)
-void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram)
+void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram, set<pair<int, int>>* blockers)
 {
 	_state = FALLING;
 	_dir = true;
 	_shaderProgram = shaderProgram;
+	_blockers = blockers;
 	_framesFromStart = 0;
 	loadSpritesheet("images/lemming.png", 8, 4, initialPosition, 12);
 	_sprite->changeAnimation(FALLING_RIGHT_ANIM);
@@ -61,6 +62,7 @@ void Lemming::update(int deltaTime, glm::vec2 disp)
 	_dispY = disp.y;
 	if(_dead || _sprite->update(deltaTime) == 0 || _win) return;
 	++_framesFromStart;
+	checkBlockers();
 
 	switch(_state)
 	{
@@ -108,12 +110,35 @@ void Lemming::update(int deltaTime, glm::vec2 disp)
 	}
 }
 
+
 void Lemming::render()
 {
 	if (!_dead && !_win) {
 		//_shaderProgram.setUniform2f("center", _sprite->position().x, _sprite->position().y);
 		_sprite->render();
 	}
+}
+
+
+void Lemming::checkBlockers() {
+	std::set<pair<int, int> >::iterator it;
+	int X = floor(_sprite->position().x + _dispX) + 7;
+	int Y = floor(_sprite->position().y + _dispY) + 7;
+	for (it = _blockers->begin(); it != _blockers->end(); ++it) {
+		cout << ' ' << it->first << "," << it->second << " ";
+		int X1 = it->first, Y1 = it->second;
+		bool dir = !(X1 < 0);
+		X1 = abs(X1); Y1 = abs(Y1);
+		cout << "X is " << X << ", X1 is " << X1 << endl;
+		if (X == X1) {
+			for (int i = 0; i < 16; ++i) {
+				if (Y == Y1 + i) {
+					turn(dir);
+				}
+			}
+		}
+	}
+	cout << endl;
 }
 
 void Lemming::updateFalling() {
@@ -297,6 +322,38 @@ void Lemming::updateDig() {
 
 }
 
+void Lemming::turn(bool dir) {
+	switch (_state)
+	{
+	case WALKING:
+		//turn
+		turnWalk(dir);
+		break;
+	case BUILD:
+		//turn
+		turnBuild(dir);
+		break;
+	case BASH:
+	case CLIMB:
+	case END_CLIMB:
+	case MINE:
+		_dir = dir; //turn
+		startWalk(); //walk
+		break;
+	}
+}
+
+void Lemming::turnWalk(bool dir) {
+	_dir = dir;
+	_sprite->changeAnimation((_dir ? WALKING_RIGHT_ANIM : WALKING_LEFT_ANIM));
+}
+
+void Lemming::turnBuild(bool dir) {
+	_dir = dir;
+	_sprite->changeAnimation((_dir ? BUILD_RIGHT_ANIM : BUILD_LEFT_ANIM));
+}
+
+
 bool Lemming::calculateFall() {
 	int fall = collisionFloor(2, 7, 16);
 	if (fall > 0) {
@@ -391,6 +448,7 @@ void Lemming::startStop() {
 }
 
 void Lemming::startPop() {
+	unblockCells();
 	loadSpritesheet("images/bomber.png", 16, 1, _sprite->position(), 12);
 	_state = EXPLODING;
 	_framesFromStart = 0;
@@ -546,10 +604,9 @@ void Lemming::hole(int posX, int posY, int radius) {
 void Lemming::pop() {
 	die();
 	// Transform from mouse coordinates to map coordinates
-	//   The map is enlarged 3 times and displaced 120 pixels
-	int posX = floor(_sprite->position().x + _dispX)+7;
-	int posY = floor(_sprite->position().y + _dispY)+16;
-	hole(posX, posY, 5);
+	int posX = floor(_sprite->position().x+7 + _dispX);
+	int posY = floor(_sprite->position().y+16 + _dispY);
+	hole(posX, posY, 7);
 }
 
 void Lemming::bashRow(int index) {
@@ -600,7 +657,7 @@ void Lemming::mineRow() {
 
 void Lemming::paintStep(bool r) {
 	int ini = 2;
-	if (r) ini = 9;
+	if (r) ini = 10;
 	int X = floor(_sprite->position().x + _dispX) + ini;
 	int Y = floor(_sprite->position().y + _dispY) + 15;
 	_mask->setPixel(X, Y, 255);
@@ -612,13 +669,18 @@ void Lemming::paintStep(bool r) {
 void Lemming::blockCells() {
 	int X = floor(_sprite->position().x + _dispX);
 	int Y = floor(_sprite->position().y + _dispY);
-	for (int i = 3; i < 12; ++i) {
-		for (int j = 9; j < 15; ++j) {
-			if ((i != 3 || j != 10) && (i != 12 || j != 10)) {
-				_mask->setPixel(X+i, Y+j, 1);
-			}
-		}
-	}
+	_blockers->insert(make_pair(-(X + 3), -Y));
+	_blockers->insert(make_pair(X + 12, Y));
+}
+
+void Lemming::unblockCells() {
+	int X = floor(_sprite->position().x + _dispX);
+	int Y = floor(_sprite->position().y + _dispY);
+
+	set<pair<int, int> >::iterator it1 = _blockers->find(make_pair(-(X + 3), -Y));
+	set<pair<int, int> >::iterator it2 = _blockers->find(make_pair(X + 12, Y));
+	if (it1 != _blockers->end()) _blockers->erase(make_pair(-(X + 3), -Y));
+	if (it2 != _blockers->end()) _blockers->erase(make_pair(X + 12, Y));
 }
 
 void Lemming::die() {
