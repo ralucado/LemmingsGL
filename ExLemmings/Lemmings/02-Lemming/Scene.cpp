@@ -123,6 +123,7 @@ void Scene::update(int deltaTime)
 {
 
 	if (menuControl.buttonPressed() != 0) {
+		if (menuControl.buttonPressed() == 1) deltaTime *= 2;
 		currentTime += deltaTime;
 		//coords mapa
 		_texCoords[0] = glm::vec2(_disp.x / colorTexture.width(), _disp.y / colorTexture.height());
