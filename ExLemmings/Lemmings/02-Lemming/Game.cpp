@@ -39,7 +39,7 @@ void Game::initScene(int i)
 
 void Game::initMenu(int i)
 {
-
+	menu = Menu();
 	switch (i) {
 	case MAINMENU:
 		currentMenu = MAINMENU;

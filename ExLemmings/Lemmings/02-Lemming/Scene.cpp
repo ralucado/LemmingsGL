@@ -10,10 +10,11 @@ Scene::~Scene()
 {
 	if(map != NULL)
 		delete map;
-	menuPowers.~Menu();
-	menuControl.~Menu();
-	for (int i = 0; i < NUM_LEMMINGS; i++) 
-		delete lemmings[i];
+	for (int i = 0; i < NUM_LEMMINGS; i++) {
+		if (lemmings[i] != NULL) {
+			delete lemmings[i];
+		}
+	}
 }
 
 void Scene::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position, Sprite*& _sprite, Texture& _texture) {
@@ -103,6 +104,8 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 }
 
 void Scene::initMenus() {
+	menuPowers = Menu();
+	menuControl = Menu();
 	for (int i = 0; i < NUM_POWERS; i++) 
 		menuPowersButtonPos[i] = glm::vec2(geomMenuPowers[1][0] * (i / float(NUM_POWERS)), geomMenuPowers[0][1]);
 
