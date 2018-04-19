@@ -10,7 +10,7 @@ Scene::~Scene()
 {
 	if(map != NULL)
 		delete map;
-	for (int i = 0; i < NUM_LEMMINGS; i++) {
+	for (int i = 0; i < lemmings.size(); i++) {
 		if (lemmings[i] != NULL) {
 			delete lemmings[i];
 		}
@@ -40,7 +40,7 @@ void Scene::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, cons
 }
 
 
-void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize, int powerCount[])
+void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& ttSize, int powerCount[], int iniLemmings, int finLemmings)
 {
 	_finished = false;
 	lemmingsSaved = 0;
@@ -84,13 +84,6 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 	//cursor
 	cursor.init(simpleTexProgram);
 	
-	//lemmings
-	for (int i = 0; i < NUM_LEMMINGS; i++) {
-		lemmings[i] = new Lemming;
-		lemmings[i]->init(positionLemmings, simpleTexProgram, &_blockers);
-		lemmings[i]->setMapMask(&maskTexture);
-	}
-	
 	//menus
 	initMenus();
 	
@@ -99,8 +92,19 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 	exit.setMapMask(&maskTexture);
 
 	//entry
+	_positionEntry = positionEntry;
 	entry.init(positionEntry, simpleTexProgram);
 	entry.setMapMask(&maskTexture);
+
+	//lemmings
+	for (int i = 0; i < lemmings.size(); ++i) {
+		delete lemmings[i];
+	}
+	lemmings = vector<Lemming*>();
+	_totalLemmings = iniLemmings;
+	_targetLemmings = finLemmings;
+	_madeLemmings = 0;
+	_spawnTime = 0.f;
 
 }
 
@@ -125,6 +129,19 @@ void Scene::update(int deltaTime)
 	if (menuControl.buttonPressed() != 0) { //pause
 		if (menuControl.buttonPressed() == 1) deltaTime *= 2; //fast
 		currentTime += deltaTime;
+		_spawnTime += deltaTime;
+		//lemmings
+		if (_spawnTime >= 2000 && lemmings.size() < _totalLemmings) {
+			int i = lemmings.size();
+			glm::vec2 positionLemmings = glm::vec2(_positionEntry.x + 13, _positionEntry.y);
+			lemmings.push_back(new Lemming);
+			lemmings[i]->init(positionLemmings, simpleTexProgram, &_blockers);
+			lemmings[i]->setMapMask(&maskTexture);
+			++_madeLemmings;
+			_spawnTime = 0.f;
+		}
+
+
 		//coords mapa
 		_texCoords[0] = glm::vec2(_disp.x / colorTexture.width(), _disp.y / colorTexture.height());
 		_texCoords[1] = glm::vec2((_disp.x + float(CAMERA_WIDTH)) / colorTexture.width(), (_disp.y + float(CAMERA_HEIGHT)) / colorTexture.height());
@@ -136,8 +153,8 @@ void Scene::update(int deltaTime)
 		//cursor
 		cursor.update(deltaTime);
 		//lemmings
-		bool finished = true;
-		for (int i = 0; i < NUM_LEMMINGS; i++) {
+		bool finished = (lemmings.size() > 0);
+		for (int i = 0; i < lemmings.size(); i++) {
 			if (lemmings[i]->checkAlive()) {
 				finished = false;
 				if (lemmings[i]->getPosition() == exit.getBasePosition()) {
@@ -149,9 +166,10 @@ void Scene::update(int deltaTime)
 		}
 		_activePower = Power(menuPowers.buttonPressed());
 		if (menuControl.buttonPressed() == 2) {
-			for (int i = 0; i < NUM_LEMMINGS; i++)
+			for (int i = 0; i < lemmings.size(); i++)
 				lemmings[i]->switchBomber();
 		}
+		if (finished) cout << "finished in scene!" << endl;
 		_finished = finished;
 	}
 }
@@ -178,7 +196,7 @@ void Scene::render()
 	//entry
 	entry.render();
 	//lemmings
-	for (int i = 0; i < NUM_LEMMINGS; i++) {
+	for (int i = 0; i < lemmings.size(); i++) {
 		lemmings[i]->render();
 	}
 	//menus
@@ -243,7 +261,7 @@ void Scene::mouseLeftPressed(int mouseX, int mouseY)
 	mouseX = mouseX / 3;
 	mouseY = mouseY / 3;
 	//update clicked lemming
-	for (int i = 0; i < NUM_LEMMINGS; i++) {
+	for (int i = 0; i < lemmings.size(); i++) {
 		//calc 0,0 position from base position
 		glm::vec2 lemPos = lemmings[i]->getPosition() - glm::vec2(7, 16);
 		if (mouseX >= lemPos.x && mouseX <= lemPos.x + 16 && mouseY >= lemPos.y && mouseY <= lemPos.y + 16) {
@@ -330,7 +348,7 @@ bool Scene::checkFinished() {
 }
 
 bool Scene::checkWin() {
-	return lemmingsSaved >= NUM_LEMMINGS_MIN;
+	return lemmingsSaved >= _targetLemmings;
 }
 
 void Scene::initShaders()

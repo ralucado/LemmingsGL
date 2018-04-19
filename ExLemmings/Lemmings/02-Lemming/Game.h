@@ -58,7 +58,7 @@ private:
 	int mouseX, mouseY;               // Mouse position
 	bool bLeftMouse, bRightMouse;     // Mouse button states
 
-	// Scene
+	// Scene arguments
 	string sceneMaps[NUM_SCENES] = {
 		"images/fun1.png",
 		"images/fun2.png"
@@ -69,6 +69,26 @@ private:
 		"images/fun2_mask.png"
 	};
 	
+	int scenePowers[NUM_SCENES][NUM_POWERS] = {
+		{ 9, 9, 9, 9, 9, 9, 9, 9 },
+		{ 9, 9, 9, 9, 9, 9, 9, 9 }
+	};
+
+	glm::vec2 sceneEntries[NUM_SCENES]{
+		glm::vec2(180, 30),
+		glm::vec2(110, 10)
+	};
+
+	glm::vec2 sceneExits[NUM_SCENES]{
+		glm::vec2(340, 91),
+		glm::vec2(330, 109)
+	};
+
+	glm::vec2 sceneSizes[NUM_SCENES]{
+		glm::vec2(512, 159),
+		glm::vec2(443, 160)
+	};
+
 	// Main Menu
 	string mainMenuBackground = "images/MainMenu.png";
 	glm::vec2 geomMainMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };

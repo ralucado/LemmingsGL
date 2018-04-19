@@ -14,7 +14,6 @@ bool Lemming::grounded()
 
 bool Lemming::acceptsPower() {
 	if (grounded() && _state != STOPPED) {
-		cout << "accepts power" << endl;
 		return true;
 	}
 	return false;
@@ -125,11 +124,9 @@ void Lemming::checkBlockers() {
 	int X = floor(_sprite->position().x + _dispX) + 7;
 	int Y = floor(_sprite->position().y + _dispY) + 7;
 	for (it = _blockers->begin(); it != _blockers->end(); ++it) {
-		cout << ' ' << it->first << "," << it->second << " ";
 		int X1 = it->first, Y1 = it->second;
 		bool dir = !(X1 < 0);
 		X1 = abs(X1); Y1 = abs(Y1);
-		cout << "X is " << X << ", X1 is " << X1 << endl;
 		if (X == X1) {
 			for (int i = 0; i < 16; ++i) {
 				if (Y == Y1 + i) {
@@ -138,7 +135,6 @@ void Lemming::checkBlockers() {
 			}
 		}
 	}
-	cout << endl;
 }
 
 void Lemming::updateFalling() {

@@ -19,21 +19,14 @@ void Game::initScene(int i)
 	initMenu(MENUESC);
 	sceneActive = true;
 	sceneVisible = true;
-	int powers[NUM_POWERS] = {9, 9, 9, 9, 9, 9, 9, 9};
-	switch (i){
-	case LEVEL1:
-	    //                                      entry               exit                lemmings            drawing size         powercount
-		currentScene = LEVEL1;
-		scene.init(sceneMaps[0], sceneMasks[0], glm::vec2(180, 30), glm::vec2(340, 91), glm::vec2(180, 30), glm::vec2(512, 159), powers);
-		break;
-	case LEVEL2:
-		currentScene = LEVEL2;
-		scene.init(sceneMaps[1], sceneMasks[1], glm::vec2(110, 10), glm::vec2(330, 109), glm::vec2(110, 10), glm::vec2(443, 160), powers);
-		break;
-	case END:
+	if (i == END) {
 		sceneVisible = false;
 		sceneActive = false;
 		initMenu(CREDITS);
+	}
+	else {
+		currentScene = Scenes(i);
+		scene.init(sceneMaps[i], sceneMasks[i], sceneEntries[i], sceneExits[i], sceneSizes[i], scenePowers[i], 10, 1);
 	}
 }
 
@@ -133,6 +126,7 @@ bool Game::update(int deltaTime)
 
 	if (sceneActive) {
 		if (scene.checkFinished()) {
+			cout << "scenefinished" << endl;
 			sceneActive = false;
 			sceneVisible = false;
 			if (scene.checkWin())

@@ -16,8 +16,6 @@
 // It is responsible for updating and render them.
 
 #define NUM_BUTTONS 3
-#define NUM_LEMMINGS 2
-#define NUM_LEMMINGS_MIN 2
 
 class Scene
 {
@@ -27,7 +25,7 @@ public:
 	~Scene();
 
 
-	void init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize, int powerCount[]);
+	void init(string filenameMap, string filenameMask, const glm::vec2 & positionEntry, const glm::vec2 & positionExit, const glm::vec2 & ttSize, int powerCount[], int iniLemmings, int finLemmings);
 	void update(int deltaTime);
 	void render();
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
@@ -49,6 +47,7 @@ private:
 	};
 	vector<int> _powerCount;
 	Power _activePower;
+	int _iniLemmings, _finLemmings;
 	void loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2 & position, Sprite*& _sprite, Texture& texture);
 	Texture colorTexture;
 	Cursor cursor;
@@ -63,7 +62,7 @@ private:
 	int lemmingsSaved = 0;
 	bool _clicked;
 	glm::mat4 projection;
-	Lemming *lemmings[NUM_LEMMINGS];
+	vector<Lemming*>lemmings;
 	Menu menuPowers, menuControl;
 	Exit exit;
 	Entry entry;
@@ -71,6 +70,7 @@ private:
 	glm::vec2 _texCoords[2];
 	glm::vec2 _disp;
 	glm::vec2 _clickOrigin;
+	glm::vec2 _positionEntry;
 	set<pair<int, int>> _blockers;
 	// Lemming Menu
 	string menuPowersBackground = "images/MainMenu.png";
@@ -101,6 +101,8 @@ private:
 
 	glm::vec2 menuControlButtonPos[NUM_BUTTONS];
 
+	int _totalLemmings, _targetLemmings, _madeLemmings;
+	float _spawnTime;
 };
 
 
