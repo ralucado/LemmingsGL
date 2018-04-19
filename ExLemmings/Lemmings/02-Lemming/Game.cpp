@@ -73,11 +73,9 @@ bool Game::update(int deltaTime)
 		switch (menu.buttonPressed())
 		{
 		case 0:
-			menu.~Menu();
 			initScene(LEVEL1);
 			break;
 		case 1:
-			menu.~Menu();
 			initMenu(CREDITS);
 			break;
 		default:
@@ -88,7 +86,6 @@ bool Game::update(int deltaTime)
 		switch (menu.buttonPressed())
 		{
 		case 0:
-			menu.~Menu();
 			initMenu(MENUESC);
 			sceneActive = true;
 			sceneVisible = true;
@@ -101,11 +98,9 @@ bool Game::update(int deltaTime)
 		switch (menu.buttonPressed())
 		{
 		case 0:
-			menu.~Menu();
 			initScene(currentScene);
 			break;
 		case 1:
-			menu.~Menu();
 			initScene(currentScene+1);
 			break;
 		default:
@@ -116,7 +111,6 @@ bool Game::update(int deltaTime)
 		switch (menu.buttonPressed())
 		{
 		case 0:
-			menu.~Menu();
 			initScene(currentScene);
 			break;
 		default:
@@ -127,7 +121,6 @@ bool Game::update(int deltaTime)
 		switch (menu.buttonPressed())
 		{
 		case 0:
-			menu.~Menu();
 			initMenu(MAINMENU);
 			break;
 		default:
@@ -140,7 +133,6 @@ bool Game::update(int deltaTime)
 
 	if (sceneActive) {
 		if (scene.checkFinished()) {
-			//scene.~Scene();
 			sceneActive = false;
 			sceneVisible = false;
 			if (scene.checkWin())
@@ -175,10 +167,8 @@ void Game::keyPressed(int key)
 			initMenu(MENUESC);
 		}
 		else {
-			if (sceneVisible) {
-				menu.~Menu();
+			if (sceneVisible) 
 				sceneActive = true;
-			}
 		}
 
 	}
