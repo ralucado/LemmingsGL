@@ -14,6 +14,7 @@ public:
 	void loadSpritesheet(string filename, const glm::vec2& position);
 	void render();
 	void mouseMoved(int mouseXInput, int mouseYInput, bool bLeftButton);
+	bool mouseReleased(int mouseXInput, int mouseYInput);
 	bool isSelected();
 	void deselect();
 private:

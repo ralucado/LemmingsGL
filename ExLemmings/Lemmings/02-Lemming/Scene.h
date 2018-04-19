@@ -17,6 +17,7 @@
 
 #define NUM_BUTTONS 3
 #define NUM_LEMMINGS 2
+#define NUM_LEMMINGS_MIN 2
 
 class Scene
 {
@@ -35,9 +36,11 @@ public:
 	void keyReleased(int key);
 	void mouseReleased(int mouseX, int mouseY);
 	bool checkFinished();
+	bool checkWin();
 
 private:
 	void initShaders();
+	void initMenus();
 	void modifyMask(int mouseX, int mouseY, bool apply);
 	void givePower(int i);
 private:
@@ -57,6 +60,7 @@ private:
 	ShaderProgram simpleTexProgram, maskedTexProgram;
 	float currentTime;
 	bool _finished;
+	int lemmingsSaved = 0;
 	bool _clicked;
 	glm::mat4 projection;
 	Lemming *lemmings[NUM_LEMMINGS];
@@ -80,21 +84,11 @@ private:
 		"images/buttonDig.png",
 		"images/buttonClimb.png",
 		"images/buttonBuild.png",
-		"images/buttonMine.png"
-		//"images/buttonNothing.png"
+		"images/buttonMine.png",
+		"images/buttonNothing.png"
 	};
 
-	glm::vec2 menuPowersButtonPos[NUM_POWERS]{
-		glm::vec2(geomMenuPowers[1][0] *(0.f / NUM_POWERS), geomMenuPowers[0][1]),
-		glm::vec2(geomMenuPowers[1][0] *(1.f / NUM_POWERS), geomMenuPowers[0][1]),
-		glm::vec2(geomMenuPowers[1][0] *(2.f / NUM_POWERS), geomMenuPowers[0][1]),
-		glm::vec2(geomMenuPowers[1][0] *(3.f / NUM_POWERS), geomMenuPowers[0][1]),
-		glm::vec2(geomMenuPowers[1][0] *(4.f / NUM_POWERS), geomMenuPowers[0][1]),
-		glm::vec2(geomMenuPowers[1][0] *(5.f / NUM_POWERS), geomMenuPowers[0][1]),
-		glm::vec2(geomMenuPowers[1][0] *(6.f / NUM_POWERS), geomMenuPowers[0][1]),
-		glm::vec2(geomMenuPowers[1][0] *(7.f / NUM_POWERS), geomMenuPowers[0][1]),
-		//glm::vec2(geomMenuPowers[1][0] *(8.f / NUM_POWERS), geomMenuPowers[0][1])
-	};
+	glm::vec2 menuPowersButtonPos[NUM_POWERS];
 
 	// Control Menu
 	string menuControlBackground = "images/MainMenu.png";
@@ -103,16 +97,11 @@ private:
 	string menuControlButtonSprite[NUM_BUTTONS]{
 		"images/buttonPause.png",
 		"images/buttonSpeed.png",
-		"images/buttonNuke.png",
+		"images/buttonNuke.png"
 		//"images/buttonPlay.png"
 	};
 
-	glm::vec2 menuControlButtonPos[NUM_BUTTONS]{
-		glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (0.f / NUM_BUTTONS) + geomMenuControl[0][0], geomMenuControl[0][1]),
-		glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (1.f / NUM_BUTTONS) + geomMenuControl[0][0], geomMenuControl[0][1]),
-		glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (2.f / NUM_BUTTONS) + geomMenuControl[0][0], geomMenuControl[0][1]),
-		//glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (3.f / NUM_BUTTONS) + geomMenuControl[0][0], geomMenuControl[0][1]),
-	};
+	glm::vec2 menuControlButtonPos[NUM_BUTTONS];
 
 };
 

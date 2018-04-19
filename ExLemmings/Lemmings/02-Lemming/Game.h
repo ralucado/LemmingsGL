@@ -8,9 +8,11 @@
 #include "Utils.h"
 
 #define NUM_SCENES 2
-#define NUM_BUTTONS_MAINMENU 1
+#define NUM_BUTTONS_MAINMENU 2
 #define NUM_BUTTONS_ESCMENU 1
-
+#define NUM_BUTTONS_WINMENU 2
+#define NUM_BUTTONS_LOSEMENU 1
+#define NUM_BUTTONS_CREDITS 1
 // Game is a singleton (a class with a single instance) that represents our whole application
 
 
@@ -73,11 +75,13 @@ private:
 	glm::vec2 geomESCMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string mainMenuButtonSprite[NUM_BUTTONS_MAINMENU]{
+		"images/buttonPP.png",
 		"images/buttonPP.png"
 	};
 
 	glm::vec2 mainMenuButtonsPos[NUM_BUTTONS_MAINMENU]{
-		glm::vec2(100, 100)
+		glm::vec2(100, 100),
+		glm::vec2(100, 150)
 	};
 
 	// ESC Menu
@@ -91,22 +95,63 @@ private:
 		glm::vec2(100, 100)
 	};
 
+	// Win Menu
+	string winMenuBackground = "images/MainMenu.png";
+	glm::vec2 geomWinMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+
+	string winMenuButtonSprite[NUM_BUTTONS_WINMENU]{
+		"images/buttonPP.png",
+		"images/buttonPP.png"
+	};
+
+	glm::vec2 winMenuButtonsPos[NUM_BUTTONS_WINMENU]{
+		glm::vec2(100, 100),
+		glm::vec2(150, 100)
+	};
+
+	// Lose Menu
+	string loseMenuBackground = "images/MainMenu.png";
+	glm::vec2 geomLoseMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+
+	string loseMenuButtonSprite[NUM_BUTTONS_LOSEMENU]{
+		"images/buttonPP.png"
+	};
+
+	glm::vec2 loseMenuButtonsPos[NUM_BUTTONS_LOSEMENU]{
+		glm::vec2(100, 100)
+	};
+
+	// Credits 
+	string creditsBackground = "images/MainMenu.png";
+	glm::vec2 geomCredits[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+
+	string creditsButtonSprite[NUM_BUTTONS_CREDITS]{
+		"images/buttonPP.png"
+	};
+
+	glm::vec2 creditsButtonsPos[NUM_BUTTONS_CREDITS]{
+		glm::vec2(100, 100)
+	};
+
 	// Current Menu
 	enum MenuState
 	{
 		MAINMENU,
-		MENUESC
+		MENUESC,
+		MENUWIN,
+		MENULOSE,
+		CREDITS
 	};
 
 	enum Scenes
 	{
-		LEVEL1, LEVEL2
+		LEVEL1, LEVEL2, END
 	};
 
 	MenuState currentMenu;
-
+	Scenes currentScene;
 	void initScene(int i);
-
+	void initMenu(int i);
 
 
 };
