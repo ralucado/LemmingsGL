@@ -60,7 +60,7 @@ private:
 	ShaderProgram simpleTexProgram, maskedTexProgram;
 	float currentTime;
 	bool _finished;
-	int lemmingsSaved = 0;
+	int lemmingsSaved;
 	bool _clicked;
 	glm::mat4 projection;
 	Lemming *lemmings[NUM_LEMMINGS];

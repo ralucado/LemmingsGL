@@ -43,6 +43,7 @@ void Scene::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, cons
 void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize, int powerCount[])
 {
 	_finished = false;
+	lemmingsSaved = 0;
 	_disp.x = 0;
 	_disp.y = 0;
 	textureTrueSize = ttSize;
