@@ -102,7 +102,7 @@ bool Game::update(int deltaTime)
 		{
 		case 0:
 			menu.~Menu();
-			initScene(currentScene+1);
+			initScene(currentScene);
 			break;
 		case 1:
 			menu.~Menu();
