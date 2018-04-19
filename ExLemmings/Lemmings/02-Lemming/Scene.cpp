@@ -247,7 +247,7 @@ void Scene::mouseLeftPressed(int mouseX, int mouseY)
 		glm::vec2 lemPos = lemmings[i]->getPosition() - glm::vec2(7, 16);
 		if (mouseX >= lemPos.x && mouseX <= lemPos.x + 16 && mouseY >= lemPos.y && mouseY <= lemPos.y + 16) {
 			cout << "clicked lemming " << i << endl;
-			if (_powerCount[_activePower] > 0) {
+			if (_activePower >= 0 && _activePower < _powerCount.size() && _powerCount[_activePower] > 0) {
 				givePower(i);
 			}
 			break;

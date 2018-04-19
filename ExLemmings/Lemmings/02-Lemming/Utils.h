@@ -7,7 +7,7 @@
 #include <string>
 #include <algorithm>
 
-#define NUM_POWERS 9
+#define NUM_POWERS 8
 using namespace std;
 
 class Utils

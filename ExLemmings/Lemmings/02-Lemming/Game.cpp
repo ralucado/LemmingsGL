@@ -19,7 +19,7 @@ void Game::initScene(int i)
 	initMenu(MENUESC);
 	sceneActive = true;
 	sceneVisible = true;
-	int powers[NUM_POWERS] = {1, 1, 1, 1, 1, 1, 1, 1, 0};
+	int powers[NUM_POWERS] = {1, 1, 1, 1, 1, 1, 1, 1};
 	switch (i){
 	case LEVEL1:
 	    //                                      entry               exit                lemmings            drawing size         powercount
