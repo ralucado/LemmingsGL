@@ -122,7 +122,7 @@ void Lemming::render()
 void Lemming::checkBlockers() {
 	std::set<pair<int, int> >::iterator it;
 	int X = floor(_sprite->position().x + _dispX) + 7;
-	int Y = floor(_sprite->position().y + _dispY) + 7;
+	int Y = floor(_sprite->position().y + _dispY) + 12;
 	for (it = _blockers->begin(); it != _blockers->end(); ++it) {
 		int X1 = it->first, Y1 = it->second;
 		bool dir = !(X1 < 0);
@@ -130,7 +130,7 @@ void Lemming::checkBlockers() {
 		if (X == X1) {
 			for (int i = 0; i < 16; ++i) {
 				if (Y == Y1 + i) {
-					turn(dir);
+					if(_dir != dir) turn(dir);
 				}
 			}
 		}
@@ -347,6 +347,7 @@ void Lemming::turnWalk(bool dir) {
 void Lemming::turnBuild(bool dir) {
 	_dir = dir;
 	_sprite->changeAnimation((_dir ? BUILD_RIGHT_ANIM : BUILD_LEFT_ANIM));
+	_framesFromStart = 0;
 }
 
 
