@@ -169,7 +169,6 @@ void Scene::update(int deltaTime)
 			for (int i = 0; i < lemmings.size(); i++)
 				lemmings[i]->switchBomber();
 		}
-		if (finished) cout << "finished in scene!" << endl;
 		_finished = finished;
 	}
 }

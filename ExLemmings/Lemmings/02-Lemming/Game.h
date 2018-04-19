@@ -7,7 +7,7 @@
 #include "Menu.h"
 #include "Utils.h"
 
-#define NUM_SCENES 2
+#define NUM_SCENES 3
 #define NUM_BUTTONS_MAINMENU 2
 #define NUM_BUTTONS_ESCMENU 1
 #define NUM_BUTTONS_WINMENU 2
@@ -61,32 +61,38 @@ private:
 	// Scene arguments
 	string sceneMaps[NUM_SCENES] = {
 		"images/fun1.png",
-		"images/fun2.png"
+		"images/fun2.png",
+		"images/fun3.png",
 	};
 
 	string sceneMasks[NUM_SCENES] = {
 		"images/fun1_mask.png",
-		"images/fun2_mask.png"
+		"images/fun2_mask.png",
+		"images/fun3_mask.png",
 	};
 	
 	int scenePowers[NUM_SCENES][NUM_POWERS] = {
+		{ 9, 9, 9, 9, 9, 9, 9, 9 },
 		{ 9, 9, 9, 9, 9, 9, 9, 9 },
 		{ 9, 9, 9, 9, 9, 9, 9, 9 }
 	};
 
 	glm::vec2 sceneEntries[NUM_SCENES]{
 		glm::vec2(180, 30),
-		glm::vec2(110, 10)
+		glm::vec2(110, 10),
+		glm::vec2(132, 3),
 	};
 
 	glm::vec2 sceneExits[NUM_SCENES]{
 		glm::vec2(340, 91),
-		glm::vec2(330, 109)
+		glm::vec2(330, 109),
+		glm::vec2(133, 113),
 	};
 
 	glm::vec2 sceneSizes[NUM_SCENES]{
-		glm::vec2(512, 159),
-		glm::vec2(443, 160)
+		glm::vec2(512, 160),
+		glm::vec2(443, 160),
+		glm::vec2(437, 160),
 	};
 
 	// Main Menu
@@ -165,7 +171,7 @@ private:
 
 	enum Scenes
 	{
-		LEVEL1, LEVEL2, END
+		LEVEL1, LEVEL2, LEVEL3, END
 	};
 
 	MenuState currentMenu;

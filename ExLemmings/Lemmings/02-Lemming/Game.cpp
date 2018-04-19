@@ -126,7 +126,6 @@ bool Game::update(int deltaTime)
 
 	if (sceneActive) {
 		if (scene.checkFinished()) {
-			cout << "scenefinished" << endl;
 			sceneActive = false;
 			sceneVisible = false;
 			if (scene.checkWin())
@@ -170,6 +169,8 @@ void Game::keyPressed(int key)
 		initScene(LEVEL1);
 	if (key == 50) //2
 		initScene(LEVEL2);
+	if (key == 51) //3
+		initScene(LEVEL3);
 	if (key == 57) //9
 		bPause = !bPause;
 	if (sceneActive)
