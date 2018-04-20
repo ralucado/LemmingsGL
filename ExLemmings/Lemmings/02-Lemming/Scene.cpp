@@ -199,6 +199,8 @@ void Scene::update(int deltaTime)
 
 		_activePower = Power(menuPowers.buttonPressed());
 		if (menuControl.buttonPressed() == 2) { //nuke
+			if (!_nuke) 
+				_engine->play2D("audio/ohno.ogg");
 			_nuke = true;
 			for (int i = 0; i < lemmings.size(); i++)
 				lemmings[i]->forceBomber();
@@ -390,6 +392,7 @@ void Scene::givePower(int i) {
 		break;
 	}
 	if (success) {
+		_engine->play2D("audio/lemmingPower.ogg");
 		--_powerCount[_activePower];
 		menuControl.updateText(_activePower + 5, to_string(_powerCount[_activePower]));
 		if (_powerCount[_activePower] == 0)
