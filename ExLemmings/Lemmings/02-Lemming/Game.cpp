@@ -68,6 +68,7 @@ void Game::initMenu(int i)
 		menu.initText("Good luck and have fun! ", glm::vec2(CAMERA_WIDTH / 2 - 150, 135), 28, glm::vec4(1, 1, 1, 1));
 		break;
 	case MENUWIN:
+		engine->play2D("audio/win.wav");
 		currentMenu = MENUWIN;
 		menu.init(winMenuBackground, geomWinMenu, winMenuButtonSprite, winMenuButtonsPos, NUM_BUTTONS_WINMENU);
 		menu.initText("YOU SAVED: " + to_string(scene.getSaved()) + " OF " + to_string(scene.getTotal()), glm::vec2(CAMERA_WIDTH / 2 - 100, 75), 30, glm::vec4(1, 1, 1, 1));
