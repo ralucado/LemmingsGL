@@ -146,7 +146,7 @@ void Scene::update(int deltaTime)
 {
 
 	if (menuControl.buttonPressed() != 0) { //pause
-		if (menuControl.buttonPressed() == 1) deltaTime *= 2; //fast
+		if (menuControl.buttonPressed() == 1) deltaTime *= 5; //fast
 		currentTime += deltaTime;
 		_spawnTime += deltaTime;
 		//lemmings

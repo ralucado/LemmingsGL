@@ -7,7 +7,7 @@
 #include "Menu.h"
 #include "Utils.h"
 
-#define NUM_SCENES 15
+#define NUM_SCENES 5
 #pragma comment(lib, "irrKlang.lib") // link with irrKlang.dll
 
 #define NUM_BUTTONS_MAINMENU 4
@@ -68,7 +68,7 @@ private:
 		"images/fun3.png",
 		"images/fun4.png",
 		"images/fun5.png",
-		"images/tricky1.png",
+		/*"images/tricky1.png",
 		"images/tricky2.png",
 		"images/tricky3.png",
 		"images/tricky4.png",
@@ -77,7 +77,7 @@ private:
 		"images/taxing2.png",
 		"images/taxing3.png",
 		"images/taxing4.png",
-		"images/taxing5.png"
+		"images/taxing5.png"*/
 	};
 
 	string sceneMasks[NUM_SCENES] = {
@@ -86,7 +86,7 @@ private:
 		"images/fun3_mask.png",
 		"images/fun4_mask.png",
 		"images/fun5_mask.png",
-		"images/tricky1_mask.png",
+		/*"images/tricky1_mask.png",
 		"images/tricky2_mask.png",
 		"images/tricky3_mask.png",
 		"images/tricky4_mask.png",
@@ -95,7 +95,7 @@ private:
 		"images/taxing2_mask.png",
 		"images/taxing3_mask.png",
 		"images/taxing4_mask.png",
-		"images/taxing5_mask.png"
+		"images/taxing5_mask.png"*/
 	};
 	
 	int scenePowers[NUM_SCENES][NUM_POWERS] = {
@@ -105,6 +105,7 @@ private:
 		{ 10, 0, 0, 0, 0, 0, 0, 0 },
 		{ 0, 0, 0, 0, 0, 10, 0, 1 },
 		{ 0, 0, 50, 0, 0, 0, 0, 0 },
+		/*
 		// Tricky
 		{ 10, 10, 10, 10, 10, 10, 10, 10 },
 		{ 20, 20, 20, 20, 20, 20, 40, 20 },
@@ -117,6 +118,7 @@ private:
 		{ 4, 5, 2, 0, 2, 0, 20, 2 },
 		{ 4, 5, 10, 0, 3, 0, 20, 0 },
 		{ 3, 3, 5, 0, 1, 0, 0, 0 }
+		*/
 
 	};
 
@@ -124,30 +126,41 @@ private:
 		glm::vec2(180, 30),
 		glm::vec2(110, 10),
 		glm::vec2(132, 3),
+		glm::vec2(201, 12),
+		glm::vec2(123, 23),
 	};
 
 	glm::vec2 sceneExits[NUM_SCENES]{
 		glm::vec2(340, 91),
 		glm::vec2(330, 109),
 		glm::vec2(133, 113),
+		glm::vec2(366, 8),
+		glm::vec2(602, 91),
 	};
 
 	glm::vec2 sceneSizes[NUM_SCENES]{
 		glm::vec2(512, 160),
 		glm::vec2(443, 160),
 		glm::vec2(437, 160),
+		glm::vec2(564, 160),
+		glm::vec2(848, 160),
+		//glm::vec2(924, 160),
+		//glm::vec2(705, 160),
+		//glm::vec2(1600, 160),
+		//glm::vec2(1211, 160),
+		//glm::vec2(396, 160),
 	};
 	
 	int lemmingsNeeded[NUM_SCENES]{
 		1, 1, 5, 10, 5, 
-		50, 50, 20, 4, 60,
-		99, 80, 30, 45, 30
+		//50, 50, 20, 4, 60,
+		//99, 80, 30, 45, 30
 	};
 
 	int lemmingsTotal[NUM_SCENES]{
 		10, 10, 50, 10, 50,
-		100, 100, 100, 5, 100,
-		100, 100, 40, 60, 50
+		//100, 100, 100, 5, 100,
+		//100, 100, 40, 60, 50
 	};
 
 	// Main Menu
@@ -175,15 +188,15 @@ private:
 
 	string lvlMenuButtonSprite[NUM_SCENES + 1]{
 		"images/buttonL1.png", "images/buttonL2.png", "images/buttonL3.png", "images/buttonL4.png", "images/buttonL5.png",
-		"images/buttonL6.png", "images/buttonL7.png", "images/buttonL8.png", "images/buttonL9.png", "images/buttonL10.png",
-		"images/buttonL11.png", "images/buttonL12.png", "images/buttonL13.png", "images/buttonL14.png", "images/buttonL15.png",
+		//"images/buttonL6.png", "images/buttonL7.png", "images/buttonL8.png", "images/buttonL9.png", "images/buttonL10.png",
+		//"images/buttonL11.png", "images/buttonL12.png", "images/buttonL13.png", "images/buttonL14.png", "images/buttonL15.png",
 		"images/buttonBack.png"
 	};
 
 	glm::vec2 lvlMenuButtonsPos[NUM_SCENES + 1]{
 		glm::vec2(50, 50), glm::vec2(85, 50), glm::vec2(120, 50), glm::vec2(155, 50), glm::vec2(190, 50),
-		glm::vec2(50, 85), glm::vec2(85, 85), glm::vec2(120, 85), glm::vec2(155, 85), glm::vec2(190, 85),
-		glm::vec2(50, 120), glm::vec2(85, 120), glm::vec2(120, 120), glm::vec2(155, 120), glm::vec2(190, 120),
+		//glm::vec2(50, 85), glm::vec2(85, 85), glm::vec2(120, 85), glm::vec2(155, 85), glm::vec2(190, 85),
+		//glm::vec2(50, 120), glm::vec2(85, 120), glm::vec2(120, 120), glm::vec2(155, 120), glm::vec2(190, 120),
 		glm::vec2(50, 150)
 	};
 
@@ -264,8 +277,8 @@ private:
 	enum Scenes
 	{
 		LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5,
-		LEVEL6, LEVEL7, LEVEL8, LEVEL9, LEVEL10,
-		LEVEL11, LEVEL12, LEVEL13, LEVEL14, LEVEL15,
+		//LEVEL6, LEVEL7, LEVEL8, LEVEL9, LEVEL10,
+	//	LEVEL11, LEVEL12, LEVEL13, LEVEL14, LEVEL15,
 		END
 	};
 
