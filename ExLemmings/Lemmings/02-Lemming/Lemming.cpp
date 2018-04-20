@@ -400,7 +400,6 @@ bool Lemming::switchBomber() {
 		return true;
 	}
 	return false;
-
 }
 
 void Lemming::forceBomber() {
@@ -462,6 +461,7 @@ void Lemming::startStop() {
 
 void Lemming::startPop() {
 	unblockCells();
+	_engine->play2D("audio/ohoh.ogg");
 	loadSpritesheet("images/bomber.png", 16, 1, _sprite->position(), 12);
 	_state = EXPLODING;
 	_framesFromStart = 0;

@@ -50,7 +50,7 @@ private:
 	bool hodor(int i);
 private:
 	enum Power {
-		BLOCK, BOMB, BASH, FLOAT, DIG, CLIMB, BUILD, MINE, NONE
+		BLOCK, BOMB, BASH, FLOAT, DIG, CLIMB, BUILD, MINE, C4, NONE
 	};
 	vector<int> _powerCount;
 	Power _activePower;
@@ -81,7 +81,7 @@ private:
 	set<pair<int, int>> _blockers;
 	// Lemming Menu
 	string menuPowersBackground = "images/buttonBar1.png";
-	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, float(CAMERA_HEIGHT)-31.f), glm::vec2(float(CAMERA_WIDTH)*(8.f/14.f), float(CAMERA_HEIGHT)) };
+	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, float(CAMERA_HEIGHT)-31.f), glm::vec2(float(CAMERA_WIDTH)*(9.f/15.f), float(CAMERA_HEIGHT)) };
 
 	string menuPowersButtonSprite[NUM_POWERS]{
 		"images/buttonBlock.png",
@@ -92,13 +92,14 @@ private:
 		"images/buttonClimb.png",
 		"images/buttonBuild.png",
 		"images/buttonMine.png",
+		"images/buttonMine.png"
 	};
 
 	glm::vec2 menuPowersButtonPos[NUM_POWERS];
 
 	// Control Menu
 	string menuControlBackground = "images/buttonBar2.png";
-  glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(8.f / 14.f), float(CAMERA_HEIGHT) - 31.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+  glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(9.f / 15.f), float(CAMERA_HEIGHT) - 31.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string menuControlButtonSprite[NUM_BUTTONS]{
 		"images/buttonPause.png",

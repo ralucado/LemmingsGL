@@ -10,7 +10,7 @@
 #include <irrKlang.h>
 using namespace irrklang;
 
-#define NUM_POWERS 8
+#define NUM_POWERS 9
 using namespace std;
 
 class Utils
