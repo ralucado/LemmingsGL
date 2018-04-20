@@ -7,6 +7,7 @@
 #include "Menu.h"
 #include "Utils.h"
 
+#pragma comment(lib, "irrKlang.lib") // link with irrKlang.dll
 #define NUM_SCENES 3
 #define NUM_BUTTONS_MAINMENU 4
 #define NUM_BUTTONS_ESCMENU 1
@@ -47,6 +48,7 @@ public:
 	bool getSpecialKey(int key) const;
 
 private:
+	ISoundEngine * engine;
 	bool bPlay;                       // Continue to play game?
 	bool bPause;
 	Scene scene;                      // Scene to render

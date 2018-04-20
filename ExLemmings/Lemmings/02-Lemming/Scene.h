@@ -26,7 +26,7 @@ public:
 	~Scene();
 
 
-	void init(string filenameMap, string filenameMask, const glm::vec2 & positionEntry, const glm::vec2 & positionExit, const glm::vec2 & ttSize, int powerCount[], int iniLemmings, int finLemmings, int time, int lvl);
+	void init(string filenameMap, string filenameMask, const glm::vec2 & positionEntry, const glm::vec2 & positionExit, const glm::vec2 & ttSize, int powerCount[], int iniLemmings, int finLemmings, int time, int lvl, ISoundEngine * engine);
 	void update(int deltaTime);
 	void render();
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
@@ -42,6 +42,7 @@ public:
 
 
 private:
+	ISoundEngine * _engine;
 	void initShaders();
 	void initMenus();
 	void modifyMask(int mouseX, int mouseY, bool apply);

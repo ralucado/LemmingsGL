@@ -51,7 +51,6 @@ void Entry::update(int deltaTime, glm::vec2 disp)
 	switch (_state)
 	{
 	case OPENING:
-		cout << "Entry frame :" << _framesFromStart << endl;
 		if (_framesFromStart == 7) {
 			_framesFromStart = 0;
 			_state = NORMAL;

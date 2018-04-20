@@ -38,8 +38,10 @@ void Scene::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, cons
 }
 
 
-void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& ttSize, int powerCount[], int iniLemmings, int finLemmings, int time, int lvl)
+void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit,
+				 const glm::vec2& ttSize, int powerCount[], int iniLemmings, int finLemmings, int time, int lvl, ISoundEngine * engine)
 {
+	_engine = engine;
 	_finished = false;
 	_nuke = false;
 	lemmingsSaved = 0;
@@ -147,7 +149,7 @@ void Scene::update(int deltaTime)
 			int i = lemmings.size();
 			glm::vec2 positionLemmings = glm::vec2(_positionEntry.x + 13, _positionEntry.y);
 			lemmings.push_back(new Lemming);
-			lemmings[i]->init(positionLemmings, lemmingTexProgram, &_blockers);
+			lemmings[i]->init(positionLemmings, lemmingTexProgram, &_blockers, _engine);
 			lemmings[i]->setMapMask(&maskTexture);
 			_spawnTime = 0.f;
 			menuControl.updateText(1, "OUT: " + to_string(lemmings.size() - (lemmingsSaved + lemmingsDead)));
@@ -247,7 +249,8 @@ void Scene::render()
 	for (int i = 0; i < lemmings.size(); i++) {
 		lemmings[i]->render();
 	}
-	//cursor
+	//temporary hack
+	//wtf is going on
 	simpleTexProgram.use();
 	simpleTexProgram.setUniformMatrix4f("projection", projection);
 	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
@@ -294,7 +297,7 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 
         }
         //start scrolling
-        else if(maskTexture.pixel(mouseX / 3, mouseY / 3) == 255) {
+        else{
           //first click, set click origin
           _clicked = true;
           _clickOrigin.x = mouseX/3;

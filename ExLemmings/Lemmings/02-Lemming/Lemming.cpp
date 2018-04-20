@@ -41,8 +41,9 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 }
 
 //void Lemming::init(const glm::vec2 &initialPosition, const glm::vec2 &positionExit, ShaderProgram &shaderProgram)
-void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram, set<pair<int, int>>* blockers)
+void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram, set<pair<int, int>>* blockers, ISoundEngine * engine)
 {
+	_engine = engine;
 	_state = FALLING;
 	_shaderProgram = shaderProgram;
 	_dir = true;
@@ -616,6 +617,7 @@ void Lemming::hole(int posX, int posY, int radius) {
 }
 
 void Lemming::pop() {
+	_engine->play2D("audio/pop.ogg");
 	die();
 	// Transform from mouse coordinates to map coordinates
 	int posX = floor(_sprite->position().x+7 + _dispX);
