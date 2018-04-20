@@ -56,9 +56,14 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 
 void Lemming::update(int deltaTime, glm::vec2 disp)
 {
+	_currentTime += deltaTime;
 	_sprite->position() += glm::vec2(_dispX - disp.x, _dispY - disp.y);
 	_dispX = disp.x;
 	_dispY = disp.y;
+	if (_countdown == 1) {
+		_count += deltaTime;
+		if (_count >= 3000) startPop();
+	}
 	if(_dead || _sprite->update(deltaTime) == 0 || _win) return;
 	++_framesFromStart;
 	checkBlockers();
@@ -113,7 +118,9 @@ void Lemming::update(int deltaTime, glm::vec2 disp)
 void Lemming::render()
 {
 	if (!_dead && !_win) {
-		//_shaderProgram.setUniform2f("center", _sprite->position().x, _sprite->position().y);
+
+		_shaderProgram.setUniform1f("time", _currentTime);
+		_shaderProgram.setUniform1i("act", _countdown);
 		_sprite->render();
 	}
 }
@@ -384,11 +391,15 @@ bool Lemming::switchStopper() {
 
 bool Lemming::switchBomber() {
 	if (grounded()) {
-		startPop();
+		_countdown = 1;
 		return true;
 	}
 	return false;
 
+}
+
+void Lemming::forceBomber() {
+	_countdown = 1;
 }
 
 
@@ -449,6 +460,8 @@ void Lemming::startPop() {
 	loadSpritesheet("images/bomber.png", 16, 1, _sprite->position(), 12);
 	_state = EXPLODING;
 	_framesFromStart = 0;
+	_count = 0;
+	_countdown = 2;
 	_sprite->changeAnimation(EXPLODING_ANIM);
 }
 

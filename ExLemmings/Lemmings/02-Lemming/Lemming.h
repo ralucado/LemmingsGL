@@ -31,6 +31,7 @@ public:
 	bool switchFloater();
 	bool switchClimber();
 	bool switchBomber();
+	void forceBomber();
 	bool switchBasher();
 	bool switchDigger();
 	bool switchBuilder();
@@ -155,6 +156,9 @@ private:
 
 	bool _canClimb = false;
 	bool _canFloat = false;
+	int _countdown = 0;
+	float _count = 0.f;
+	float _currentTime = 0.f;
 	bool _dead = false;
 	bool _win = false;
 	glm::vec2 _positionExit;

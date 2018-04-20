@@ -56,7 +56,7 @@ private:
 	Texture tileTexture;
 	VariableTexture maskTexture;
 	MaskedTexturedQuad *map;
-	ShaderProgram simpleTexProgram, maskedTexProgram;
+	ShaderProgram simpleTexProgram, maskedTexProgram, lemmingTexProgram;
 	float currentTime;
 	bool _finished;
 	int lemmingsSaved = 0;
@@ -101,7 +101,8 @@ private:
 
 	glm::vec2 menuControlButtonPos[NUM_BUTTONS];
 
-	int _totalLemmings, _targetLemmings, _madeLemmings;
+	int _totalLemmings, _targetLemmings;
+	bool _nuke;
 	float _spawnTime;
 };
 

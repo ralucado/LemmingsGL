@@ -43,6 +43,7 @@ void Scene::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, cons
 void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& ttSize, int powerCount[], int iniLemmings, int finLemmings)
 {
 	_finished = false;
+	_nuke = false;
 	lemmingsSaved = 0;
 	_disp.x = 0;
 	_disp.y = 0;
@@ -103,7 +104,6 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 	lemmings = vector<Lemming*>();
 	_totalLemmings = iniLemmings;
 	_targetLemmings = finLemmings;
-	_madeLemmings = 0;
 	_spawnTime = 0.f;
 
 }
@@ -131,13 +131,12 @@ void Scene::update(int deltaTime)
 		currentTime += deltaTime;
 		_spawnTime += deltaTime;
 		//lemmings
-		if (_spawnTime >= 2000 && lemmings.size() < _totalLemmings) {
+		if (_spawnTime >= 2000 && lemmings.size() < _totalLemmings && !_nuke) {
 			int i = lemmings.size();
 			glm::vec2 positionLemmings = glm::vec2(_positionEntry.x + 13, _positionEntry.y);
 			lemmings.push_back(new Lemming);
-			lemmings[i]->init(positionLemmings, simpleTexProgram, &_blockers);
+			lemmings[i]->init(positionLemmings, lemmingTexProgram, &_blockers);
 			lemmings[i]->setMapMask(&maskTexture);
-			++_madeLemmings;
 			_spawnTime = 0.f;
 		}
 
@@ -165,9 +164,10 @@ void Scene::update(int deltaTime)
 			}
 		}
 		_activePower = Power(menuPowers.buttonPressed());
-		if (menuControl.buttonPressed() == 2) {
+		if (menuControl.buttonPressed() == 2) { //nuke
+			_nuke = true;
 			for (int i = 0; i < lemmings.size(); i++)
-				lemmings[i]->switchBomber();
+				lemmings[i]->forceBomber();
 		}
 		_finished = finished;
 	}
@@ -177,27 +177,38 @@ void Scene::render()
 {
 	//shaders
 	glm::mat4 modelview;
+	modelview = glm::mat4(1.0f);
 	maskedTexProgram.use();
 	maskedTexProgram.setUniformMatrix4f("projection", projection);
 	maskedTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
-	modelview = glm::mat4(1.0f);
 	maskedTexProgram.setUniformMatrix4f("modelview", modelview);
 	map->render(maskedTexProgram, colorTexture, maskTexture, tileTexture);
 	
 	simpleTexProgram.use();
 	simpleTexProgram.setUniformMatrix4f("projection", projection);
 	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
-	modelview = glm::mat4(1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
+
 	//exit
 	exit.render();
 	//entry
 	entry.render();
+
+	lemmingTexProgram.use();
+	lemmingTexProgram.setUniformMatrix4f("projection", projection);
+	lemmingTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	lemmingTexProgram.setUniformMatrix4f("modelview", modelview);
 	//lemmings
 	for (int i = 0; i < lemmings.size(); i++) {
 		lemmings[i]->render();
 	}
+
+	simpleTexProgram.use();
+	simpleTexProgram.setUniformMatrix4f("projection", projection);
+	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
+	simpleTexProgram.setUniform1f("time", currentTime);
 	//menus
     menuPowers.render();
 	menuControl.render();
@@ -403,4 +414,30 @@ void Scene::initShaders()
 	maskedTexProgram.bindFragmentOutput("outColor");
 	vShader.free();
 	fShader.free();
+
+	vShader.initFromFile(VERTEX_SHADER, "shaders/textureLemming.vert");
+	if (!vShader.isCompiled())
+	{
+		cout << "Vertex Shader Error" << endl;
+		cout << "" << vShader.log() << endl << endl;
+	}
+	fShader.initFromFile(FRAGMENT_SHADER, "shaders/textureLemming.frag");
+	if (!fShader.isCompiled())
+	{
+		cout << "Fragment Shader Error" << endl;
+		cout << "" << fShader.log() << endl << endl;
+	}
+	lemmingTexProgram.init();
+	lemmingTexProgram.addShader(vShader);
+	lemmingTexProgram.addShader(fShader);
+	lemmingTexProgram.link();
+	if (!lemmingTexProgram.isLinked())
+	{
+		cout << "Shader Linking Error" << endl;
+		cout << "" << lemmingTexProgram.log() << endl << endl;
+	}
+	lemmingTexProgram.bindFragmentOutput("outColor");
+	vShader.free();
+	fShader.free();
+
 }
