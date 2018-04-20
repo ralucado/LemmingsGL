@@ -26,7 +26,7 @@ public:
 	~Scene();
 
 
-	void init(string filenameMap, string filenameMask, const glm::vec2 & positionEntry, const glm::vec2 & positionExit, const glm::vec2 & ttSize, int powerCount[], int iniLemmings, int finLemmings, int time);
+	void init(string filenameMap, string filenameMask, const glm::vec2 & positionEntry, const glm::vec2 & positionExit, const glm::vec2 & ttSize, int powerCount[], int iniLemmings, int finLemmings, int time, int lvl);
 	void update(int deltaTime);
 	void render();
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
@@ -106,7 +106,8 @@ private:
 
 	glm::vec2 menuControlButtonPos[NUM_BUTTONS];
 	// Text
-	string textString[4] = {
+	string textString[5] = {
+		"LEVEL: " + to_string(_levelNum),
 		"OUT: " + to_string(0),
 		"SAVED: " + to_string(0),
 		"MIN: " + to_string(0),
@@ -135,7 +136,7 @@ private:
 		glm::vec4(1, 1, 1, 1)
 	};*/
 
-	int _totalLemmings, _targetLemmings, _levelTime;
+	int _totalLemmings, _targetLemmings, _levelTime, _levelNum;
 	bool _nuke;
 	float _spawnTime;
 };

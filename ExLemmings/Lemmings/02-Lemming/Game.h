@@ -10,8 +10,8 @@
 #define NUM_SCENES 3
 #define NUM_BUTTONS_MAINMENU 4
 #define NUM_BUTTONS_ESCMENU 1
-#define NUM_BUTTONS_WINMENU 2
-#define NUM_BUTTONS_LOSEMENU 1
+#define NUM_BUTTONS_WINMENU 3
+#define NUM_BUTTONS_LOSEMENU 2
 #define NUM_BUTTONS_CREDITS 1
 // Game is a singleton (a class with a single instance) that represents our whole application
 
@@ -142,11 +142,21 @@ private:
 	string escMenuBackground = "images/HelpMenu.png";
 
 	string escMenuButtonSprite[NUM_BUTTONS_ESCMENU]{
+		"images/buttonBack.png"
+	};
+
+	string escMenuButtonSprite2[NUM_BUTTONS_ESCMENU+1]{
 		"images/buttonBack.png",
+		"images/buttonBack.png"
 	};
 
 	glm::vec2 escMenuButtonsPos[NUM_BUTTONS_ESCMENU]{
-		glm::vec2(100, 100)
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT / 2 + 60)
+	};
+
+	glm::vec2 escMenuButtonsPos2[NUM_BUTTONS_ESCMENU+1]{
+		glm::vec2(CAMERA_WIDTH / 2 - 150, CAMERA_HEIGHT / 2 + 60),
+		glm::vec2(CAMERA_WIDTH / 2 + 50, CAMERA_HEIGHT / 2 + 60)
 	};
 
 	// Win Menu
@@ -156,11 +166,13 @@ private:
 	string winMenuButtonSprite[NUM_BUTTONS_WINMENU]{
 		"images/buttonRetry.png",
 		"images/buttonContinue.png",
+		"images/buttonContinue.png"
 	};
 
 	glm::vec2 winMenuButtonsPos[NUM_BUTTONS_WINMENU]{
-		glm::vec2(CAMERA_WIDTH / 2 - 150, CAMERA_HEIGHT / 2 + 30),
-		glm::vec2(CAMERA_WIDTH / 2 + 50, CAMERA_HEIGHT / 2 + 30),
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT / 2 + 60),
+		glm::vec2(CAMERA_WIDTH / 2 + 50, CAMERA_HEIGHT / 2 + 60),
+		glm::vec2(CAMERA_WIDTH / 2 - 150, CAMERA_HEIGHT / 2 + 60)
 	};
 
 	// Lose Menu
@@ -169,10 +181,12 @@ private:
 
 	string loseMenuButtonSprite[NUM_BUTTONS_LOSEMENU]{
 		"images/buttonRetry.png",
+		"images/buttonContinue.png"
 	};
 
 	glm::vec2 loseMenuButtonsPos[NUM_BUTTONS_LOSEMENU]{
-		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT / 2 + 30)
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT / 2 + 60),
+		glm::vec2(CAMERA_WIDTH / 2 - 150, CAMERA_HEIGHT / 2 + 60)
 	};
 
 	// Credits 
