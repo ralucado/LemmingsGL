@@ -122,11 +122,15 @@ void Scene::initMenus() {
 	menuPowers.init(menuPowersBackground, geomMenuPowers, menuPowersButtonSprite, menuPowersButtonPos, NUM_POWERS);
 	menuControl.init(menuControlBackground, geomMenuControl, menuControlButtonSprite, menuControlButtonPos, NUM_BUTTONS);
 
+	// Info Level
 	for (int i = 0; i < 5; i++) 
 		menuControl.initText(textString[i], glm::vec2(float(CAMERA_WIDTH)*(11.f / 14.f)+10.f, float(CAMERA_HEIGHT) - (28.f - 5.f*(i+1))), 12, glm::vec4(1, 1, 1, 1));
 
 	menuControl.updateText(3, "MIN: " + to_string(_targetLemmings));
 	menuControl.updateText(2, "SAVED: " + to_string(0));
+
+	for (int i = 0; i < NUM_POWERS; i++)
+		menuControl.initText(to_string(_powerCount[i]), (menuPowersButtonPos[i] + glm::vec2(6, 28)), 16, glm::vec4(1, 1, 1, 1));
 }
 
 unsigned int x = 0;
@@ -370,6 +374,9 @@ void Scene::givePower(int i) {
 	}
 	if (success) {
 		--_powerCount[_activePower];
+		menuControl.updateText(_activePower + 5, to_string(_powerCount[_activePower]));
+		if (_powerCount[_activePower] == 0)
+			menuControl.updateColor(_activePower + 5, glm::vec4(0.6f, 0.6f, 0.6f, 1));
 	}
 }
 

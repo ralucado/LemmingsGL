@@ -69,7 +69,7 @@ void Game::initMenu(int i)
 		if (scene.getSaved()/ scene.getTotal() != 1)
 			menu.initText("Will you try to save them all? ", glm::vec2(CAMERA_WIDTH / 2 - 100, 130), 22, glm::vec4(1, 1, 1, 1));
 		else 
-			menu.initText("You saved them all! Good job!", glm::vec2(CAMERA_WIDTH / 2 - 100, 130), 22, glm::vec4(1, 1, 1, 1));
+			menu.initText(winLines[rand() % 3], glm::vec2(CAMERA_WIDTH / 2 - 100, 130), 22, glm::vec4(1, 1, 1, 1));
 
 		break;
 	case MENULOSE:
@@ -77,7 +77,7 @@ void Game::initMenu(int i)
 		menu.init(loseMenuBackground, geomLoseMenu, loseMenuButtonSprite, loseMenuButtonsPos, NUM_BUTTONS_LOSEMENU);
 		menu.initText("YOU SAVED: " + to_string(scene.getSaved()) + " OF " + to_string(scene.getTotal()), glm::vec2(CAMERA_WIDTH / 2 - 100, 75), 30, glm::vec4(1, 1, 1, 1));
 		menu.initText("YOU NEEDED: " + to_string(scene.getMin()), glm::vec2(CAMERA_WIDTH / 2 - 100, 90), 30, glm::vec4(1, 1, 1, 1));
-		menu.initText("Try again", glm::vec2(CAMERA_WIDTH / 2 - 100, 115), 22, glm::vec4(1, 1, 1, 1));
+		menu.initText(motivationalLines[rand()%3], glm::vec2(CAMERA_WIDTH / 2 - 100, 115), 22, glm::vec4(1, 1, 1, 1));
 		break;
 	case CREDITS:
 		currentMenu = CREDITS;

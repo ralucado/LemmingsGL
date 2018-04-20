@@ -222,6 +222,19 @@ private:
 	void initScene(int i);
 	void initMenu(int i);
 
+
+	string motivationalLines[3]{
+		"Try again",
+		"Don't let your dreams be dreams",
+		"YES, you can!"
+	};
+
+	string winLines[3]{
+		"You saved them all! WOW",
+		"100%? You are the real MVP!",
+		"You saved them all! Good Job!"
+	};
+
 };
 
 
