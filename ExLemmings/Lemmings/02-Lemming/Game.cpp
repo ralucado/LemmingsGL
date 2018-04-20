@@ -120,7 +120,7 @@ bool Game::update(int deltaTime)
 	case SELECTLVL:
 		switch (menu.buttonPressed())
 		{
-		case 15:
+		case 6:
 			initMenu(MAINMENU);
 			break;
 		default:
