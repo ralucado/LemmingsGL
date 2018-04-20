@@ -119,7 +119,7 @@ void Scene::initMenus() {
 		menuPowersButtonPos[i] = glm::vec2(geomMenuPowers[1][0] * (i / float(NUM_POWERS)), geomMenuPowers[0][1]);
 
 	for (int i = 0; i < NUM_BUTTONS; i++)
-		menuControlButtonPos[i] = glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (i / float(NUM_BUTTONS + 2)) + geomMenuControl[0][0], geomMenuControl[0][1]);
+		menuControlButtonPos[i] = glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (i / float(NUM_BUTTONS + 3)) + geomMenuControl[0][0], geomMenuControl[0][1]);
 
 	menuPowers.init(menuPowersBackground, geomMenuPowers, menuPowersButtonSprite, menuPowersButtonPos, NUM_POWERS);
 	menuControl.init(menuControlBackground, geomMenuControl, menuControlButtonSprite, menuControlButtonPos, NUM_BUTTONS);
@@ -381,6 +381,9 @@ void Scene::givePower(int i) {
 		success = lemmings[i]->switchBuilder();
 		break; 
 	case MINE:
+		success = lemmings[i]->switchMiner();
+		break;
+	case C4:
 		success = lemmings[i]->switchMiner();
 		break;
 	default:
