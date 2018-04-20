@@ -102,14 +102,14 @@ private:
 
 	string mainMenuButtonSprite[NUM_BUTTONS_MAINMENU]{
 		"images/buttonPlay.png",
-		"images/buttonCredits.png"
-		"images/buttonPP.png",
-		"images/buttonPP.png"
+		"images/buttonPlay.png",
+		"images/buttonPlay.png",
+		"images/buttonCredits.png",
 	};
 
 	glm::vec2 mainMenuButtonsPos[NUM_BUTTONS_MAINMENU]{
-	  glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT/2-15),
-		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT/2+45)
+	    glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT/2-15),
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT/2+45),
 		glm::vec2(100, 120),
 		glm::vec2(100, 150)
 	};
@@ -118,16 +118,14 @@ private:
 	string lvlMenuBackground = "images/MainMenu.png";
 	glm::vec2 geomLvlMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
-	//string lvlMenuButtonSprite[NUM_SCENES + 1]{
-	string lvlMenuButtonSprite[NUM_SCENES + 2]{
-		"images/buttonPP.png",
-		"images/buttonPP.png",
-		"images/buttonPP.png",
-		"images/buttonPP.png"
+	string lvlMenuButtonSprite[NUM_SCENES + 1]{
+		"images/buttonPlay.png",
+		"images/buttonPlay.png",
+		"images/buttonPlay.png",
+		"images/buttonPlay.png",
 	};
 
-	//glm::vec2 lvlMenuButtonsPos[NUM_SCENES + 1]{
-	glm::vec2 lvlMenuButtonsPos[NUM_SCENES + 2]{
+	glm::vec2 lvlMenuButtonsPos[NUM_SCENES + 1]{
 		glm::vec2(50, 60),
 		glm::vec2(50, 90),
 		glm::vec2(50, 120),
@@ -137,11 +135,11 @@ private:
 	// ESC Menu (instructions)
 	string escMenuBackground = "images/MainMenu.png";
 
-	string escMenuButtonSprite[NUM_BUTTONS_MAINMENU]{
-		"images/buttonPP.png"
+	string escMenuButtonSprite[NUM_BUTTONS_ESCMENU]{
+		"images/buttonPlay.png",
 	};
 
-	glm::vec2 escMenuButtonsPos[NUM_BUTTONS_MAINMENU]{
+	glm::vec2 escMenuButtonsPos[NUM_BUTTONS_ESCMENU]{
 		glm::vec2(100, 100)
 	};
 
@@ -164,7 +162,7 @@ private:
 	glm::vec2 geomLoseMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string loseMenuButtonSprite[NUM_BUTTONS_LOSEMENU]{
-		"images/buttonRetry.png"
+		"images/buttonRetry.png",
 	};
 
 	glm::vec2 loseMenuButtonsPos[NUM_BUTTONS_LOSEMENU]{
@@ -176,7 +174,7 @@ private:
 	glm::vec2 geomCredits[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string creditsButtonSprite[NUM_BUTTONS_CREDITS]{
-		"images/buttonBack.png"
+		"images/buttonBack.png",
 	};
 
 	glm::vec2 creditsButtonsPos[NUM_BUTTONS_CREDITS]{

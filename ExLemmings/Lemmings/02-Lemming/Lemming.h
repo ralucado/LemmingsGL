@@ -40,7 +40,7 @@ public:
 	void switchWin();
   
 	glm::vec2 getPosition();
-	bool checkAlive();
+	bool checkDead();
 	bool checkActive();
 
 	

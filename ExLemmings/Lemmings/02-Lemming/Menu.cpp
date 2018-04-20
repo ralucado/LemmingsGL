@@ -122,9 +122,10 @@ void Menu::render()
 
 	for (int i = 0; i < buttons.size(); i++)
 		buttons[i]->render();
-
+	/*
 	for (int i = 0; i < texts.size(); i++)
 		texts[i]->render(_textString[i], _textPositions[i], _textSize[i], _textColor[i]);
+	*/
 
 
 }

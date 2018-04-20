@@ -636,7 +636,7 @@ glm::vec2 Lemming::getPosition() {
 	return _sprite->position() + glm::vec2(7, 16); 
 }
 
-bool Lemming::checkAlive() {
+bool Lemming::checkDead() {
 	return _dead;
 }
 

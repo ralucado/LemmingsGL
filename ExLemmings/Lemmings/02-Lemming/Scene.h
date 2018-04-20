@@ -53,7 +53,6 @@ private:
 	};
 	vector<int> _powerCount;
 	Power _activePower;
-	int _iniLemmings, _finLemmings;
 	void loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2 & position, Sprite*& _sprite, Texture& texture);
 	Texture colorTexture;
 	Cursor cursor;
@@ -109,13 +108,11 @@ private:
 	glm::vec2 menuControlButtonPos[NUM_BUTTONS];
 	// Text
 	string textString[4] = {
-		"OUT: " + to_string(NUM_LEMMINGS),
-		"SAVED: " + to_string(0),
-		"MIN: " + to_string(NUM_LEMMINGS_MIN),
-		"TIME: " + to_string(LEVEL_TIME/60) + ":00"
+		"OUT: ",
+		"SAVED: ",
+		"MIN: ",
+		"TIME: "
 	};
-
-
 
 	/*
 	glm::vec2 textPos[4] = {

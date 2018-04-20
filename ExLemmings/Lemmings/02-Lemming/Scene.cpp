@@ -163,17 +163,16 @@ void Scene::update(int deltaTime)
 				if (lemmings[i]->getPosition() == exit.getBasePosition() ) {
 					lemmings[i]->switchWin();
 					lemmingsSaved++;
-					menuControl.updateText(0, "OUT: " + to_string(NUM_LEMMINGS - (lemmingsDead + lemmingsSaved)));
+					menuControl.updateText(0, "OUT: " + to_string(lemmings.size()));
 					menuControl.updateText(1, "SAVED: " + to_string(lemmingsSaved));
 				}
 				lemmings[i]->update(deltaTime, _disp);
 			}
-			else if (lemmings[i]->checkAlive()) 
+			else if (lemmings[i]->checkDead()) 
 				lemmingsDeadAUX++;
 		}
 		if (lemmingsDeadAUX != lemmingsDead) {
 			lemmingsDead = lemmingsDeadAUX;
-			menuControl.updateText(0, "OUT: " + to_string(NUM_LEMMINGS - (lemmingsDead + lemmingsSaved)));
 		}
 
 		_activePower = Power(menuPowers.buttonPressed());
@@ -240,7 +239,7 @@ void Scene::render()
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
 	//menus
-  menuPowers.render();
+	menuPowers.render();
 	menuControl.render();
 	//cursor
 	cursor.render();

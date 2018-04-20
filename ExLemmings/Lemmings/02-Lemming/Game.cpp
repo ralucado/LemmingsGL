@@ -40,8 +40,7 @@ void Game::initMenu(int i)
 		break;
 	case SELECTLVL:
 		currentMenu = SELECTLVL;
-		//menu.init(lvlMenuBackground, geomLvlMenu, lvlMenuButtonSprite, lvlMenuButtonsPos, NUM_SCENES + 1);
-		menu.init(lvlMenuBackground, geomLvlMenu, lvlMenuButtonSprite, lvlMenuButtonsPos, NUM_SCENES + 2);
+		menu.init(lvlMenuBackground, geomLvlMenu, lvlMenuButtonSprite, lvlMenuButtonsPos, NUM_SCENES + 1);
 		break;
 	case MENUESC:
 		currentMenu = MENUESC;
@@ -101,9 +100,9 @@ bool Game::update(int deltaTime)
 		case 1:
 			initScene(LEVEL2);
 			break;
-		/*case 2:
+		case 2:
 			initScene(LEVEL3);
-			break;*/
+			break;
 		case 3:
 			initMenu(MAINMENU);
 			break;
