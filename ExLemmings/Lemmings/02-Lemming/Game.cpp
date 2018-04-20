@@ -26,7 +26,7 @@ void Game::initScene(int i)
 	}
 	else {
 		currentScene = Scenes(i);
-		scene.init(sceneMaps[i], sceneMasks[i], sceneEntries[i], sceneExits[i], sceneSizes[i], scenePowers[i], 10, 1, sceneTimes[i]);
+		scene.init(sceneMaps[i], sceneMasks[i], sceneEntries[i], sceneExits[i], sceneSizes[i], scenePowers[i], 10, 1, sceneTimes[i],i+1);
 	}
 }
 
@@ -44,21 +44,40 @@ void Game::initMenu(int i)
 		break;
 	case MENUESC:
 		currentMenu = MENUESC;
-		menu.init(escMenuBackground, geomESCMenu, escMenuButtonSprite, escMenuButtonsPos, NUM_BUTTONS_ESCMENU);
+		
+		if (sceneVisible) {
+			menu.initText("Quick! You have to save at least " + to_string(scene.getMin()), glm::vec2(CAMERA_WIDTH / 2 - 150, 55), 22, glm::vec4(1, 1, 1, 1));
+			menu.init(escMenuBackground, geomESCMenu, escMenuButtonSprite2, escMenuButtonsPos2, NUM_BUTTONS_ESCMENU + 1);
+		}
+		else {
+			menu.initText("Quick! You have to save a minimum number of", glm::vec2(CAMERA_WIDTH / 2 - 150, 55), 21, glm::vec4(1, 1, 1, 1));
+			menu.init(escMenuBackground, geomESCMenu, escMenuButtonSprite, escMenuButtonsPos, NUM_BUTTONS_ESCMENU);
+		}
+		menu.initText("lemmings to pass the level ", glm::vec2(CAMERA_WIDTH / 2 - 150, 65), 22, glm::vec4(1, 1, 1, 1));
+		menu.initText("Click the power you want and then ", glm::vec2(CAMERA_WIDTH / 2 - 150, 85), 22, glm::vec4(1, 1, 1, 1));
+		menu.initText("on the lemming to give it that power", glm::vec2(CAMERA_WIDTH / 2 - 150, 95), 22, glm::vec4(1, 1, 1, 1));
+		menu.initText("If you don't want to continue the ", glm::vec2(CAMERA_WIDTH / 2 - 150, 105), 22, glm::vec4(1, 1, 1, 1));
+		menu.initText("level, press the global bomb ", glm::vec2(CAMERA_WIDTH / 2 - 150, 115), 22, glm::vec4(1, 1, 1, 1));
+		menu.initText("Good luck and have fun! ", glm::vec2(CAMERA_WIDTH / 2 - 150, 135), 28, glm::vec4(1, 1, 1, 1));
 		break;
 	case MENUWIN:
 		currentMenu = MENUWIN;
 		menu.init(winMenuBackground, geomWinMenu, winMenuButtonSprite, winMenuButtonsPos, NUM_BUTTONS_WINMENU);
-		menu.initText("SAVED: " + to_string(scene.getSaved()) + " OF " + to_string(scene.getTotal()), glm::vec2(100, 20), 30, glm::vec4(1, 1, 1, 1));
-		menu.initText("NEED: "+to_string(scene.getMin()), glm::vec2(100, 50), 30, glm::vec4(1, 1, 1, 1));
-		menu.initText("UEUEU CONGRATS ", glm::vec2(100, 70), 30, glm::vec4(1, 1, 1, 1));
+		menu.initText("YOU SAVED: " + to_string(scene.getSaved()) + " OF " + to_string(scene.getTotal()), glm::vec2(CAMERA_WIDTH / 2 - 100, 75), 30, glm::vec4(1, 1, 1, 1));
+		menu.initText("YOU NEEDED: "+to_string(scene.getMin()), glm::vec2(CAMERA_WIDTH / 2 - 100, 90), 30, glm::vec4(1, 1, 1, 1));
+		menu.initText("All lemmings needed are safe! ", glm::vec2(CAMERA_WIDTH / 2 - 100, 115), 22, glm::vec4(1, 1, 1, 1));
+		if (scene.getSaved()/ scene.getTotal() != 1)
+			menu.initText("Will you try to save them all? ", glm::vec2(CAMERA_WIDTH / 2 - 100, 130), 22, glm::vec4(1, 1, 1, 1));
+		else 
+			menu.initText("You saved them all! Good job!", glm::vec2(CAMERA_WIDTH / 2 - 100, 130), 22, glm::vec4(1, 1, 1, 1));
+
 		break;
 	case MENULOSE:
 		currentMenu = MENULOSE;
 		menu.init(loseMenuBackground, geomLoseMenu, loseMenuButtonSprite, loseMenuButtonsPos, NUM_BUTTONS_LOSEMENU);
-		menu.initText("SAVED: " + to_string(scene.getSaved()) + " OF " + to_string(scene.getTotal()), glm::vec2(100, 20), 30, glm::vec4(1, 1, 1, 1));
-		menu.initText("NEED: " + to_string(scene.getMin()), glm::vec2(100, 50), 30, glm::vec4(1, 1, 1, 1));
-		menu.initText("TRY AGAIN :c", glm::vec2(100, 70), 30, glm::vec4(1, 1, 1, 1));
+		menu.initText("YOU SAVED: " + to_string(scene.getSaved()) + " OF " + to_string(scene.getTotal()), glm::vec2(CAMERA_WIDTH / 2 - 100, 75), 30, glm::vec4(1, 1, 1, 1));
+		menu.initText("YOU NEEDED: " + to_string(scene.getMin()), glm::vec2(CAMERA_WIDTH / 2 - 100, 90), 30, glm::vec4(1, 1, 1, 1));
+		menu.initText("Try again", glm::vec2(CAMERA_WIDTH / 2 - 100, 115), 22, glm::vec4(1, 1, 1, 1));
 		break;
 	case CREDITS:
 		currentMenu = CREDITS;
@@ -113,13 +132,17 @@ bool Game::update(int deltaTime)
 	case MENUESC:
 		switch (menu.buttonPressed())
 		{
-		case 0:
+		case 0: 
 			if (sceneVisible) {
 				initMenu(MENUESC);
 				sceneActive = true;
 			}
 			else initMenu(MAINMENU);
-			
+			break;
+		case 1:
+			sceneVisible = false;
+			sceneActive = false;
+			initMenu(MAINMENU);
 			break;
 		default:
 			break;
@@ -134,6 +157,9 @@ bool Game::update(int deltaTime)
 		case 1:
 			initScene(currentScene+1);
 			break;
+		case 2:
+			initMenu(MAINMENU);
+			break;
 		default:
 			break;
 		}
@@ -143,6 +169,9 @@ bool Game::update(int deltaTime)
 		{
 		case 0:
 			initScene(currentScene);
+			break;
+		case 1:
+			initMenu(MAINMENU);
 			break;
 		default:
 			break;

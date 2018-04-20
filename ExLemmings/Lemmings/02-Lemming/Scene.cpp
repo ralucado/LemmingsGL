@@ -38,7 +38,7 @@ void Scene::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, cons
 }
 
 
-void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& ttSize, int powerCount[], int iniLemmings, int finLemmings, int time)
+void Scene::init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& ttSize, int powerCount[], int iniLemmings, int finLemmings, int time, int lvl)
 {
 	_finished = false;
 	_nuke = false;
@@ -47,6 +47,7 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 	_totalLemmings = iniLemmings;
 	_targetLemmings = finLemmings;
 	_levelTime = time;
+	_levelNum = lvl;
 	_spawnTime = 0.f;
 	_disp.x = 0;
 	_disp.y = 0;
@@ -121,11 +122,11 @@ void Scene::initMenus() {
 	menuPowers.init(menuPowersBackground, geomMenuPowers, menuPowersButtonSprite, menuPowersButtonPos, NUM_POWERS);
 	menuControl.init(menuControlBackground, geomMenuControl, menuControlButtonSprite, menuControlButtonPos, NUM_BUTTONS);
 
-	for (int i = 0; i < 4; i++) 
-		menuControl.initText(textString[i], glm::vec2(float(CAMERA_WIDTH)*(11.f / 14.f)+10.f, float(CAMERA_HEIGHT) - (30.f - 7.f*(i+1))), 16, glm::vec4(1, 1, 1, 1));
+	for (int i = 0; i < 5; i++) 
+		menuControl.initText(textString[i], glm::vec2(float(CAMERA_WIDTH)*(11.f / 14.f)+10.f, float(CAMERA_HEIGHT) - (28.f - 5.f*(i+1))), 12, glm::vec4(1, 1, 1, 1));
 
-	menuControl.updateText(2, "MIN: " + to_string(_targetLemmings));
-	menuControl.updateText(1, "SAVED: " + to_string(0));
+	menuControl.updateText(3, "MIN: " + to_string(_targetLemmings));
+	menuControl.updateText(2, "SAVED: " + to_string(0));
 }
 
 unsigned int x = 0;
@@ -145,7 +146,7 @@ void Scene::update(int deltaTime)
 			lemmings[i]->init(positionLemmings, lemmingTexProgram, &_blockers);
 			lemmings[i]->setMapMask(&maskTexture);
 			_spawnTime = 0.f;
-			menuControl.updateText(0, "OUT: " + to_string(lemmings.size() - (lemmingsSaved + lemmingsDead)));
+			menuControl.updateText(1, "OUT: " + to_string(lemmings.size() - (lemmingsSaved + lemmingsDead)));
 		}
 
 
@@ -168,8 +169,8 @@ void Scene::update(int deltaTime)
 				if (lemmings[i]->getPosition() == exit.getBasePosition() ) {
 					lemmings[i]->switchWin();
 					lemmingsSaved++;
-					menuControl.updateText(0, "OUT: " + to_string(lemmings.size()-(lemmingsSaved+lemmingsDead)));
-					menuControl.updateText(1, "SAVED: " + to_string(lemmingsSaved));
+					menuControl.updateText(1, "OUT: " + to_string(lemmings.size()-(lemmingsSaved+lemmingsDead)));
+					menuControl.updateText(2, "SAVED: " + to_string(lemmingsSaved));
 				}
 				lemmings[i]->update(deltaTime, _disp);
 			}
@@ -178,7 +179,7 @@ void Scene::update(int deltaTime)
 		}
 		if (lemmingsDeadAUX != lemmingsDead) {
 			lemmingsDead = lemmingsDeadAUX;
-			menuControl.updateText(0, "OUT: " + to_string(lemmings.size() - (lemmingsSaved + lemmingsDead)));
+			menuControl.updateText(1, "OUT: " + to_string(lemmings.size() - (lemmingsSaved + lemmingsDead)));
 		}
 
 		_activePower = Power(menuPowers.buttonPressed());
@@ -199,9 +200,9 @@ void Scene::update(int deltaTime)
 	if (levelTime < 30)
 		menuControl.updateColor(3, glm::vec4(1, 0.2f, 0.2f, 1));
 	if (seconds < 10)
-		menuControl.updateText(3, "TIME: " + to_string(minutes) + ":0" + to_string(seconds));
+		menuControl.updateText(4, "TIME: " + to_string(minutes) + ":0" + to_string(seconds));
 	else 
-		menuControl.updateText(3, "TIME: " + to_string(minutes) + ":" + to_string(seconds));
+		menuControl.updateText(4, "TIME: " + to_string(minutes) + ":" + to_string(seconds));
 	
 	if (levelTime < 1)
 		_finished = true;
@@ -244,9 +245,7 @@ void Scene::render()
 	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
-	//menus
-	menuPowers.render();
-	menuControl.render();
+
 	//cursor
 	cursor.render();
 
