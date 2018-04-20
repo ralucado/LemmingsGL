@@ -17,7 +17,6 @@
 // It is responsible for updating and render them.
 
 #define NUM_BUTTONS 3
-#define LEVEL_TIME 300
 
 class Scene
 {
@@ -27,7 +26,7 @@ public:
 	~Scene();
 
 
-	void init(string filenameMap, string filenameMask, const glm::vec2 & positionEntry, const glm::vec2 & positionExit, const glm::vec2 & ttSize, int powerCount[], int iniLemmings, int finLemmings);
+	void init(string filenameMap, string filenameMask, const glm::vec2 & positionEntry, const glm::vec2 & positionExit, const glm::vec2 & ttSize, int powerCount[], int iniLemmings, int finLemmings, int time);
 	void update(int deltaTime);
 	void render();
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
@@ -80,7 +79,7 @@ private:
 	set<pair<int, int>> _blockers;
 	// Lemming Menu
 	string menuPowersBackground = "images/MainMenu.png";
-	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, float(CAMERA_HEIGHT)-31.f), glm::vec2(float(CAMERA_WIDTH)*(8.f/13.f), float(CAMERA_HEIGHT)) };
+	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, float(CAMERA_HEIGHT)-31.f), glm::vec2(float(CAMERA_WIDTH)*(8.f/14.f), float(CAMERA_HEIGHT)) };
 
 	string menuPowersButtonSprite[NUM_POWERS]{
 		"images/buttonBlock.png",
@@ -97,7 +96,7 @@ private:
 
 	// Control Menu
 	string menuControlBackground = "images/MainMenu.png";
-  glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(8.f / 13.f), float(CAMERA_HEIGHT) - 31.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+  glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(8.f / 14.f), float(CAMERA_HEIGHT) - 31.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string menuControlButtonSprite[NUM_BUTTONS]{
 		"images/buttonPause.png",
@@ -136,7 +135,7 @@ private:
 		glm::vec4(1, 1, 1, 1)
 	};*/
 
-	int _totalLemmings, _targetLemmings;
+	int _totalLemmings, _targetLemmings, _levelTime;
 	bool _nuke;
 	float _spawnTime;
 };
