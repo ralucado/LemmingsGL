@@ -26,7 +26,7 @@ void Game::initScene(int i)
 	}
 	else {
 		currentScene = Scenes(i);
-		scene.init(sceneMaps[i], sceneMasks[i], sceneEntries[i], sceneExits[i], sceneSizes[i], scenePowers[i], 10, 1, sceneTimes[i],i+1);
+		scene.init(sceneMaps[i], sceneMasks[i], sceneEntries[i], sceneExits[i], sceneSizes[i], scenePowers[i], lemmingsTotal[i], lemmingsNeeded[i], 300,i+1);
 	}
 }
 
@@ -113,19 +113,12 @@ bool Game::update(int deltaTime)
 	case SELECTLVL:
 		switch (menu.buttonPressed())
 		{
-		case 0:
-			initScene(LEVEL1);
-			break;
-		case 1:
-			initScene(LEVEL2);
-			break;
-		case 2:
-			initScene(LEVEL3);
-			break;
-		case 3:
+		case 15:
 			initMenu(MAINMENU);
 			break;
 		default:
+			if(menu.buttonPressed() != -1)
+				initScene(menu.buttonPressed());
 			break;
 		}
 		break;

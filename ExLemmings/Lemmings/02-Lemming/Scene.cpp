@@ -130,8 +130,12 @@ void Scene::initMenus() {
 	menuControl.updateText(3, "MIN: " + to_string(_targetLemmings));
 	menuControl.updateText(2, "SAVED: " + to_string(0));
 
-	for (int i = 0; i < NUM_POWERS; i++)
+	for (int i = 0; i < NUM_POWERS; i++) {
 		menuControl.initText(to_string(_powerCount[i]), (menuPowersButtonPos[i] + glm::vec2(6, 28)), 16, glm::vec4(1, 1, 1, 1));
+		if (_powerCount[i] == 0)
+			menuControl.updateColor(i+5, glm::vec4(0.6f, 0.6f, 0.6f, 1));
+			
+	}
 }
 
 unsigned int x = 0;

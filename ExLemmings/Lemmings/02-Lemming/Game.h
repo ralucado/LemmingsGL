@@ -7,7 +7,7 @@
 #include "Menu.h"
 #include "Utils.h"
 
-#define NUM_SCENES 3
+#define NUM_SCENES 15
 #define NUM_BUTTONS_MAINMENU 4
 #define NUM_BUTTONS_ESCMENU 1
 #define NUM_BUTTONS_WINMENU 3
@@ -63,18 +63,58 @@ private:
 		"images/fun1.png",
 		"images/fun2.png",
 		"images/fun3.png",
+		"images/fun4.png",
+		"images/fun5.png",
+		"images/tricky1.png",
+		"images/tricky2.png",
+		"images/tricky3.png",
+		"images/tricky4.png",
+		"images/tricky5.png",
+		"images/taxing1.png",
+		"images/taxing2.png",
+		"images/taxing3.png",
+		"images/taxing4.png",
+		"images/taxing5.png"
 	};
 
 	string sceneMasks[NUM_SCENES] = {
 		"images/fun1_mask.png",
 		"images/fun2_mask.png",
 		"images/fun3_mask.png",
+		"images/fun4_mask.png",
+		"images/fun5_mask.png",
+		"images/tricky1_mask.png",
+		"images/tricky2_mask.png",
+		"images/tricky3_mask.png",
+		"images/tricky4_mask.png",
+		"images/tricky5_mask.png",
+		"images/taxing1_mask.png",
+		"images/taxing2_mask.png",
+		"images/taxing3_mask.png",
+		"images/taxing4_mask.png",
+		"images/taxing5_mask.png"
 	};
 	
 	int scenePowers[NUM_SCENES][NUM_POWERS] = {
-		{ 9, 9, 9, 9, 9, 9, 9, 9 },
-		{ 9, 9, 9, 9, 9, 9, 9, 9 },
-		{ 9, 9, 9, 9, 9, 9, 9, 9 }
+		// Fun
+		{ 0, 0, 0, 0, 10, 0, 0, 0 },
+		{ 0, 0, 0, 10, 0, 0, 0, 0 },
+		{ 10, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 10, 0, 1 },
+		{ 0, 0, 50, 0, 0, 0, 0, 0 },
+		// Tricky
+		{ 10, 10, 10, 10, 10, 10, 10, 10 },
+		{ 20, 20, 20, 20, 20, 20, 40, 20 },
+		{ 20, 20, 20, 20, 20, 20, 20, 20 },
+		{ 20, 20, 20, 20, 20, 20, 20, 20 },
+		{ 20, 0, 0, 0, 0, 0, 50, 0 },
+		// Taxing
+		{ 2, 2, 2, 2, 2, 2, 8, 2 },
+		{ 10, 5, 5, 5, 5, 10, 10, 5 },
+		{ 4, 5, 2, 0, 2, 0, 20, 2 },
+		{ 4, 5, 10, 0, 3, 0, 20, 0 },
+		{ 3, 3, 5, 0, 1, 0, 0, 0 }
+
 	};
 
 	glm::vec2 sceneEntries[NUM_SCENES]{
@@ -94,11 +134,17 @@ private:
 		glm::vec2(443, 160),
 		glm::vec2(437, 160),
 	};
+	
+	int lemmingsNeeded[NUM_SCENES]{
+		1, 1, 5, 10, 5, 
+		50, 50, 20, 4, 60,
+		99, 80, 30, 45, 30
+	};
 
-	int sceneTimes[NUM_SCENES]{
-		300,
-		300,
-		300
+	int lemmingsTotal[NUM_SCENES]{
+		10, 10, 50, 10, 50,
+		100, 100, 100, 5, 100,
+		100, 100, 40, 60, 50
 	};
 
 	// Main Menu
@@ -125,16 +171,16 @@ private:
 	glm::vec2 geomLvlMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string lvlMenuButtonSprite[NUM_SCENES + 1]{
-		"images/buttonL1.png",
-		"images/buttonL2.png",
-		"images/buttonL3.png",
+		"images/buttonL1.png", "images/buttonL2.png", "images/buttonL3.png", "images/buttonL4.png", "images/buttonL5.png",
+		"images/buttonL6.png", "images/buttonL7.png", "images/buttonL8.png", "images/buttonL9.png", "images/buttonL10.png",
+		"images/buttonL11.png", "images/buttonL12.png", "images/buttonL13.png", "images/buttonL14.png", "images/buttonL15.png",
 		"images/buttonBack.png"
 	};
 
 	glm::vec2 lvlMenuButtonsPos[NUM_SCENES + 1]{
-		glm::vec2(50, 50),
-		glm::vec2(85, 50),
-		glm::vec2(120,50),
+		glm::vec2(50, 50), glm::vec2(85, 50), glm::vec2(120, 50), glm::vec2(155, 50), glm::vec2(190, 50),
+		glm::vec2(50, 85), glm::vec2(85, 85), glm::vec2(120, 85), glm::vec2(155, 85), glm::vec2(190, 85),
+		glm::vec2(50, 120), glm::vec2(85, 120), glm::vec2(120, 120), glm::vec2(155, 120), glm::vec2(190, 120),
 		glm::vec2(50, 150)
 	};
 
@@ -214,7 +260,10 @@ private:
 
 	enum Scenes
 	{
-		LEVEL1, LEVEL2, LEVEL3, END
+		LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5,
+		LEVEL6, LEVEL7, LEVEL8, LEVEL9, LEVEL10,
+		LEVEL11, LEVEL12, LEVEL13, LEVEL14, LEVEL15,
+		END
 	};
 
 	MenuState currentMenu;
