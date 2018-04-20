@@ -126,6 +126,7 @@ void Scene::initMenus() {
 	for (int i = 0; i < 5; i++) 
 		menuControl.initText(textString[i], glm::vec2(float(CAMERA_WIDTH)*(11.f / 14.f)+10.f, float(CAMERA_HEIGHT) - (28.f - 5.f*(i+1))), 12, glm::vec4(1, 1, 1, 1));
 
+	menuControl.updateText(0, "LEVEL: " + to_string(_levelNum));
 	menuControl.updateText(3, "MIN: " + to_string(_targetLemmings));
 	menuControl.updateText(2, "SAVED: " + to_string(0));
 
