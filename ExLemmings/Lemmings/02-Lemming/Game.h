@@ -7,7 +7,7 @@
 #include "Menu.h"
 #include "Utils.h"
 
-#define NUM_SCENES 2
+#define NUM_SCENES 3
 #define NUM_BUTTONS_MAINMENU 4
 #define NUM_BUTTONS_ESCMENU 1
 #define NUM_BUTTONS_WINMENU 2
@@ -58,32 +58,58 @@ private:
 	int mouseX, mouseY;               // Mouse position
 	bool bLeftMouse, bRightMouse;     // Mouse button states
 
-	// Scene
+	// Scene arguments
 	string sceneMaps[NUM_SCENES] = {
 		"images/fun1.png",
-		"images/fun2.png"
+		"images/fun2.png",
+		"images/fun3.png",
 	};
 
 	string sceneMasks[NUM_SCENES] = {
 		"images/fun1_mask.png",
-		"images/fun2_mask.png"
+		"images/fun2_mask.png",
+		"images/fun3_mask.png",
 	};
 	
+	int scenePowers[NUM_SCENES][NUM_POWERS] = {
+		{ 9, 9, 9, 9, 9, 9, 9, 9 },
+		{ 9, 9, 9, 9, 9, 9, 9, 9 },
+		{ 9, 9, 9, 9, 9, 9, 9, 9 }
+	};
+
+	glm::vec2 sceneEntries[NUM_SCENES]{
+		glm::vec2(180, 30),
+		glm::vec2(110, 10),
+		glm::vec2(132, 3),
+	};
+
+	glm::vec2 sceneExits[NUM_SCENES]{
+		glm::vec2(340, 91),
+		glm::vec2(330, 109),
+		glm::vec2(133, 113),
+	};
+
+	glm::vec2 sceneSizes[NUM_SCENES]{
+		glm::vec2(512, 160),
+		glm::vec2(443, 160),
+		glm::vec2(437, 160),
+	};
+
 	// Main Menu
 	string mainMenuBackground = "images/MainMenu.png";
 	glm::vec2 geomMainMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 	glm::vec2 geomESCMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string mainMenuButtonSprite[NUM_BUTTONS_MAINMENU]{
-		"images/buttonPP.png",
-		"images/buttonPP.png",
+		"images/buttonPlay.png",
+		"images/buttonCredits.png"
 		"images/buttonPP.png",
 		"images/buttonPP.png"
 	};
 
 	glm::vec2 mainMenuButtonsPos[NUM_BUTTONS_MAINMENU]{
-		glm::vec2(100, 60),
-		glm::vec2(100, 90),
+	  glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT/2-15),
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT/2+45)
 		glm::vec2(100, 120),
 		glm::vec2(100, 150)
 	};
@@ -120,41 +146,41 @@ private:
 	};
 
 	// Win Menu
-	string winMenuBackground = "images/MainMenu.png";
+	string winMenuBackground = "images/WinMenu.png";
 	glm::vec2 geomWinMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string winMenuButtonSprite[NUM_BUTTONS_WINMENU]{
-		"images/buttonPP.png",
-		"images/buttonPP.png"
+		"images/buttonRetry.png",
+		"images/buttonContinue.png",
 	};
 
 	glm::vec2 winMenuButtonsPos[NUM_BUTTONS_WINMENU]{
-		glm::vec2(100, 100),
-		glm::vec2(150, 100)
+		glm::vec2(CAMERA_WIDTH / 2 - 150, CAMERA_HEIGHT / 2 + 30),
+		glm::vec2(CAMERA_WIDTH / 2 + 50, CAMERA_HEIGHT / 2 + 30),
 	};
 
 	// Lose Menu
-	string loseMenuBackground = "images/MainMenu.png";
+	string loseMenuBackground = "images/LoseMenu.png";
 	glm::vec2 geomLoseMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string loseMenuButtonSprite[NUM_BUTTONS_LOSEMENU]{
-		"images/buttonPP.png"
+		"images/buttonRetry.png"
 	};
 
 	glm::vec2 loseMenuButtonsPos[NUM_BUTTONS_LOSEMENU]{
-		glm::vec2(100, 100)
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT / 2 + 30)
 	};
 
 	// Credits 
-	string creditsBackground = "images/MainMenu.png";
+	string creditsBackground = "images/AboutMenu.png";
 	glm::vec2 geomCredits[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string creditsButtonSprite[NUM_BUTTONS_CREDITS]{
-		"images/buttonPP.png"
+		"images/buttonBack.png"
 	};
 
 	glm::vec2 creditsButtonsPos[NUM_BUTTONS_CREDITS]{
-		glm::vec2(100, 100)
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT / 2 + 60)
 	};
 
 	// Current Menu
@@ -170,7 +196,7 @@ private:
 
 	enum Scenes
 	{
-		LEVEL1, LEVEL2, END
+		LEVEL1, LEVEL2, LEVEL3, END
 	};
 
 	MenuState currentMenu;

@@ -17,8 +17,6 @@
 // It is responsible for updating and render them.
 
 #define NUM_BUTTONS 3
-#define NUM_LEMMINGS 2
-#define NUM_LEMMINGS_MIN 2
 #define LEVEL_TIME 300
 
 class Scene
@@ -29,7 +27,7 @@ public:
 	~Scene();
 
 
-	void init(string filenameMap, string filenameMask, const glm::vec2& positionEntry, const glm::vec2& positionExit, const glm::vec2& positionLemmings, const glm::vec2& ttSize, int powerCount[]);
+	void init(string filenameMap, string filenameMask, const glm::vec2 & positionEntry, const glm::vec2 & positionExit, const glm::vec2 & ttSize, int powerCount[], int iniLemmings, int finLemmings);
 	void update(int deltaTime);
 	void render();
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
@@ -55,6 +53,7 @@ private:
 	};
 	vector<int> _powerCount;
 	Power _activePower;
+	int _iniLemmings, _finLemmings;
 	void loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2 & position, Sprite*& _sprite, Texture& texture);
 	Texture colorTexture;
 	Cursor cursor;
@@ -63,14 +62,14 @@ private:
 	Texture tileTexture;
 	VariableTexture maskTexture;
 	MaskedTexturedQuad *map;
-	ShaderProgram simpleTexProgram, maskedTexProgram;
+	ShaderProgram simpleTexProgram, maskedTexProgram, lemmingTexProgram;
 	float currentTime;
 	bool _finished;
 	int lemmingsSaved;
 	int lemmingsDead;
 	bool _clicked;
 	glm::mat4 projection;
-	Lemming *lemmings[NUM_LEMMINGS];
+	vector<Lemming*>lemmings;
 	Menu menuPowers, menuControl;
 	Exit exit;
 	Entry entry;
@@ -78,7 +77,8 @@ private:
 	glm::vec2 _texCoords[2];
 	glm::vec2 _disp;
 	glm::vec2 _clickOrigin;
-
+	glm::vec2 _positionEntry;
+	set<pair<int, int>> _blockers;
 	// Lemming Menu
 	string menuPowersBackground = "images/MainMenu.png";
 	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, float(CAMERA_HEIGHT)-31.f), glm::vec2(float(CAMERA_WIDTH)*(8.f/13.f), float(CAMERA_HEIGHT)) };
@@ -91,14 +91,14 @@ private:
 		"images/buttonDig.png",
 		"images/buttonClimb.png",
 		"images/buttonBuild.png",
-		"images/buttonMine.png"
+		"images/buttonMine.png",
 	};
 
 	glm::vec2 menuPowersButtonPos[NUM_POWERS];
 
 	// Control Menu
 	string menuControlBackground = "images/MainMenu.png";
-	glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(8.f / 13.f), float(CAMERA_HEIGHT) - 31.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+  glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(8.f / 13.f), float(CAMERA_HEIGHT) - 31.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string menuControlButtonSprite[NUM_BUTTONS]{
 		"images/buttonPause.png",
@@ -107,7 +107,6 @@ private:
 	};
 
 	glm::vec2 menuControlButtonPos[NUM_BUTTONS];
-
 	// Text
 	string textString[4] = {
 		"OUT: " + to_string(NUM_LEMMINGS),
@@ -140,8 +139,9 @@ private:
 		glm::vec4(1, 1, 1, 1)
 	};*/
 
-
-
+	int _totalLemmings, _targetLemmings;
+	bool _nuke;
+	float _spawnTime;
 };
 
 

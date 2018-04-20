@@ -19,7 +19,7 @@ class Lemming
 
 public:
 
-	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram);
+	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram, set<pair<int, int>>* blockers);
 
 	void update(int deltaTime, glm::vec2 disp);
 
@@ -31,6 +31,7 @@ public:
 	bool switchFloater();
 	bool switchClimber();
 	bool switchBomber();
+	void forceBomber();
 	bool switchBasher();
 	bool switchDigger();
 	bool switchBuilder();
@@ -44,6 +45,7 @@ public:
 
 	
 private:
+	void checkBlockers();
 	void updateFalling();
 	void updateStartFloating();
 	void updateFloating();
@@ -55,6 +57,12 @@ private:
 	void updateEndBuild();
 	void updateMine();
 	void updateDig();
+
+	void turn(bool dir);
+
+	void turnWalk(bool dir);
+
+	void turnBuild(bool dir);
 
 	int collisionFloor(int maxFall, int x, int y);
 	int collisionWall(int maxDeep, bool r, glm::ivec2 posBase);
@@ -87,6 +95,8 @@ private:
 	void paintStep(bool r);
 
 	void blockCells();
+
+	void unblockCells();
 
 	void die();
 
@@ -146,6 +156,9 @@ private:
 
 	bool _canClimb = false;
 	bool _canFloat = false;
+	int _countdown = 0;
+	float _count = 0.f;
+	float _currentTime = 0.f;
 	bool _dead = false;
 	bool _win = false;
 	glm::vec2 _positionExit;
@@ -158,6 +171,7 @@ private:
 	Sprite *_sprite;
 	VariableTexture *_mask;
 	ShaderProgram _shaderProgram;
+	set<pair<int, int>>* _blockers;
 	float _dispX;
 	float _dispY;
 };

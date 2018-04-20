@@ -51,7 +51,7 @@ void Entry::update(int deltaTime, glm::vec2 disp)
 	switch (_state)
 	{
 	case OPENING:
-		if (_framesFromStart == 10) {
+		if (_framesFromStart == 9) {
 			_state = NORMAL;
 			_sprite->changeAnimation(NORMAL_ANIM);
 		}
