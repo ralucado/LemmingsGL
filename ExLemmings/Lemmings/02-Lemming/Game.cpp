@@ -5,6 +5,13 @@
 
 void Game::init()
 {
+	engine = createIrrKlangDevice();
+	// play some sound stream, looped
+	if (!engine)
+	{
+		cout << "Could not startup engine" << endl;
+	}
+	engine->play2D("audio/music.ogg", true);
 	bPlay = true;
 	bPause = false;
 	bLeftMouse = bRightMouse = false;
@@ -26,7 +33,8 @@ void Game::initScene(int i)
 	}
 	else {
 		currentScene = Scenes(i);
-		scene.init(sceneMaps[i], sceneMasks[i], sceneEntries[i], sceneExits[i], sceneSizes[i], scenePowers[i], lemmingsTotal[i], lemmingsNeeded[i], 300,i+1);
+		scene.init(sceneMaps[i], sceneMasks[i], sceneEntries[i], sceneExits[i], sceneSizes[i], scenePowers[i], lemmingsTotal[i], lemmingsNeeded[i], 300,i+1, engine);
+
 	}
 }
 

@@ -19,7 +19,7 @@ class Lemming
 
 public:
 
-	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram, set<pair<int, int>>* blockers);
+	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram, set<pair<int, int>>* blockers, ISoundEngine * engine);
 
 	void update(int deltaTime, glm::vec2 disp);
 
@@ -46,6 +46,7 @@ public:
 
 	
 private:
+	ISoundEngine * _engine;
 	void checkBlockers();
 	void updateFalling();
 	void updateStartFloating();

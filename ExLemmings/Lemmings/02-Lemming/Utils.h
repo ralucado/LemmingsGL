@@ -7,6 +7,8 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <irrKlang.h>
+using namespace irrklang;
 
 #define NUM_POWERS 8
 using namespace std;
