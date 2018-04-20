@@ -723,6 +723,5 @@ void Lemming::revive() {
 	startWalk();
 }
 void Lemming::checkOutbounds() {
-	if (_sprite->position().x > CAMERA_WIDTH || _sprite->position().x < 0 ||
-		_sprite->position().y > CAMERA_HEIGHT || _sprite->position().y < 0) die();
+	if (_sprite->position().y > CAMERA_HEIGHT) die();
 }
