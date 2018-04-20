@@ -377,6 +377,7 @@ bool Lemming::switchMiner()
 
 void Lemming::switchWin() {
 	if (_state != WIN) {
+		_win = true;
 		startWin();
 	}
 }
@@ -569,6 +570,10 @@ glm::vec2 Lemming::getPosition() {
 }
 
 bool Lemming::checkAlive() {
+	return _dead;
+}
+
+bool Lemming::checkActive() {
 	return !(_win || _dead);
 }
 

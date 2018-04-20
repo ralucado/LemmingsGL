@@ -8,7 +8,7 @@
 #include "Utils.h"
 
 #define NUM_SCENES 2
-#define NUM_BUTTONS_MAINMENU 2
+#define NUM_BUTTONS_MAINMENU 4
 #define NUM_BUTTONS_ESCMENU 1
 #define NUM_BUTTONS_WINMENU 2
 #define NUM_BUTTONS_LOSEMENU 1
@@ -76,16 +76,40 @@ private:
 
 	string mainMenuButtonSprite[NUM_BUTTONS_MAINMENU]{
 		"images/buttonPP.png",
+		"images/buttonPP.png",
+		"images/buttonPP.png",
 		"images/buttonPP.png"
 	};
 
 	glm::vec2 mainMenuButtonsPos[NUM_BUTTONS_MAINMENU]{
-		glm::vec2(100, 100),
+		glm::vec2(100, 60),
+		glm::vec2(100, 90),
+		glm::vec2(100, 120),
 		glm::vec2(100, 150)
 	};
 
-	// ESC Menu
-	string escMenuBackground = "images/ESCMenu.png";
+	// Select level Menu
+	string lvlMenuBackground = "images/MainMenu.png";
+	glm::vec2 geomLvlMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+
+	//string lvlMenuButtonSprite[NUM_SCENES + 1]{
+	string lvlMenuButtonSprite[NUM_SCENES + 2]{
+		"images/buttonPP.png",
+		"images/buttonPP.png",
+		"images/buttonPP.png",
+		"images/buttonPP.png"
+	};
+
+	//glm::vec2 lvlMenuButtonsPos[NUM_SCENES + 1]{
+	glm::vec2 lvlMenuButtonsPos[NUM_SCENES + 2]{
+		glm::vec2(50, 60),
+		glm::vec2(50, 90),
+		glm::vec2(50, 120),
+		glm::vec2(50, 150)
+	};
+
+	// ESC Menu (instructions)
+	string escMenuBackground = "images/MainMenu.png";
 
 	string escMenuButtonSprite[NUM_BUTTONS_MAINMENU]{
 		"images/buttonPP.png"
@@ -137,6 +161,7 @@ private:
 	enum MenuState
 	{
 		MAINMENU,
+		SELECTLVL,
 		MENUESC,
 		MENUWIN,
 		MENULOSE,
@@ -152,7 +177,6 @@ private:
 	Scenes currentScene;
 	void initScene(int i);
 	void initMenu(int i);
-
 
 };
 

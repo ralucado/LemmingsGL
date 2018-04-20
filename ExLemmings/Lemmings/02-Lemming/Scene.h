@@ -11,6 +11,7 @@
 #include "Exit.h"
 #include "Entry.h"
 #include "Cursor.h"
+#include "Text.h"
 
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
@@ -18,6 +19,7 @@
 #define NUM_BUTTONS 3
 #define NUM_LEMMINGS 2
 #define NUM_LEMMINGS_MIN 2
+#define LEVEL_TIME 300
 
 class Scene
 {
@@ -37,6 +39,10 @@ public:
 	void mouseReleased(int mouseX, int mouseY);
 	bool checkFinished();
 	bool checkWin();
+	int getSaved();
+	int getTotal();
+	int getMin();
+
 
 private:
 	void initShaders();
@@ -61,6 +67,7 @@ private:
 	float currentTime;
 	bool _finished;
 	int lemmingsSaved;
+	int lemmingsDead;
 	bool _clicked;
 	glm::mat4 projection;
 	Lemming *lemmings[NUM_LEMMINGS];
@@ -74,7 +81,7 @@ private:
 
 	// Lemming Menu
 	string menuPowersBackground = "images/MainMenu.png";
-	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, float(CAMERA_HEIGHT)-31.f), glm::vec2(float(CAMERA_WIDTH)*(8.f/11.f), float(CAMERA_HEIGHT)) };
+	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, float(CAMERA_HEIGHT)-31.f), glm::vec2(float(CAMERA_WIDTH)*(8.f/13.f), float(CAMERA_HEIGHT)) };
 
 	string menuPowersButtonSprite[NUM_POWERS]{
 		"images/buttonBlock.png",
@@ -91,7 +98,7 @@ private:
 
 	// Control Menu
 	string menuControlBackground = "images/MainMenu.png";
-	glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(8.f / 11.f), float(CAMERA_HEIGHT) - 31.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+	glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(8.f / 13.f), float(CAMERA_HEIGHT) - 31.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string menuControlButtonSprite[NUM_BUTTONS]{
 		"images/buttonPause.png",
@@ -100,6 +107,40 @@ private:
 	};
 
 	glm::vec2 menuControlButtonPos[NUM_BUTTONS];
+
+	// Text
+	string textString[4] = {
+		"OUT: " + to_string(NUM_LEMMINGS),
+		"SAVED: " + to_string(0),
+		"MIN: " + to_string(NUM_LEMMINGS_MIN),
+		"TIME: " + to_string(LEVEL_TIME/60) + ":00"
+	};
+
+
+
+	/*
+	glm::vec2 textPos[4] = {
+		glm::vec2(float(CAMERA_WIDTH)*(11.f / 13.f)*3, float(CAMERA_HEIGHT)*3 - 85.f),
+		glm::vec2(float(CAMERA_WIDTH)*(11.f / 13.f)*3, float(CAMERA_HEIGHT)*3 - 68.f),
+		glm::vec2(float(CAMERA_WIDTH)*(11.f / 13.f)*3, float(CAMERA_HEIGHT)*3 - 51.f),
+		glm::vec2(float(CAMERA_WIDTH)*(11.f / 13.f)*3, float(CAMERA_HEIGHT)*3 - 34.f)
+	};
+
+	int textSize[4] = {
+		15,
+		15,
+		15,
+		15
+	};
+
+	glm::vec4 textColor[4] = {
+		glm::vec4(1, 1, 1, 1),
+		glm::vec4(1, 1, 1, 1),
+		glm::vec4(1, 1, 1, 1),
+		glm::vec4(1, 1, 1, 1)
+	};*/
+
+
 
 };
 

@@ -48,6 +48,17 @@ void MaskedTexturedQuad::render(ShaderProgram &program, const Texture &tex, cons
 	glDisable(GL_TEXTURE_2D);
 }
 
+void MaskedTexturedQuad::render(const Texture &tex) const
+{
+	glEnable(GL_TEXTURE_2D);
+	tex.use();
+	glBindVertexArray(vao);
+	glEnableVertexAttribArray(posLocation);
+	glEnableVertexAttribArray(texCoordLocation);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDisable(GL_TEXTURE_2D);
+}
+
 void MaskedTexturedQuad::free()
 {
 	glDeleteBuffers(1, &vbo);

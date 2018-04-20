@@ -31,9 +31,7 @@ void Scene::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, cons
 	for (int frame = 0; frame < NUM_FRAMES; frame++) {
 		float num_frame = float(frame) / float(NUM_FRAMES);
 		for (int anim = 0; anim < NUM_ANIMS; anim++) {
-			//_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height + 0.5f / _texture.height()));
 			_sprite->addKeyframe(anim, glm::vec2(num_frame, float(anim)*height));
-
 		}
 	}
 	_sprite->setPosition(position);
@@ -44,6 +42,7 @@ void Scene::init(string filenameMap, string filenameMask, const glm::vec2& posit
 {
 	_finished = false;
 	lemmingsSaved = 0;
+	lemmingsDead = 0;
 	_disp.x = 0;
 	_disp.y = 0;
 	textureTrueSize = ttSize;
@@ -111,10 +110,14 @@ void Scene::initMenus() {
 		menuPowersButtonPos[i] = glm::vec2(geomMenuPowers[1][0] * (i / float(NUM_POWERS)), geomMenuPowers[0][1]);
 
 	for (int i = 0; i < NUM_BUTTONS; i++)
-		menuControlButtonPos[i] = glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (i / float(NUM_BUTTONS)) + geomMenuControl[0][0], geomMenuControl[0][1]);
+		menuControlButtonPos[i] = glm::vec2((geomMenuControl[1][0] - geomMenuControl[0][0]) * (i / float(NUM_BUTTONS + 2)) + geomMenuControl[0][0], geomMenuControl[0][1]);
 
 	menuPowers.init(menuPowersBackground, geomMenuPowers, menuPowersButtonSprite, menuPowersButtonPos, NUM_POWERS);
 	menuControl.init(menuControlBackground, geomMenuControl, menuControlButtonSprite, menuControlButtonPos, NUM_BUTTONS);
+
+	for (int i = 0; i < 4; i++) 
+		menuControl.initText(textString[i], glm::vec2(float(CAMERA_WIDTH)*(11.f / 13.f), float(CAMERA_HEIGHT) - (31.f - 7.f*(i+1))), 20, glm::vec4(1, 1, 1, 1));
+
 }
 
 unsigned int x = 0;
@@ -136,16 +139,26 @@ void Scene::update(int deltaTime)
 		cursor.update(deltaTime);
 		//lemmings
 		bool finished = true;
+		int lemmingsDeadAUX = 0;
 		for (int i = 0; i < NUM_LEMMINGS; i++) {
-			if (lemmings[i]->checkAlive()) {
+			if (lemmings[i]->checkActive()) {
 				finished = false;
-				if (lemmings[i]->getPosition() == exit.getBasePosition()) {
+				if (lemmings[i]->getPosition() == exit.getBasePosition() ) {
 					lemmings[i]->switchWin();
 					lemmingsSaved++;
+					menuControl.updateText(0, "OUT: " + to_string(NUM_LEMMINGS - (lemmingsDead + lemmingsSaved)));
+					menuControl.updateText(1, "SAVED: " + to_string(lemmingsSaved));
 				}
 				lemmings[i]->update(deltaTime, _disp);
 			}
+			else if (lemmings[i]->checkAlive()) 
+				lemmingsDeadAUX++;
 		}
+		if (lemmingsDeadAUX != lemmingsDead) {
+			lemmingsDead = lemmingsDeadAUX;
+			menuControl.updateText(0, "OUT: " + to_string(NUM_LEMMINGS - (lemmingsDead + lemmingsSaved)));
+		}
+
 		_activePower = Power(menuPowers.buttonPressed());
 		if (menuControl.buttonPressed() == 2) {
 			for (int i = 0; i < NUM_LEMMINGS; i++)
@@ -153,6 +166,23 @@ void Scene::update(int deltaTime)
 		}
 		_finished = finished;
 	}
+
+	// Time
+	int levelTime;
+	if ((currentTime / 1000) > 1) levelTime = LEVEL_TIME - ((currentTime / 1000) - 2);
+	else levelTime = LEVEL_TIME;
+	int minutes = levelTime / 60;
+	int seconds = levelTime % 60;
+	if (levelTime < 30)
+		menuControl.updateColor(3, glm::vec4(1, 0.2f, 0.2f, 1));
+	if (seconds < 10)
+		menuControl.updateText(3, "TIME: " + to_string(minutes) + ":0" + to_string(seconds));
+	else 
+		menuControl.updateText(3, "TIME: " + to_string(minutes) + ":" + to_string(seconds));
+	
+	if (levelTime < 1)
+		_finished = true;
+
 }
 
 void Scene::render()
@@ -180,11 +210,13 @@ void Scene::render()
 	for (int i = 0; i < NUM_LEMMINGS; i++) {
 		lemmings[i]->render();
 	}
-	//menus
-    menuPowers.render();
-	menuControl.render();
+	
 	//cursor
 	cursor.render();
+
+	//menus
+	menuPowers.render();
+	menuControl.render();
 }
 
 
@@ -324,13 +356,12 @@ void Scene::modifyMask(int mouseX, int mouseY, bool apply)
 	}
 }
 
-bool Scene::checkFinished() {
-	return _finished;
-}
+bool Scene::checkFinished() { return _finished; }
+bool Scene::checkWin() { return lemmingsSaved >= NUM_LEMMINGS_MIN; }
 
-bool Scene::checkWin() {
-	return lemmingsSaved >= NUM_LEMMINGS_MIN;
-}
+int Scene::getSaved() { return lemmingsSaved; }
+int Scene::getTotal() { return NUM_LEMMINGS; }
+int Scene::getMin() { return NUM_LEMMINGS_MIN; }
 
 void Scene::initShaders()
 {

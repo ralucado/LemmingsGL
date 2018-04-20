@@ -16,7 +16,7 @@ public:
 	static MaskedTexturedQuad *createTexturedQuad(glm::vec2 geom[2], glm::vec2 texCoords[2], ShaderProgram &program);
 
 	MaskedTexturedQuad(glm::vec2 geom[2], glm::vec2 texCoords[2], ShaderProgram &program);
-
+	void render(const Texture &tex) const;
 	void render(ShaderProgram &program, const Texture &tex, const VariableTexture &mask, const Texture &back) const;
 	void free();
 
