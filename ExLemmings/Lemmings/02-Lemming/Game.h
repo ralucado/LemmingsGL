@@ -101,13 +101,13 @@ private:
 	glm::vec2 geomESCMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string mainMenuButtonSprite[NUM_BUTTONS_MAINMENU]{
-		"images/buttonPP.png",
-		"images/buttonPP.png"
+		"images/buttonPlay.png",
+		"images/buttonCredits.png"
 	};
 
 	glm::vec2 mainMenuButtonsPos[NUM_BUTTONS_MAINMENU]{
-		glm::vec2(100, 100),
-		glm::vec2(100, 150)
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT/2-15),
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT/2+45)
 	};
 
 	// ESC Menu
@@ -122,41 +122,41 @@ private:
 	};
 
 	// Win Menu
-	string winMenuBackground = "images/MainMenu.png";
+	string winMenuBackground = "images/WinMenu.png";
 	glm::vec2 geomWinMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string winMenuButtonSprite[NUM_BUTTONS_WINMENU]{
-		"images/buttonPP.png",
-		"images/buttonPP.png"
+		"images/buttonRetry.png",
+		"images/buttonContinue.png",
 	};
 
 	glm::vec2 winMenuButtonsPos[NUM_BUTTONS_WINMENU]{
-		glm::vec2(100, 100),
-		glm::vec2(150, 100)
+		glm::vec2(CAMERA_WIDTH / 2 - 150, CAMERA_HEIGHT / 2 + 30),
+		glm::vec2(CAMERA_WIDTH / 2 + 50, CAMERA_HEIGHT / 2 + 30),
 	};
 
 	// Lose Menu
-	string loseMenuBackground = "images/MainMenu.png";
+	string loseMenuBackground = "images/LoseMenu.png";
 	glm::vec2 geomLoseMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string loseMenuButtonSprite[NUM_BUTTONS_LOSEMENU]{
-		"images/buttonPP.png"
+		"images/buttonRetry.png"
 	};
 
 	glm::vec2 loseMenuButtonsPos[NUM_BUTTONS_LOSEMENU]{
-		glm::vec2(100, 100)
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT / 2 + 30)
 	};
 
 	// Credits 
-	string creditsBackground = "images/MainMenu.png";
+	string creditsBackground = "images/AboutMenu.png";
 	glm::vec2 geomCredits[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string creditsButtonSprite[NUM_BUTTONS_CREDITS]{
-		"images/buttonPP.png"
+		"images/buttonBack.png"
 	};
 
 	glm::vec2 creditsButtonsPos[NUM_BUTTONS_CREDITS]{
-		glm::vec2(100, 100)
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT / 2 + 60)
 	};
 
 	// Current Menu
