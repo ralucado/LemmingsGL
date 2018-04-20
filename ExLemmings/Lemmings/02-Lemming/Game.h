@@ -122,7 +122,7 @@ private:
 		"images/buttonL1.png",
 		"images/buttonL2.png",
 		"images/buttonL3.png",
-		"images/buttonBack.png",
+		"images/buttonBack.png"
 	};
 
 	glm::vec2 lvlMenuButtonsPos[NUM_SCENES + 1]{

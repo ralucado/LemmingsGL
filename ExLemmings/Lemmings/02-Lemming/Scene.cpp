@@ -122,7 +122,7 @@ void Scene::initMenus() {
 	for (int i = 0; i < 4; i++) 
 		menuControl.initText(textString[i], glm::vec2(float(CAMERA_WIDTH)*(11.f / 13.f), float(CAMERA_HEIGHT) - (31.f - 7.f*(i+1))), 20, glm::vec4(1, 1, 1, 1));
 
-	menuControl.updateText(0, "MIN: " + to_string(_targetLemmings));
+	menuControl.updateText(2, "MIN: " + to_string(_targetLemmings));
 	menuControl.updateText(1, "SAVED: " + to_string(0));
 }
 
@@ -143,6 +143,7 @@ void Scene::update(int deltaTime)
 			lemmings[i]->init(positionLemmings, lemmingTexProgram, &_blockers);
 			lemmings[i]->setMapMask(&maskTexture);
 			_spawnTime = 0.f;
+			menuControl.updateText(0, "OUT: " + to_string(lemmings.size() - (lemmingsSaved + lemmingsDead)));
 		}
 
 
@@ -165,7 +166,7 @@ void Scene::update(int deltaTime)
 				if (lemmings[i]->getPosition() == exit.getBasePosition() ) {
 					lemmings[i]->switchWin();
 					lemmingsSaved++;
-					menuControl.updateText(0, "OUT: " + to_string(lemmings.size()));
+					menuControl.updateText(0, "OUT: " + to_string(lemmings.size()-(lemmingsSaved+lemmingsDead)));
 					menuControl.updateText(1, "SAVED: " + to_string(lemmingsSaved));
 				}
 				lemmings[i]->update(deltaTime, _disp);
@@ -175,6 +176,7 @@ void Scene::update(int deltaTime)
 		}
 		if (lemmingsDeadAUX != lemmingsDead) {
 			lemmingsDead = lemmingsDeadAUX;
+			menuControl.updateText(0, "OUT: " + to_string(lemmings.size() - (lemmingsSaved + lemmingsDead)));
 		}
 
 		_activePower = Power(menuPowers.buttonPressed());
