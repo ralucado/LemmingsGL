@@ -38,6 +38,11 @@ void Game::initMenu(int i)
 		currentMenu = MAINMENU;
 		menu.init(mainMenuBackground, geomMainMenu, mainMenuButtonSprite, mainMenuButtonsPos, NUM_BUTTONS_MAINMENU);
 		break;
+	case SELECTLVL:
+		currentMenu = SELECTLVL;
+		//menu.init(lvlMenuBackground, geomLvlMenu, lvlMenuButtonSprite, lvlMenuButtonsPos, NUM_SCENES + 1);
+		menu.init(lvlMenuBackground, geomLvlMenu, lvlMenuButtonSprite, lvlMenuButtonsPos, NUM_SCENES + 2);
+		break;
 	case MENUESC:
 		currentMenu = MENUESC;
 		menu.init(escMenuBackground, geomESCMenu, escMenuButtonSprite, escMenuButtonsPos, NUM_BUTTONS_ESCMENU);
@@ -45,10 +50,16 @@ void Game::initMenu(int i)
 	case MENUWIN:
 		currentMenu = MENUWIN;
 		menu.init(winMenuBackground, geomWinMenu, winMenuButtonSprite, winMenuButtonsPos, NUM_BUTTONS_WINMENU);
+		menu.initText("SAVED: " + to_string(scene.getSaved()) + " OF " + to_string(scene.getTotal()), glm::vec2(100, 20), 30, glm::vec4(1, 1, 1, 1));
+		menu.initText("NEED: "+to_string(scene.getMin()), glm::vec2(100, 50), 30, glm::vec4(1, 1, 1, 1));
+		menu.initText("UEUEU CONGRATS ", glm::vec2(100, 70), 30, glm::vec4(1, 1, 1, 1));
 		break;
 	case MENULOSE:
 		currentMenu = MENULOSE;
 		menu.init(loseMenuBackground, geomLoseMenu, loseMenuButtonSprite, loseMenuButtonsPos, NUM_BUTTONS_LOSEMENU);
+		menu.initText("SAVED: " + to_string(scene.getSaved()) + " OF " + to_string(scene.getTotal()), glm::vec2(100, 20), 30, glm::vec4(1, 1, 1, 1));
+		menu.initText("NEED: " + to_string(scene.getMin()), glm::vec2(100, 50), 30, glm::vec4(1, 1, 1, 1));
+		menu.initText("TRY AGAIN :c", glm::vec2(100, 70), 30, glm::vec4(1, 1, 1, 1));
 		break;
 	case CREDITS:
 		currentMenu = CREDITS;
@@ -69,7 +80,32 @@ bool Game::update(int deltaTime)
 			initScene(LEVEL1);
 			break;
 		case 1:
+			initMenu(SELECTLVL);
+			break;
+		case 2:
+			initMenu(MENUESC);
+			break;
+		case 3:
 			initMenu(CREDITS);
+			break;
+		default:
+			break;
+		}
+		break;
+	case SELECTLVL:
+		switch (menu.buttonPressed())
+		{
+		case 0:
+			initScene(LEVEL1);
+			break;
+		case 1:
+			initScene(LEVEL2);
+			break;
+		/*case 2:
+			initScene(LEVEL3);
+			break;*/
+		case 3:
+			initMenu(MAINMENU);
 			break;
 		default:
 			break;
@@ -79,9 +115,12 @@ bool Game::update(int deltaTime)
 		switch (menu.buttonPressed())
 		{
 		case 0:
-			initMenu(MENUESC);
-			sceneActive = true;
-			sceneVisible = true;
+			if (sceneVisible) {
+				initMenu(MENUESC);
+				sceneActive = true;
+			}
+			else initMenu(MAINMENU);
+			
 			break;
 		default:
 			break;

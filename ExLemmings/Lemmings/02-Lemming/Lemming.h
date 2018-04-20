@@ -41,7 +41,7 @@ public:
   
 	glm::vec2 getPosition();
 	bool checkAlive();
-
+	bool checkActive();
 
 	
 private:
