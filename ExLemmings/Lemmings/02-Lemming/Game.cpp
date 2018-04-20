@@ -26,7 +26,7 @@ void Game::initScene(int i)
 	}
 	else {
 		currentScene = Scenes(i);
-		scene.init(sceneMaps[i], sceneMasks[i], sceneEntries[i], sceneExits[i], sceneSizes[i], scenePowers[i], 10, 1);
+		scene.init(sceneMaps[i], sceneMasks[i], sceneEntries[i], sceneExits[i], sceneSizes[i], scenePowers[i], 10, 1, sceneTimes[i]);
 	}
 }
 

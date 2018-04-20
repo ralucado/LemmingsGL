@@ -95,6 +95,12 @@ private:
 		glm::vec2(437, 160),
 	};
 
+	int sceneTimes[NUM_SCENES]{
+		300,
+		300,
+		300
+	};
+
 	// Main Menu
 	string mainMenuBackground = "images/MainMenu.png";
 	glm::vec2 geomMainMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
