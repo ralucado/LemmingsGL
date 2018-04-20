@@ -8,6 +8,7 @@
 
 
 void Entry::loadSpritesheet(string filename, int NUM_FRAMES, int NUM_ANIMS, const glm::vec2& position, int speed) {
+	_framesFromStart = 0;
 	_spritesheet.loadFromFile(filename, TEXTURE_PIXEL_FORMAT_RGBA);
 	_spritesheet.setMinFilter(GL_NEAREST);
 	_spritesheet.setMagFilter(GL_NEAREST);
@@ -46,15 +47,17 @@ void Entry::update(int deltaTime, glm::vec2 disp)
 	_dispX = disp.x;
 	_dispY = disp.y;
 	if (_sprite->update(deltaTime) == 0) return;
-	++_framesFromStart;
 
 	switch (_state)
 	{
 	case OPENING:
-		if (_framesFromStart == 9) {
+		cout << "Entry frame :" << _framesFromStart << endl;
+		if (_framesFromStart == 7) {
+			_framesFromStart = 0;
 			_state = NORMAL;
 			_sprite->changeAnimation(NORMAL_ANIM);
 		}
+		++_framesFromStart;
 	case NORMAL:
 		break;
 	}

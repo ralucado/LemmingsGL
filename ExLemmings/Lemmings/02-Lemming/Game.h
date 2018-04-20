@@ -147,7 +147,7 @@ private:
 
 	string escMenuButtonSprite2[NUM_BUTTONS_ESCMENU+1]{
 		"images/buttonBack.png",
-		"images/buttonBack.png"
+		"images/buttonMenu.png",
 	};
 
 	glm::vec2 escMenuButtonsPos[NUM_BUTTONS_ESCMENU]{
@@ -155,8 +155,8 @@ private:
 	};
 
 	glm::vec2 escMenuButtonsPos2[NUM_BUTTONS_ESCMENU+1]{
+		glm::vec2(CAMERA_WIDTH / 2 + 50, CAMERA_HEIGHT / 2 + 60),
 		glm::vec2(CAMERA_WIDTH / 2 - 150, CAMERA_HEIGHT / 2 + 60),
-		glm::vec2(CAMERA_WIDTH / 2 + 50, CAMERA_HEIGHT / 2 + 60)
 	};
 
 	// Win Menu
@@ -166,7 +166,7 @@ private:
 	string winMenuButtonSprite[NUM_BUTTONS_WINMENU]{
 		"images/buttonRetry.png",
 		"images/buttonContinue.png",
-		"images/buttonContinue.png"
+		"images/buttonMenu.png"
 	};
 
 	glm::vec2 winMenuButtonsPos[NUM_BUTTONS_WINMENU]{
@@ -181,7 +181,7 @@ private:
 
 	string loseMenuButtonSprite[NUM_BUTTONS_LOSEMENU]{
 		"images/buttonRetry.png",
-		"images/buttonContinue.png"
+		"images/buttonMenu.png"
 	};
 
 	glm::vec2 loseMenuButtonsPos[NUM_BUTTONS_LOSEMENU]{

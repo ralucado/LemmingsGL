@@ -44,8 +44,11 @@ void Lemming::loadSpritesheet(string filename, int NUM_FRAMES,  int NUM_ANIMS, c
 void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram, set<pair<int, int>>* blockers)
 {
 	_state = FALLING;
-	_dir = true;
 	_shaderProgram = shaderProgram;
+	_dir = true;
+	_counted = false;
+	_win = false;
+	_dead = false;
 	_blockers = blockers;
 	_framesFromStart = 0;
 	loadSpritesheet("images/lemming.png", 8, 4, initialPosition, 12);
@@ -66,6 +69,7 @@ void Lemming::update(int deltaTime, glm::vec2 disp)
 	}
 	if(_dead || _sprite->update(deltaTime) == 0 || _win) return;
 	++_framesFromStart;
+	checkOutbounds();
 	checkBlockers();
 
 	switch(_state)
@@ -442,7 +446,6 @@ bool Lemming::switchMiner()
 
 void Lemming::switchWin() {
 	if (_state != WIN) {
-		_win = true;
 		startWin();
 	}
 }
@@ -640,6 +643,15 @@ bool Lemming::checkDead() {
 	return _dead;
 }
 
+bool Lemming::getWin()
+{
+	if (!_counted && _win) {
+		_counted = true;
+		return true;
+	}
+	return false;
+}
+
 bool Lemming::checkActive() {
 	return !(_win || _dead);
 }
@@ -707,4 +719,8 @@ void Lemming::die() {
 void Lemming::revive() {
 	_dead = false;
 	startWalk();
+}
+void Lemming::checkOutbounds() {
+	if (_sprite->position().x > CAMERA_WIDTH || _sprite->position().x < 0 ||
+		_sprite->position().y > CAMERA_HEIGHT || _sprite->position().y < 0) die();
 }

@@ -46,6 +46,7 @@ private:
 	void initMenus();
 	void modifyMask(int mouseX, int mouseY, bool apply);
 	void givePower(int i);
+	bool hodor(int i);
 private:
 	enum Power {
 		BLOCK, BOMB, BASH, FLOAT, DIG, CLIMB, BUILD, MINE, NONE
@@ -78,7 +79,7 @@ private:
 	glm::vec2 _positionEntry;
 	set<pair<int, int>> _blockers;
 	// Lemming Menu
-	string menuPowersBackground = "images/MainMenu.png";
+	string menuPowersBackground = "images/buttonBar1.png";
 	glm::vec2 geomMenuPowers[2] = { glm::vec2(0.f, float(CAMERA_HEIGHT)-31.f), glm::vec2(float(CAMERA_WIDTH)*(8.f/14.f), float(CAMERA_HEIGHT)) };
 
 	string menuPowersButtonSprite[NUM_POWERS]{
@@ -95,7 +96,7 @@ private:
 	glm::vec2 menuPowersButtonPos[NUM_POWERS];
 
 	// Control Menu
-	string menuControlBackground = "images/MainMenu.png";
+	string menuControlBackground = "images/buttonBar2.png";
   glm::vec2 geomMenuControl[2] = { glm::vec2(float(CAMERA_WIDTH)*(8.f / 14.f), float(CAMERA_HEIGHT) - 31.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string menuControlButtonSprite[NUM_BUTTONS]{

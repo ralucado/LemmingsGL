@@ -41,6 +41,7 @@ public:
   
 	glm::vec2 getPosition();
 	bool checkDead();
+	bool getWin();
 	bool checkActive();
 
 	
@@ -87,16 +88,12 @@ private:
 	void hole(int posX, int posY, int radius);
 	void pop();
 	void bashRow(int index);
-
 	void digRow();
-
 	void mineRow();
-
 	void paintStep(bool r);
-
 	void blockCells();
-
 	void unblockCells();
+	void checkOutbounds();
 
 	void die();
 
@@ -161,6 +158,7 @@ private:
 	float _currentTime = 0.f;
 	bool _dead = false;
 	bool _win = false;
+	bool _counted = false;
 	glm::vec2 _positionExit;
 	int _builtSteps = 0;
 	int _framesFromStart = 0; //frames from the start of some animation, useful when building, exploding, etc.
@@ -174,6 +172,7 @@ private:
 	set<pair<int, int>>* _blockers;
 	float _dispX;
 	float _dispY;
+
 };
 
 

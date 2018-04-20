@@ -166,16 +166,20 @@ void Scene::update(int deltaTime)
 		for (int i = 0; i < lemmings.size(); i++) {
 			if (lemmings[i]->checkActive()) {
 				finished = false;
-				if (lemmings[i]->getPosition() == exit.getBasePosition() ) {
+				if (hodor(i)) { //sorry
 					lemmings[i]->switchWin();
-					lemmingsSaved++;
-					menuControl.updateText(1, "OUT: " + to_string(lemmings.size()-(lemmingsSaved+lemmingsDead)));
-					menuControl.updateText(2, "SAVED: " + to_string(lemmingsSaved));
 				}
 				lemmings[i]->update(deltaTime, _disp);
 			}
-			else if (lemmings[i]->checkDead()) 
+			else if (lemmings[i]->checkDead()) {
 				lemmingsDeadAUX++;
+			}
+			else if (lemmings[i]->getWin()) {
+				cout << "win " << i << endl;
+				lemmingsSaved++;
+				menuControl.updateText(1, "OUT: " + to_string(lemmings.size()-(lemmingsSaved+lemmingsDead)));
+				menuControl.updateText(2, "SAVED: " + to_string(lemmingsSaved));
+			}
 		}
 		if (lemmingsDeadAUX != lemmingsDead) {
 			lemmingsDead = lemmingsDeadAUX;
@@ -214,23 +218,23 @@ void Scene::render()
 	//shaders
 	glm::mat4 modelview;
 	modelview = glm::mat4(1.0f);
-	maskedTexProgram.use();
-	maskedTexProgram.setUniformMatrix4f("projection", projection);
-	maskedTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
-	maskedTexProgram.setUniformMatrix4f("modelview", modelview);
-	map->render(maskedTexProgram, colorTexture, maskTexture, tileTexture);
-	
+
 	simpleTexProgram.use();
 	simpleTexProgram.setUniformMatrix4f("projection", projection);
 	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
 
-	//exit
-	exit.render();
 	//entry
 	entry.render();
-
+	//exit
+	exit.render();
+	maskedTexProgram.use();
+	maskedTexProgram.setUniformMatrix4f("projection", projection);
+	maskedTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	maskedTexProgram.setUniformMatrix4f("modelview", modelview);
+	map->render(maskedTexProgram, colorTexture, maskTexture, tileTexture);
+	
 	lemmingTexProgram.use();
 	lemmingTexProgram.setUniformMatrix4f("projection", projection);
 	lemmingTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
@@ -240,18 +244,16 @@ void Scene::render()
 		lemmings[i]->render();
 	}
 
+	//menus
+	menuPowers.render();
+	menuControl.render();
+	//cursor
 	simpleTexProgram.use();
 	simpleTexProgram.setUniformMatrix4f("projection", projection);
 	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
-
-	//cursor
 	cursor.render();
-
-	//menus
-	menuPowers.render();
-	menuControl.render();
 }
 
 
@@ -372,6 +374,12 @@ void Scene::givePower(int i) {
 }
 
 void Scene::keyReleased(int key) {
+}
+
+bool Scene::hodor(int i) {
+	int X = lemmings[i]->getPosition().x; int Y = lemmings[i]->getPosition().y;
+	int X1 = exit.getBasePosition().x; int Y1 = exit.getBasePosition().y;
+	return (X > X1 - 5 && X < X1 + 5 && Y > Y1 - 7 && Y < Y1 + 3);
 }
 
 void Scene::modifyMask(int mouseX, int mouseY, bool apply)
