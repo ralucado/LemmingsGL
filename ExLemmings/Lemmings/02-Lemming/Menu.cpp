@@ -32,7 +32,7 @@ void Menu::initText(string textString, glm::vec2 textPositions, int size, const 
 	_textColor.push_back(color);
 	Text *t = new Text;
 	texts.push_back(t);
-	if (!texts[texts.size()-1]->init("fonts/OpenSans-Regular.ttf"))
+	if (!texts[texts.size()-1]->init("fonts/PressStart2P.ttf"))
 		cout << "Could not load font!!!" << endl;
 	
 }
@@ -122,10 +122,10 @@ void Menu::render()
 
 	for (int i = 0; i < buttons.size(); i++)
 		buttons[i]->render();
-	/*
+	
 	for (int i = 0; i < texts.size(); i++)
 		texts[i]->render(_textString[i], _textPositions[i], _textSize[i], _textColor[i]);
-	*/
+	
 
 
 }

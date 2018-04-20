@@ -102,41 +102,41 @@ private:
 
 	string mainMenuButtonSprite[NUM_BUTTONS_MAINMENU]{
 		"images/buttonPlay.png",
-		"images/buttonPlay.png",
-		"images/buttonPlay.png",
+		"images/buttonLevels.png",
+		"images/buttonHelp.png",
 		"images/buttonCredits.png",
 	};
 
 	glm::vec2 mainMenuButtonsPos[NUM_BUTTONS_MAINMENU]{
-	    glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT/2-15),
-		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT/2+45),
-		glm::vec2(100, 120),
-		glm::vec2(100, 150)
+	    glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT/2-45),
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT/2 - 10),
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT / 2+25),
+		glm::vec2(CAMERA_WIDTH / 2 - 50, CAMERA_HEIGHT / 2 + 60)
 	};
 
 	// Select level Menu
-	string lvlMenuBackground = "images/MainMenu.png";
+	string lvlMenuBackground = "images/LevelMenu.png";
 	glm::vec2 geomLvlMenu[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
 
 	string lvlMenuButtonSprite[NUM_SCENES + 1]{
-		"images/buttonPlay.png",
-		"images/buttonPlay.png",
-		"images/buttonPlay.png",
-		"images/buttonPlay.png",
+		"images/buttonL1.png",
+		"images/buttonL2.png",
+		"images/buttonL3.png",
+		"images/buttonBack.png",
 	};
 
 	glm::vec2 lvlMenuButtonsPos[NUM_SCENES + 1]{
-		glm::vec2(50, 60),
-		glm::vec2(50, 90),
-		glm::vec2(50, 120),
+		glm::vec2(50, 50),
+		glm::vec2(85, 50),
+		glm::vec2(120,50),
 		glm::vec2(50, 150)
 	};
 
 	// ESC Menu (instructions)
-	string escMenuBackground = "images/MainMenu.png";
+	string escMenuBackground = "images/HelpMenu.png";
 
 	string escMenuButtonSprite[NUM_BUTTONS_ESCMENU]{
-		"images/buttonPlay.png",
+		"images/buttonBack.png",
 	};
 
 	glm::vec2 escMenuButtonsPos[NUM_BUTTONS_ESCMENU]{

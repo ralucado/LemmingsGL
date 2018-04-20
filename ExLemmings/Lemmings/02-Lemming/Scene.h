@@ -108,10 +108,10 @@ private:
 	glm::vec2 menuControlButtonPos[NUM_BUTTONS];
 	// Text
 	string textString[4] = {
-		"OUT: ",
-		"SAVED: ",
-		"MIN: ",
-		"TIME: "
+		"OUT: " + to_string(0),
+		"SAVED: " + to_string(0),
+		"MIN: " + to_string(0),
+		"TIME: " + to_string(0) + ":00"
 	};
 
 	/*
