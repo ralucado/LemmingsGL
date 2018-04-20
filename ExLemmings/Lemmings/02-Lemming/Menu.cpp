@@ -16,7 +16,7 @@ void Menu::init(string background, glm::vec2 geom[2], string buttonSprites[], gl
 
 	for (int i = 0; i < num_buttons; i++) {
 		Button *b = new Button;
-		b->init(buttonPositions[i], buttonSprites[i], simpleTexProgram);
+		b->init(buttonPositions[i], buttonSprites[i], simpleTexProgram2);
 		buttons.push_back(b);
 	}
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
@@ -105,23 +105,22 @@ void Menu::render()
 {
 	glm::mat4 modelview;
 
-	simpleTexProgram2.use();
-	simpleTexProgram2.setUniformMatrix4f("projection", projection);
-	simpleTexProgram2.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
-	modelview = glm::mat4(1.0f);
-	simpleTexProgram2.setUniformMatrix4f("modelview", modelview);
-	simpleTexProgram2.setUniform1f("time", currentTime);
-	backgroundQuad->render(colorTexture);
-	
-	
 	simpleTexProgram.use();
 	simpleTexProgram.setUniformMatrix4f("projection", projection);
 	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	modelview = glm::mat4(1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	simpleTexProgram.setUniform1f("time", currentTime);
+	backgroundQuad->render(colorTexture);
 	
-
+	
+	simpleTexProgram2.use();
+	simpleTexProgram2.setUniformMatrix4f("projection", projection);
+	simpleTexProgram2.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	modelview = glm::mat4(1.0f);
+	simpleTexProgram2.setUniformMatrix4f("modelview", modelview);
+	simpleTexProgram2.setUniform1f("time", currentTime);
+	
 	for (int i = 0; i < buttons.size(); i++)
 		buttons[i]->render();
 	

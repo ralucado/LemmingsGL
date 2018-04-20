@@ -247,7 +247,13 @@ void Scene::render()
 	for (int i = 0; i < lemmings.size(); i++) {
 		lemmings[i]->render();
 	}
-
+	//cursor
+	simpleTexProgram.use();
+	simpleTexProgram.setUniformMatrix4f("projection", projection);
+	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
+	simpleTexProgram.setUniform1f("time", currentTime);
+	cursor.render();
 	//menus
 	menuPowers.render();
 	menuControl.render();
