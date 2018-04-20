@@ -8,7 +8,7 @@
 
 #define FALL_STEP 4
 #define HEIGHT_TO_FLOAT 25
-#define HEIGHT_TO_DIE 50
+#define HEIGHT_TO_DIE 60
 
 // Lemming is basically a Sprite that represents one lemming. As such it has
 // all properties it needs to track its movement and collisions.
