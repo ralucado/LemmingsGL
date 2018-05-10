@@ -113,6 +113,7 @@ void Lemming::update(int deltaTime, glm::vec2 disp)
 		break;
 	case SQUISHED:
 		if (_framesFromStart == 16) die();
+		break;
 	case WIN:
 		if (_framesFromStart == 7) _win = true;
 		break;
